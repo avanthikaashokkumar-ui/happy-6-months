@@ -3233,6 +3233,137 @@ const screenDiary = (() => {
     { id: "seethamma-vakitlo-sirimalle-chettu", title: "Seethamma Vakitlo Sirimalle Chettu", note: "Watched together", status: "watched", poster: "https://play-lh.googleusercontent.com/ztyP5jIJ9pRuz-gxXAlGC7DTfFEQNNt78RdYZRh-Ufr1YRZdvWW8yoilmvxvjevjmr5O=w480-h960" }
   ];
 
+  const AI_MOVIE_CATALOG = [
+    {
+      id: "hi-nanna",
+      title: "Hi Nanna",
+      year: 2023,
+      type: "Movie",
+      duration: "2h 35m",
+      minutes: 155,
+      language: "Telugu",
+      genre: "Romantic family drama",
+      actors: ["Nani", "Mrunal Thakur", "Kiara Khanna"],
+      synopsis: "A devoted single father and his six-year-old daughter meet a mysterious woman whose connection to their past slowly turns their lives into a story of love, memory, and family.",
+      moods: ["emotional", "romantic", "cozy"],
+      why: "Your diary already leans toward heartfelt Telugu stories, warm relationships, and emotional romance, so this is a very natural next watch.",
+      icon: "🐕",
+      palette: "rose"
+    },
+    {
+      id: "sita-ramam",
+      title: "Sita Ramam",
+      year: 2022,
+      type: "Movie",
+      duration: "2h 43m",
+      minutes: 163,
+      language: "Telugu",
+      genre: "Period romantic drama",
+      actors: ["Dulquer Salmaan", "Mrunal Thakur", "Rashmika Mandanna"],
+      synopsis: "In 1964, an orphaned army officer begins receiving letters from a woman calling herself his wife, sending him on a sweeping journey shaped by love, identity, duty, and sacrifice.",
+      moods: ["emotional", "romantic", "epic"],
+      why: "This matches the sincere romance and family emotion already present in your watched list, but gives the next movie night a grander, more cinematic feel.",
+      icon: "💌",
+      palette: "gold"
+    },
+    {
+      id: "premalu",
+      title: "Premalu",
+      year: 2024,
+      type: "Movie",
+      duration: "2h 36m",
+      minutes: 156,
+      language: "Malayalam",
+      genre: "Romantic comedy",
+      actors: ["Naslen", "Mamitha Baiju", "Sangeeth Prathap"],
+      synopsis: "A directionless graduate moves to Hyderabad and falls for a confident young professional, while awkward friendships and one-sided feelings create a funny, modern romance.",
+      moods: ["funny", "romantic", "light"],
+      why: "You have a mix of romance and comedy in the diary, so this gives you something playful, current, and easy to laugh through together.",
+      icon: "💘",
+      palette: "peach"
+    },
+    {
+      id: "pelli-choopulu",
+      title: "Pelli Choopulu",
+      year: 2016,
+      type: "Movie",
+      duration: "1h 58m",
+      minutes: 118,
+      language: "Telugu",
+      genre: "Romantic comedy",
+      actors: ["Vijay Deverakonda", "Ritu Varma"],
+      synopsis: "A laid-back aspiring chef and an ambitious entrepreneur meet during a matchmaking visit, then discover that working together may change both their careers and their relationship.",
+      moods: ["funny", "romantic", "light"],
+      why: "It has the warm Telugu rom-com energy your list suggests, and it is also one of the shorter choices for an easy movie night.",
+      icon: "🍲",
+      palette: "green"
+    },
+    {
+      id: "oohalu-gusagusalade",
+      title: "Oohalu Gusagusalade",
+      year: 2014,
+      type: "Movie",
+      duration: "2h 08m",
+      minutes: 128,
+      language: "Telugu",
+      genre: "Romantic comedy",
+      actors: ["Naga Shaurya", "Raashii Khanna", "Srinivas Avasarala"],
+      synopsis: "A television presenter agrees to help his boss impress the woman he loves, only to realize that he has feelings for her too, leading to a charming romantic triangle.",
+      moods: ["funny", "romantic", "cozy"],
+      why: "This is a gentle, dialogue-driven romance that fits the comfortable and familiar side of your shared watch history.",
+      icon: "☕",
+      palette: "lavender"
+    },
+    {
+      id: "96",
+      title: "'96",
+      year: 2018,
+      type: "Movie",
+      duration: "2h 38m",
+      minutes: 158,
+      language: "Tamil",
+      genre: "Nostalgic romantic drama",
+      actors: ["Vijay Sethupathi", "Trisha Krishnan", "Gouri G. Kishan"],
+      synopsis: "Two former school sweethearts meet again at a reunion after more than two decades, spending one night revisiting the love, choices, and memories that shaped them.",
+      moods: ["emotional", "romantic", "nostalgic"],
+      why: "Choose this when you want something deeply emotional and memory-focused rather than a light comedy.",
+      icon: "📷",
+      palette: "blue"
+    },
+    {
+      id: "about-time",
+      title: "About Time",
+      year: 2013,
+      type: "Movie",
+      duration: "2h 03m",
+      minutes: 123,
+      language: "English",
+      genre: "Romantic fantasy comedy-drama",
+      actors: ["Domhnall Gleeson", "Rachel McAdams", "Bill Nighy"],
+      synopsis: "A young man learns that the men in his family can travel through time, but his attempts to improve his love life gradually teach him to value ordinary days and the people in them.",
+      moods: ["emotional", "romantic", "cozy", "fantasy"],
+      why: "It turns small shared moments into the heart of the story, which makes it especially fitting for an anniversary watch.",
+      icon: "⏳",
+      palette: "rain"
+    },
+    {
+      id: "business-proposal",
+      title: "Business Proposal",
+      year: 2022,
+      type: "Series",
+      duration: "12 episodes",
+      minutes: 720,
+      language: "Korean",
+      genre: "Romantic comedy series",
+      actors: ["Ahn Hyo-seop", "Kim Se-jeong", "Kim Min-kyu", "Seol In-ah"],
+      synopsis: "An employee attends a blind date while pretending to be her friend, then discovers that the man across the table is her company’s chief executive.",
+      moods: ["funny", "romantic", "light", "series"],
+      why: "Since Queen of Tears is already in your diary, this keeps the K-drama energy but switches to something faster, sillier, and much lighter.",
+      icon: "💼",
+      palette: "sky"
+    }
+  ];
+
   function makeId(value) {
     const clean = String(value || "")
       .trim()
@@ -3256,7 +3387,10 @@ const screenDiary = (() => {
       favorites: [],
       toWatch: [],
       extraWatched: [],
-      pickerMessage: ""
+      pickerMessage: "",
+      aiMood: "surprise",
+      aiLength: "any",
+      aiPickId: ""
     };
 
     try {
@@ -3266,7 +3400,10 @@ const screenDiary = (() => {
         favorites: Array.isArray(stored.favorites) ? stored.favorites : [],
         toWatch: Array.isArray(stored.toWatch) ? stored.toWatch : [],
         extraWatched: Array.isArray(stored.extraWatched) ? stored.extraWatched : [],
-        pickerMessage: ""
+        pickerMessage: "",
+        aiMood: typeof stored.aiMood === "string" ? stored.aiMood : "surprise",
+        aiLength: typeof stored.aiLength === "string" ? stored.aiLength : "any",
+        aiPickId: typeof stored.aiPickId === "string" ? stored.aiPickId : ""
       };
     } catch (_error) {
       return fallback;
@@ -3311,7 +3448,10 @@ const screenDiary = (() => {
       safeStorage.setItem(STORAGE_KEY, JSON.stringify({
         favorites: this._state.favorites,
         toWatch: this._state.toWatch,
-        extraWatched: this._state.extraWatched
+        extraWatched: this._state.extraWatched,
+        aiMood: this._state.aiMood,
+        aiLength: this._state.aiLength,
+        aiPickId: this._state.aiPickId
       }));
     },
 
@@ -3376,15 +3516,52 @@ const screenDiary = (() => {
     },
 
     _pickNext() {
-      if (!this._state.toWatch.length) {
-        this._state.pickerMessage = "Add a few things first, then let fate choose our next watch.";
-      } else {
-        const choice = this._state.toWatch[
-          Math.floor(Math.random() * this._state.toWatch.length)
-        ];
-        this._state.pickerMessage = `Tonight’s pick: ${choice.title} 🍿`;
-      }
+      const watchedTitles = new Set(
+        [...this._allWatched(), ...this._state.toWatch]
+          .map((item) => item.title.toLowerCase())
+      );
+
+      let candidates = AI_MOVIE_CATALOG.filter(
+        (item) => !watchedTitles.has(item.title.toLowerCase())
+      );
+      if (!candidates.length) candidates = [...AI_MOVIE_CATALOG];
+
+      const mood = this._state.aiMood || "surprise";
+      const length = this._state.aiLength || "any";
+      const previousPick = this._state.aiPickId;
+
+      const scored = candidates.map((item) => {
+        let score = Math.random() * 1.4;
+
+        if (["Telugu", "Tamil", "Malayalam"].includes(item.language)) score += 2.2;
+        if (item.language === "Korean") score += 1.25;
+        if (item.moods.includes("romantic")) score += 1.8;
+        if (item.moods.includes("cozy") || item.moods.includes("funny")) score += .8;
+
+        if (mood !== "surprise" && item.moods.includes(mood)) score += 5;
+        if (mood !== "surprise" && !item.moods.includes(mood)) score -= .9;
+
+        if (length === "short") score += item.type === "Movie" && item.minutes <= 130 ? 4 : -1.5;
+        if (length === "long") score += item.type === "Movie" && item.minutes > 130 ? 3.5 : -1;
+        if (length === "series") score += item.type === "Series" ? 6 : -2;
+        if (previousPick && item.id === previousPick && candidates.length > 1) score -= 5;
+
+        return { item, score };
+      }).sort((a, b) => b.score - a.score);
+
+      const choicePool = scored.slice(0, Math.min(3, scored.length));
+      const choice = choicePool[Math.floor(Math.random() * choicePool.length)].item;
+
+      this._state.aiPickId = choice.id;
+      this._state.pickerMessage = `AI-style match: ${choice.title} looks right for this movie night ✨`;
+      this._save();
       this._render();
+    },
+
+    _setAiPreference(key, value) {
+      if (key === "mood") this._state.aiMood = value;
+      if (key === "length") this._state.aiLength = value;
+      this._save();
     },
 
     _render() {
@@ -3485,7 +3662,7 @@ const screenDiary = (() => {
           </div>
           <span class="screen-count">${state.toWatch.length}</span>
         </div>
-        <p class="queue-intro">Add anything we should watch next. This list stays saved on this browser.</p>
+        <p class="queue-intro">Add your own ideas, or let the smart movie matcher suggest something with full details.</p>
       `;
 
       const addRow = document.createElement("div");
@@ -3516,11 +3693,46 @@ const screenDiary = (() => {
 
       addRow.append(label, input, addButton);
 
+      const aiControls = document.createElement("div");
+      aiControls.className = "ai-movie-controls";
+      aiControls.innerHTML = `
+        <label>
+          <span>Tonight’s mood</span>
+          <select data-ai-mood>
+            <option value="surprise">Surprise us</option>
+            <option value="funny">Cute & funny</option>
+            <option value="emotional">Emotional</option>
+            <option value="romantic">Romantic</option>
+            <option value="cozy">Cozy comfort</option>
+          </select>
+        </label>
+        <label>
+          <span>Time commitment</span>
+          <select data-ai-length>
+            <option value="any">Any length</option>
+            <option value="short">About 2 hours</option>
+            <option value="long">Long movie night</option>
+            <option value="series">Start a series</option>
+          </select>
+        </label>
+      `;
+
+      const moodSelect = aiControls.querySelector("[data-ai-mood]");
+      const lengthSelect = aiControls.querySelector("[data-ai-length]");
+      moodSelect.value = state.aiMood || "surprise";
+      lengthSelect.value = state.aiLength || "any";
+      moodSelect.addEventListener("change", () => this._setAiPreference("mood", moodSelect.value));
+      lengthSelect.addEventListener("change", () => this._setAiPreference("length", lengthSelect.value));
+
       const pickButton = document.createElement("button");
       pickButton.type = "button";
-      pickButton.className = "btn secondary screen-pick-button";
-      pickButton.textContent = "🎲 Pick our next watch";
+      pickButton.className = "btn ai-pick-button";
+      pickButton.textContent = state.aiPickId ? "✨ Pick another AI match" : "✨ AI suggest our next watch";
       pickButton.addEventListener("click", () => this._pickNext());
+
+      const aiNote = document.createElement("p");
+      aiNote.className = "ai-picker-note";
+      aiNote.textContent = "Private smart matching based on our watched list, mood, and time—no account needed.";
 
       const pickerMessage = document.createElement("p");
       pickerMessage.className = "screen-picker-message";
@@ -3530,6 +3742,52 @@ const screenDiary = (() => {
           ? "When we cannot decide, let the diary choose."
           : "Our couch queue is empty—for now."
       );
+
+      const aiResult = document.createElement("div");
+      aiResult.className = "ai-movie-result";
+
+      const aiChoice = AI_MOVIE_CATALOG.find((item) => item.id === state.aiPickId);
+      if (aiChoice) {
+        aiResult.innerHTML = `
+          <article class="ai-recommendation-card">
+            <div class="ai-poster ai-poster-${escapeHtml(aiChoice.palette)}" aria-hidden="true">
+              <span class="ai-poster-icon">${escapeHtml(aiChoice.icon)}</span>
+              <small>OUR NEXT WATCH</small>
+              <strong>${escapeHtml(aiChoice.title)}</strong>
+              <em>${escapeHtml(String(aiChoice.year))}</em>
+            </div>
+            <div class="ai-recommendation-copy">
+              <div class="ai-title-row">
+                <div>
+                  <p class="screen-section-kicker">Smart movie match</p>
+                  <h5>${escapeHtml(aiChoice.title)}</h5>
+                </div>
+                <span class="ai-match-badge">Best match</span>
+              </div>
+              <div class="ai-meta" aria-label="Movie details">
+                <span>${escapeHtml(String(aiChoice.year))}</span>
+                <span>${escapeHtml(aiChoice.duration)}</span>
+                <span>${escapeHtml(aiChoice.language)}</span>
+                <span>${escapeHtml(aiChoice.genre)}</span>
+              </div>
+              <dl class="ai-details-list">
+                <div><dt>Actors</dt><dd>${escapeHtml(aiChoice.actors.join(", "))}</dd></div>
+                <div><dt>Synopsis</dt><dd>${escapeHtml(aiChoice.synopsis)}</dd></div>
+                <div><dt>Why this fits us</dt><dd>${escapeHtml(aiChoice.why)}</dd></div>
+              </dl>
+              <div class="ai-result-actions">
+                <button class="btn" type="button" data-add-ai-pick>Add to our list</button>
+                <button class="btn secondary" type="button" data-another-ai-pick>Pick another</button>
+              </div>
+            </div>
+          </article>
+        `;
+
+        aiResult.querySelector("[data-add-ai-pick]")?.addEventListener("click", () => {
+          this._addToWatch(aiChoice.title);
+        });
+        aiResult.querySelector("[data-another-ai-pick]")?.addEventListener("click", () => this._pickNext());
+      }
 
       const queueList = document.createElement("div");
       queueList.className = "watch-queue-list";
@@ -3572,7 +3830,7 @@ const screenDiary = (() => {
         });
       }
 
-      queueSection.append(addRow, pickButton, pickerMessage, queueList);
+      queueSection.append(addRow, aiControls, pickButton, aiNote, pickerMessage, aiResult, queueList);
       columns.append(watchedSection, queueSection);
       panel.append(intro, columns);
 
@@ -3688,3 +3946,95 @@ document.addEventListener("keydown", (event) => {
     closeGame();
   }
 });
+
+
+/* ---------- Floating Spotify soundtrack ---------- */
+(() => {
+  const shell = document.querySelector("#floating-soundtrack");
+  const launcher = document.querySelector("#soundtrack-launcher");
+  const panel = document.querySelector("#soundtrack-panel");
+  const closeButton = document.querySelector("#soundtrack-close");
+  const player = document.querySelector("#spotify-player");
+  const miniTitle = document.querySelector("#soundtrack-mini-title");
+  const openSpotify = document.querySelector("#soundtrack-open-spotify");
+  const songButtons = [...document.querySelectorAll(".soundtrack-song")];
+
+  if (!shell || !launcher || !panel || !player) return;
+
+  const PLAYLIST_STORAGE_KEY = "happy6:soundtrack:v1";
+
+  function setOpen(isOpen) {
+    shell.classList.toggle("open", isOpen);
+    launcher.setAttribute("aria-expanded", String(isOpen));
+    panel.setAttribute("aria-hidden", String(!isOpen));
+
+    if (isOpen) {
+      window.setTimeout(() => {
+        panel.querySelector(".soundtrack-song.active")?.focus({ preventScroll: true });
+      }, 220);
+    }
+  }
+
+  function chooseSong(button, { openPanel = true } = {}) {
+    if (!button) return;
+
+    const kind = button.dataset.kind === "album" ? "album" : "track";
+    const spotifyId = button.dataset.spotifyId;
+    const title = button.dataset.title || "Our song";
+    const artist = button.dataset.artist || "";
+    const spotifyUrl = `https://open.spotify.com/${kind}/${spotifyId}`;
+    const embedUrl = `https://open.spotify.com/embed/${kind}/${spotifyId}?utm_source=generator&theme=0`;
+
+    songButtons.forEach((item) => {
+      const active = item === button;
+      item.classList.toggle("active", active);
+      item.setAttribute("aria-current", active ? "true" : "false");
+    });
+
+    player.title = `Spotify player for ${title} by ${artist}`;
+    player.src = embedUrl;
+    miniTitle.textContent = `${title} · ${artist}`;
+    openSpotify.href = spotifyUrl;
+    openSpotify.textContent = `Open “${title}” in Spotify ↗`;
+
+    try {
+      safeStorage.setItem(PLAYLIST_STORAGE_KEY, JSON.stringify({
+        kind,
+        spotifyId,
+        title,
+        artist
+      }));
+    } catch (_error) {}
+
+    if (openPanel) setOpen(true);
+  }
+
+  launcher.addEventListener("click", () => {
+    setOpen(!shell.classList.contains("open"));
+  });
+
+  closeButton?.addEventListener("click", () => {
+    setOpen(false);
+    launcher.focus({ preventScroll: true });
+  });
+
+  songButtons.forEach((button) => {
+    button.addEventListener("click", () => chooseSong(button));
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && shell.classList.contains("open") && !document.pointerLockElement) {
+      setOpen(false);
+      launcher.focus({ preventScroll: true });
+    }
+  });
+
+  try {
+    const saved = JSON.parse(safeStorage.getItem(PLAYLIST_STORAGE_KEY));
+    const savedButton = songButtons.find((button) =>
+      button.dataset.spotifyId === saved?.spotifyId &&
+      button.dataset.kind === saved?.kind
+    );
+    if (savedButton) chooseSong(savedButton, { openPanel: false });
+  } catch (_error) {}
+})();

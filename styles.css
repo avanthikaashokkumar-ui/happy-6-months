@@ -1243,3 +1243,406 @@ h1 {
   max-width: 480px;
   color: var(--muted);
 }
+
+
+/* ---------- Smart movie recommendation ---------- */
+.ai-movie-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 12px;
+}
+.ai-movie-controls label {
+  display: grid;
+  gap: 5px;
+  color: var(--wine-700);
+  font-size: .7rem;
+  font-weight: 900;
+}
+.ai-movie-controls select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(116,20,38,.18);
+  border-radius: 12px;
+  padding: 9px 10px;
+  color: var(--ink);
+  background: #fff;
+  font: inherit;
+}
+.ai-pick-button {
+  width: 100%;
+  margin-top: 10px;
+  background: linear-gradient(135deg, var(--wine-700), var(--wine-500));
+}
+.ai-picker-note {
+  margin: 8px 0 0;
+  color: var(--muted);
+  text-align: center;
+  font-size: .67rem;
+  line-height: 1.35;
+}
+.ai-movie-result:empty { display: none; }
+.ai-recommendation-card {
+  overflow: hidden;
+  margin: 12px 0 14px;
+  border: 1px solid rgba(116,20,38,.14);
+  border-radius: 20px;
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(53,5,13,.09);
+}
+.ai-poster {
+  min-height: 245px;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  color: #fff;
+  text-align: left;
+  position: relative;
+  isolation: isolate;
+}
+.ai-poster::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(transparent 20%, rgba(20,0,6,.8));
+}
+.ai-poster-rose { background: radial-gradient(circle at 70% 18%, #f2a0ad, transparent 28%), linear-gradient(145deg, #6e1024, #24040c); }
+.ai-poster-gold { background: radial-gradient(circle at 70% 20%, #ffd98b, transparent 25%), linear-gradient(145deg, #9e5427, #30100d); }
+.ai-poster-peach { background: radial-gradient(circle at 60% 18%, #ffd0c0, transparent 27%), linear-gradient(145deg, #c85d6f, #4b1523); }
+.ai-poster-green { background: radial-gradient(circle at 62% 20%, #c9e5a3, transparent 26%), linear-gradient(145deg, #426b4b, #132f25); }
+.ai-poster-lavender { background: radial-gradient(circle at 64% 18%, #d8c3ef, transparent 28%), linear-gradient(145deg, #765375, #2f1e3a); }
+.ai-poster-blue { background: radial-gradient(circle at 68% 18%, #abc9dc, transparent 26%), linear-gradient(145deg, #345b73, #132734); }
+.ai-poster-rain { background: radial-gradient(circle at 68% 18%, #cfd8df, transparent 27%), linear-gradient(145deg, #536579, #1f2734); }
+.ai-poster-sky { background: radial-gradient(circle at 70% 18%, #d1efff, transparent 29%), linear-gradient(145deg, #527b98, #273d59); }
+.ai-poster-icon { position: absolute; top: 18px; left: 16px; font-size: 2.25rem; }
+.ai-poster small { margin-bottom: 5px; font-size: .55rem; font-weight: 900; letter-spacing: .15em; }
+.ai-poster strong { font-family: "Playfair Display", Georgia, serif; font-size: 1.35rem; line-height: 1.05; }
+.ai-poster em { margin-top: 6px; font-size: .72rem; font-style: normal; opacity: .78; }
+.ai-recommendation-copy { padding: 16px; }
+.ai-title-row { display: flex; justify-content: space-between; gap: 10px; align-items: start; }
+.ai-title-row h5 { margin: 0; color: var(--wine-900); font-size: 1.35rem; line-height: 1.05; }
+.ai-match-badge { flex: none; padding: 5px 8px; border-radius: 999px; color: #fff; background: var(--wine-600); font-size: .6rem; font-weight: 900; }
+.ai-meta { display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0 12px; }
+.ai-meta span { padding: 5px 7px; border-radius: 999px; color: var(--wine-700); background: #f7e8eb; font-size: .62rem; font-weight: 900; }
+.ai-details-list { display: grid; gap: 9px; margin: 0; }
+.ai-details-list div { display: grid; gap: 2px; }
+.ai-details-list dt { color: var(--wine-600); font-size: .64rem; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; }
+.ai-details-list dd { margin: 0; color: var(--ink); font-size: .76rem; line-height: 1.42; }
+.ai-result-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+.ai-result-actions .btn { padding: 8px 12px; font-size: .72rem; }
+@media (max-width: 640px) {
+  .ai-movie-controls { grid-template-columns: 1fr; }
+  .ai-recommendation-card { grid-template-columns: 1fr; }
+  .ai-poster { min-height: 190px; }
+}
+
+
+/* ---------- Floating Spotify soundtrack ---------- */
+.floating-soundtrack {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1200;
+  width: min(390px, calc(100vw - 28px));
+  color: #fff8f5;
+  font-family: inherit;
+}
+.soundtrack-launcher {
+  width: 100%;
+  min-height: 66px;
+  padding: 10px 13px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 22px;
+  display: grid;
+  grid-template-columns: 44px minmax(0,1fr) 30px;
+  gap: 10px;
+  align-items: center;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  background:
+    radial-gradient(circle at 82% 15%, rgba(255,185,199,.18), transparent 10rem),
+    linear-gradient(135deg, rgba(85,8,23,.97), rgba(34,3,10,.97));
+  box-shadow: 0 18px 46px rgba(31,0,7,.34);
+  backdrop-filter: blur(18px);
+  transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+}
+.soundtrack-launcher:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 54px rgba(31,0,7,.42);
+}
+.floating-soundtrack.open .soundtrack-launcher {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px) scale(.97);
+}
+.soundtrack-disc {
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #31030d;
+  background:
+    radial-gradient(circle, #fff 0 8%, transparent 9%),
+    conic-gradient(from 20deg, #f6d9df, #bd5369, #f7e6e9, #7d1b30, #f6d9df);
+  box-shadow: inset 0 0 0 6px rgba(55,4,15,.14);
+  font-size: 1.05rem;
+  font-weight: 900;
+  animation: soundtrack-spin 8s linear infinite paused;
+}
+.floating-soundtrack.open .soundtrack-disc,
+.soundtrack-launcher:hover .soundtrack-disc {
+  animation-play-state: running;
+}
+@keyframes soundtrack-spin { to { transform: rotate(360deg); } }
+.soundtrack-launcher-copy {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.soundtrack-launcher-copy strong {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.04rem;
+}
+.soundtrack-launcher-copy small {
+  overflow: hidden;
+  color: rgba(255,248,245,.66);
+  font-size: .68rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.soundtrack-equalizer {
+  height: 28px;
+  display: flex;
+  gap: 3px;
+  align-items: end;
+  justify-content: center;
+}
+.soundtrack-equalizer i {
+  width: 3px;
+  border-radius: 999px;
+  background: #f5b6c4;
+  animation: soundtrack-eq .9s ease-in-out infinite alternate;
+}
+.soundtrack-equalizer i:nth-child(1) { height: 10px; }
+.soundtrack-equalizer i:nth-child(2) { height: 22px; animation-delay: -.35s; }
+.soundtrack-equalizer i:nth-child(3) { height: 15px; animation-delay: -.6s; }
+@keyframes soundtrack-eq { to { height: 7px; opacity: .55; } }
+
+.soundtrack-panel {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-height: min(760px, calc(100vh - 34px));
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 26px;
+  overflow: hidden auto;
+  color: #fff6f2;
+  background:
+    radial-gradient(circle at 90% 2%, rgba(222,91,118,.17), transparent 18rem),
+    linear-gradient(155deg, rgba(64,5,17,.985), rgba(25,2,8,.99));
+  box-shadow: 0 26px 70px rgba(22,0,6,.5);
+  backdrop-filter: blur(22px);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(18px) scale(.97);
+  transform-origin: right bottom;
+  transition: opacity .2s ease, visibility .2s ease, transform .2s ease;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(243,170,185,.44) transparent;
+}
+.floating-soundtrack.open .soundtrack-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+.soundtrack-header {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  padding: 17px 18px 13px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: start;
+  background: linear-gradient(rgba(62,5,17,.97), rgba(52,4,14,.93));
+  backdrop-filter: blur(18px);
+}
+.soundtrack-header p {
+  margin: 0 0 2px;
+  color: #eeb1bd;
+  font-size: .62rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.soundtrack-header h2 {
+  margin: 0;
+  color: #fff;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.65rem;
+  line-height: 1;
+}
+.soundtrack-close {
+  width: 35px;
+  height: 35px;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: rgba(255,255,255,.08);
+  cursor: pointer;
+  font-size: 1.35rem;
+}
+.soundtrack-player-wrap {
+  padding: 0 14px 11px;
+}
+.spotify-player {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 16px;
+  background: #141414;
+}
+.soundtrack-start-note {
+  margin: 7px 4px 0;
+  color: rgba(255,246,242,.56);
+  font-size: .62rem;
+  line-height: 1.35;
+}
+.soundtrack-list {
+  display: grid;
+  gap: 5px;
+  padding: 0 12px 12px;
+}
+.soundtrack-song {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  display: grid;
+  grid-template-columns: 24px 42px minmax(0,1fr) auto;
+  gap: 9px;
+  align-items: center;
+  color: #fff8f5;
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  transition: background .14s ease, border-color .14s ease, transform .14s ease;
+}
+.soundtrack-song:hover,
+.soundtrack-song:focus-visible {
+  border-color: rgba(255,255,255,.11);
+  background: rgba(255,255,255,.075);
+  transform: translateX(2px);
+}
+.soundtrack-song.active {
+  border-color: rgba(239,155,173,.22);
+  background: rgba(168,42,67,.23);
+}
+.song-number {
+  color: rgba(255,246,242,.42);
+  font: 800 .62rem ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+.song-art {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  color: rgba(255,255,255,.88);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+.art-flatline { background: linear-gradient(145deg,#3b434e,#11151a); }
+.art-another { background: linear-gradient(145deg,#b67577,#532036); }
+.art-cagole { background: linear-gradient(145deg,#e0b455,#724016); }
+.art-sweatshirt { background: linear-gradient(145deg,#89949f,#343d49); }
+.art-bike { background: linear-gradient(145deg,#8eb6aa,#2e5a52); }
+.art-tongue { background: linear-gradient(145deg,#c9879e,#64304b); }
+.song-copy {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.song-copy strong {
+  overflow: hidden;
+  font-size: .78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.song-copy small {
+  overflow: hidden;
+  color: rgba(255,246,242,.53);
+  font-size: .64rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.song-duration {
+  color: rgba(255,246,242,.47);
+  font: 700 .62rem ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+.soundtrack-footer {
+  padding: 12px 15px 15px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  display: grid;
+  gap: 6px;
+  color: rgba(255,246,242,.45);
+  font-size: .63rem;
+}
+.soundtrack-footer a {
+  width: fit-content;
+  color: #f1b5c1;
+  font-weight: 900;
+  text-decoration: none;
+}
+.soundtrack-footer a:hover { text-decoration: underline; }
+
+.minecraft-open .floating-soundtrack {
+  z-index: 1500;
+}
+@media (max-width: 620px) {
+  .floating-soundtrack {
+    right: 10px;
+    bottom: 10px;
+    width: calc(100vw - 20px);
+  }
+  .soundtrack-panel {
+    max-height: calc(100vh - 20px);
+    border-radius: 22px;
+    transform-origin: center bottom;
+  }
+  .soundtrack-launcher {
+    min-height: 60px;
+    border-radius: 19px;
+  }
+  .soundtrack-header {
+    padding-top: 15px;
+  }
+  .soundtrack-song {
+    grid-template-columns: 20px 39px minmax(0,1fr) auto;
+    gap: 7px;
+  }
+  .song-art {
+    width: 39px;
+    height: 39px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .soundtrack-disc,
+  .soundtrack-equalizer i {
+    animation: none !important;
+  }
+}

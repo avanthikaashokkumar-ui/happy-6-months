@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#3a0710" />
-  <meta name="description" content="A private six-month anniversary game night with games, Benny’s Block World, and a cozy shared movie-and-show diary." />
+  <meta name="description" content="A private six-month anniversary game night with games, Benny’s Block World, a cozy screen diary, and a floating Spotify soundtrack." />
   <title>Happy 6 Months — Game Night</title>
-  <link rel="stylesheet" href="styles.css?v=8" />
+  <link rel="stylesheet" href="styles.css?v=10" />
 
 </head>
 <body>
@@ -79,7 +79,162 @@
     <div class="game-root" id="game-root"></div>
   </div>
 
-  <script src="script.js?v=8" defer></script>
+
+  <aside class="floating-soundtrack" id="floating-soundtrack" aria-label="Us, On Repeat Spotify playlist">
+    <button
+      class="soundtrack-launcher"
+      id="soundtrack-launcher"
+      type="button"
+      aria-expanded="false"
+      aria-controls="soundtrack-panel"
+    >
+      <span class="soundtrack-disc" aria-hidden="true">♫</span>
+      <span class="soundtrack-launcher-copy">
+        <strong>Us, On Repeat</strong>
+        <small id="soundtrack-mini-title">Tap for our soundtrack</small>
+      </span>
+      <span class="soundtrack-equalizer" aria-hidden="true">
+        <i></i><i></i><i></i>
+      </span>
+    </button>
+
+    <section class="soundtrack-panel" id="soundtrack-panel" aria-hidden="true">
+      <header class="soundtrack-header">
+        <div>
+          <p>Our six-month soundtrack</p>
+          <h2>Us, On Repeat</h2>
+        </div>
+        <button class="soundtrack-close" id="soundtrack-close" type="button" aria-label="Minimize playlist">×</button>
+      </header>
+
+      <div class="soundtrack-player-wrap">
+        <iframe
+          id="spotify-player"
+          class="spotify-player"
+          title="Spotify player for Flatline by Justin Bieber"
+          src="https://open.spotify.com/embed/track/2GBgiuXwY1KzJMA0gSAr9J?utm_source=generator&theme=0"
+          width="100%"
+          height="152"
+          frameborder="0"
+          allowfullscreen
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+        ></iframe>
+        <p class="soundtrack-start-note">Spotify requires one tap on the player to start the music. It keeps playing while you explore the site.</p>
+      </div>
+
+      <div class="soundtrack-list" role="list" aria-label="Songs in our playlist">
+        <button
+          class="soundtrack-song active"
+          type="button"
+          role="listitem"
+          data-kind="track"
+          data-spotify-id="2GBgiuXwY1KzJMA0gSAr9J"
+          data-title="Flatline"
+          data-artist="Justin Bieber"
+          data-duration="3:39"
+        >
+          <span class="song-number">01</span>
+          <span class="song-art art-flatline" aria-hidden="true">F</span>
+          <span class="song-copy"><strong>Flatline</strong><small>Justin Bieber</small></span>
+          <span class="song-duration">3:39</span>
+        </button>
+
+        <button
+          class="soundtrack-song"
+          type="button"
+          role="listitem"
+          data-kind="album"
+          data-spotify-id="7pO73AlT4Yqhs8oeQgBka6"
+          data-title="Another You"
+          data-artist="Anthony Lazaro & Matthew Ifield"
+          data-duration="3:27"
+        >
+          <span class="song-number">02</span>
+          <span class="song-art art-another" aria-hidden="true">A</span>
+          <span class="song-copy"><strong>Another You</strong><small>Anthony Lazaro & Matthew Ifield</small></span>
+          <span class="song-duration">3:27</span>
+        </button>
+
+        <button
+          class="soundtrack-song"
+          type="button"
+          role="listitem"
+          data-kind="track"
+          data-spotify-id="3lqxjjIAsmq8tb8ufj3NW9"
+          data-title="CAGÖLE"
+          data-artist="Ajar"
+          data-duration="2:44"
+        >
+          <span class="song-number">03</span>
+          <span class="song-art art-cagole" aria-hidden="true">C</span>
+          <span class="song-copy"><strong>CAGÖLE</strong><small>Ajar</small></span>
+          <span class="song-duration">2:44</span>
+        </button>
+
+        <button
+          class="soundtrack-song"
+          type="button"
+          role="listitem"
+          data-kind="track"
+          data-spotify-id="5DZrNCtCKXV7lsBkN0qFBc"
+          data-title="Sweatshirt"
+          data-artist="Patrick Hizon & EJEAN"
+          data-duration="2:45"
+        >
+          <span class="song-number">04</span>
+          <span class="song-art art-sweatshirt" aria-hidden="true">S</span>
+          <span class="song-copy"><strong>Sweatshirt</strong><small>Patrick Hizon & EJEAN</small></span>
+          <span class="song-duration">2:45</span>
+        </button>
+
+        <button
+          class="soundtrack-song"
+          type="button"
+          role="listitem"
+          data-kind="track"
+          data-spotify-id="2nzED6Q3yWuvSQnxw6QTlU"
+          data-title="If I Could Ride a Bike"
+          data-artist="Park Bird & Chevy"
+          data-duration="3:23"
+        >
+          <span class="song-number">05</span>
+          <span class="song-art art-bike" aria-hidden="true">B</span>
+          <span class="song-copy"><strong>If I Could Ride a Bike</strong><small>Park Bird & Chevy</small></span>
+          <span class="song-duration">3:23</span>
+        </button>
+
+        <button
+          class="soundtrack-song"
+          type="button"
+          role="listitem"
+          data-kind="track"
+          data-spotify-id="1vxhCATyjDXRjteXeRtUKQ"
+          data-title="Tongue Tied"
+          data-artist="Ebony Loren"
+          data-duration="2:52"
+        >
+          <span class="song-number">06</span>
+          <span class="song-art art-tongue" aria-hidden="true">T</span>
+          <span class="song-copy"><strong>Tongue Tied</strong><small>Ebony Loren</small></span>
+          <span class="song-duration">2:52</span>
+        </button>
+      </div>
+
+      <footer class="soundtrack-footer">
+        <span>Made for our little universe ♥</span>
+        <a
+          id="soundtrack-open-spotify"
+          href="https://open.spotify.com/track/2GBgiuXwY1KzJMA0gSAr9J"
+          target="_blank"
+          rel="noopener noreferrer"
+        >Open current song in Spotify ↗</a>
+      </footer>
+    </section>
+  </aside>
+
+
+  <script src="script.js?v=10" defer></script>
 
 </body>
 </html>
