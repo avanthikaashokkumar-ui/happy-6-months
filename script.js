@@ -1228,6 +1228,7 @@ const LANDMARKS = [
   { id: "cave", name: "Crystal Cave", x: 0, z: 24, icon: "💎" }
 ];
 const HOUSE_SITE = { x: -7, z: -10, size: 7, foundationY: 4 };
+const HOUSE_REQUIREMENTS = { wood: 12, stone: 8, sand: 4, walls: 20, windows: 4, roof: 12 };
 const FACE_DEFS = [
   { n: [0, 1, 0], shade: "top", verts: [[0,1,0],[1,1,0],[1,1,1],[0,1,1]] },
   { n: [0,-1, 0], shade: "dark", verts: [[0,0,1],[1,0,1],[1,0,0],[0,0,0]] },
@@ -1477,6 +1478,7 @@ return {
   _animals: [],
   _zoom: .92,
   _zoomTarget: .92,
+  _povMode: "first",
   _skyMode: "day",
   _celebration: 0,
   _minimapCanvas: null,
@@ -1491,9 +1493,10 @@ return {
     this._bennyRewards = this._loadRewards();
     this._adventure = this._loadAdventure();
     this._skyMode = this._adventure.skyMode || "day";
+    this._povMode = this._adventure.povMode || "first";
     this._animals = this._createAnimals();
-    this._zoom = .92;
-    this._zoomTarget = .92;
+    this._zoom = this._povMode === "builder" ? .5 : this._povMode === "third" ? .72 : .92;
+    this._zoomTarget = this._zoom;
     this._lookTargetYaw = this._player.yaw;
     this._lookTargetPitch = this._player.pitch;
     this._selected = 0;
@@ -1540,13 +1543,17 @@ return {
                   <span>💎 Tag <strong>0/6</strong></span>
                 </div>
               </div>
-              <div class="mc-help">WASD move · mouse look · Space jump · Shift sprint · wheel/Z/X zoom · left-click mine · right-click place · E Benny · 1–8 blocks</div>
+              <div class="mc-help">WASD move · mouse look · Space jump · Shift sprint · wheel/Z/X zoom · C changes POV · left-click mine · right-click place · E Benny · 1–8 blocks</div>
             </div>
             <canvas class="mc-minimap" data-mc-minimap width="160" height="160" aria-label="Block World minimap"></canvas>
             <div class="mc-zoom-controls" aria-label="Zoom controls">
               <button type="button" data-zoom-out aria-label="Zoom out">−</button>
               <span data-zoom-label>100%</span>
               <button type="button" data-zoom-in aria-label="Zoom in">+</button>
+            </div>
+            <div class="mc-view-controls" aria-label="Camera view controls">
+              <button type="button" data-mc-pov>POV: First person</button>
+              <button type="button" data-mc-wide>Wide view</button>
             </div>
             <div class="mc-crosshair"></div>
             <div class="mc-message" data-mc-message></div>
@@ -1571,6 +1578,8 @@ return {
                 <button data-action="build"><span>▣</span><small>Place</small></button>
                 <button data-action="jump"><span>↑</span><small>Jump</small></button>
                 <button data-action="tame"><span>🐾</span><small>Benny</small></button>
+                <button data-action="pov"><span>◉</span><small>POV</small></button>
+                <button data-action="wide"><span>↔</span><small>Wide</small></button>
               </div>
             </div>
           </div>
@@ -1579,14 +1588,38 @@ return {
           <img class="mc-benny-photo" src="benny-standing.jpeg" alt="Benny standing happily on his back legs" />
           <div class="mc-benny-copy">
             <h3>Benny’s Adventure Book 🐕</h3>
-            <p>Tame Benny, feed him, make his toy and crystal tag, explore five landmarks, and complete a guided house challenge.</p>
-            <div class="mc-adventure-grid">
-              <div class="mc-activity" data-house-activity><span>🏠</span><div><strong>Build a house</strong><small>Start the challenge below.</small></div></div>
+            <p>Follow the missions in order. The mission board tells you exactly what to collect and what to build next.</p>
+            <div class="mc-current-mission" data-current-mission>
+              <span>Current mission</span>
+              <strong>1. Find and tame Benny</strong>
+              <small>Walk close to Benny and press E.</small>
+            </div>
+            <div class="mc-supply-card">
+              <div class="mc-supply-heading"><strong>House supply checklist</strong><small>Mine these before starting the house.</small></div>
+              <div class="mc-supply-list" data-house-materials>
+                <span>🪵 Wood <strong>0/12</strong></span>
+                <span>🪨 Stone <strong>0/8</strong></span>
+                <span>🟨 Sand <strong>0/4</strong></span>
+              </div>
+            </div>
+            <div class="mc-mission-board" aria-label="Ordered mission list">
+              <div class="mc-mission" data-mission-step="1"><b>1</b><span>🐕</span><div><strong>Tame Benny</strong><small>Find Benny and press E.</small></div></div>
+              <div class="mc-mission" data-mission-step="2"><b>2</b><span>⛏️</span><div><strong>Gather supplies</strong><small>12 wood · 8 stone · 4 sand</small></div></div>
+              <div class="mc-mission" data-mission-step="3"><b>3</b><span>▦</span><div><strong>Lay the foundation</strong><small>Use the Start House button.</small></div></div>
+              <div class="mc-mission" data-mission-step="4"><b>4</b><span>🧱</span><div><strong>Raise the walls</strong><small>Place 20 planks inside the guide.</small></div></div>
+              <div class="mc-mission" data-mission-step="5"><b>5</b><span>◇</span><div><strong>Add the windows</strong><small>Place 4 glass blocks.</small></div></div>
+              <div class="mc-mission" data-mission-step="6"><b>6</b><span>⌂</span><div><strong>Finish the roof</strong><small>Place 12 planks, stone, or bricks on top.</small></div></div>
+              <div class="mc-mission" data-mission-step="7"><b>7</b><span>♥</span><div><strong>Housewarming</strong><small>Celebrate the finished house with Benny.</small></div></div>
+            </div>
+            <h4 class="mc-bonus-title">Bonus adventures</h4>
+            <div class="mc-adventure-grid mc-bonus-grid">
+              <div class="mc-activity" data-feed-activity><span>🍃</span><div><strong>Feed Benny</strong><small>Mine 0/10 leaves</small></div></div>
+              <div class="mc-activity" data-toy-activity><span>🧸</span><div><strong>Make a toy</strong><small>Mine 0/5 wood</small></div></div>
               <div class="mc-activity" data-explore-activity><span>🧭</span><div><strong>Explore the map</strong><small>0/5 landmarks found</small></div></div>
               <div class="mc-activity" data-crystal-activity><span>💎</span><div><strong>Benny’s shiny tag</strong><small>Mine 0/6 crystals</small></div></div>
             </div>
             <div class="mc-adventure-actions">
-              <button class="btn" data-house-start type="button">Start house challenge</button>
+              <button class="btn" data-house-start type="button" disabled>Collect supplies first</button>
               <button class="btn secondary" data-mc-time type="button">Switch to sunset</button>
               <button class="btn secondary" data-mc-benny type="button">Go to Benny</button>
               <button class="btn secondary" data-mc-home type="button">Go home</button>
@@ -1652,6 +1685,7 @@ return {
       if (event.code === "KeyR") this._saveWorld();
       if (event.code === "KeyZ") this._setZoom(this._zoomTarget - .12);
       if (event.code === "KeyX") this._setZoom(this._zoomTarget + .12);
+      if (event.code === "KeyC") this._cyclePov();
     });
     this._on(document, "keyup", (event) => this._keys.delete(event.code));
     this._on(document, "mousemove", (event) => {
@@ -1671,6 +1705,8 @@ return {
     }, { passive: false });
     this._on(this._root.querySelector("[data-zoom-in]"), "click", () => this._setZoom(this._zoomTarget + .12));
     this._on(this._root.querySelector("[data-zoom-out]"), "click", () => this._setZoom(this._zoomTarget - .12));
+    this._on(this._root.querySelector("[data-mc-pov]"), "click", () => this._cyclePov());
+    this._on(this._root.querySelector("[data-mc-wide]"), "click", () => this._setZoom(.36));
 
     // Touch drag controls camera direction. Dragging left now turns left.
     // Camera targets are eased in the animation loop to prevent jerky movement.
@@ -1713,6 +1749,8 @@ return {
         if (action === "mine") this._mine();
         if (action === "build") this._build();
         if (action === "tame") this._interactWithBenny();
+        if (action === "pov") this._cyclePov();
+        if (action === "wide") this._setZoom(.36);
       });
     });
     this._on(this._root.querySelector("[data-house-start]"), "click", () => this._startHouseChallenge());
@@ -1731,6 +1769,7 @@ return {
       this._bennyRewards = { leaves: 0, wood: 0, fed: false, toy: false };
       this._adventure = this._defaultAdventure();
       this._skyMode = "day";
+      this._povMode = "first";
       this._animals = this._createAnimals();
       this._player.x = .5; this._player.z = -2.5; this._player.y = highestSolid(this._world, 0, -2);
       this._lookTargetYaw = this._player.yaw;
@@ -1810,19 +1849,20 @@ return {
     prompt.textContent = this._benny.tamed ? "Press E to pet Benny ♥" : "Press E to tame Benny ♥";
     prompt.classList.toggle("show", near);
     const stat = this._root.querySelector("[data-mc-stat]");
-    stat.textContent = `${this._benny.tamed ? "Benny tamed ♥" : "Find and tame Benny"} · ${BLOCKS[HOTBAR[this._selected]].label} selected`;
+    const povLabel = this._povMode === "first" ? "1st person" : this._povMode === "third" ? "3rd person" : "builder view";
+    stat.textContent = `${this._benny.tamed ? "Benny tamed ♥" : "Find and tame Benny"} · ${BLOCKS[HOTBAR[this._selected]].label} · ${povLabel}`;
 
     const quest = this._root.querySelector("[data-mc-quest]");
     if (quest && this._bennyRewards && this._adventure) {
-      const leaves = Math.min(10, this._bennyRewards.leaves);
-      const wood = Math.min(5, this._bennyRewards.wood);
       const houseProgress = this._houseProgress();
+      const step = this._missionStep();
       const crystals = Math.min(6, this._adventure.crystals);
       quest.innerHTML = `
-        <span class="${this._bennyRewards.fed ? "complete" : ""}">🍃 Leaves <strong>${leaves}/10</strong>${this._bennyRewards.fed ? " ✓" : ""}</span>
-        <span class="${this._bennyRewards.toy ? "complete" : ""}">🪵 Wood <strong>${wood}/5</strong>${this._bennyRewards.toy ? " ✓" : ""}</span>
-        <span class="${this._adventure.houseComplete ? "complete" : ""}">🏠 House <strong>${houseProgress}%</strong>${this._adventure.houseComplete ? " ✓" : ""}</span>
-        <span class="${this._adventure.shinyTag ? "complete" : ""}">💎 Tag <strong>${crystals}/6</strong>${this._adventure.shinyTag ? " ✓" : ""}</span>
+        <span class="${this._benny.tamed ? "complete" : ""}">🐕 Benny <strong>${this._benny.tamed ? "Tamed" : "Find him"}</strong></span>
+        <span class="${this._suppliesReady() ? "complete" : ""}">⛏ Supplies <strong>${this._suppliesReady() ? "Ready" : "Collect"}</strong></span>
+        <span class="${this._adventure.houseComplete ? "complete" : ""}">🏠 House <strong>${houseProgress}%</strong></span>
+        <span>📜 Mission <strong>${step}/7</strong></span>
+        <span class="${this._adventure.shinyTag ? "complete" : ""}">💎 Tag <strong>${crystals}/6</strong></span>
       `;
     }
     this._updateAdventureUI();
@@ -1927,13 +1967,16 @@ return {
   _defaultAdventure() {
     return {
       houseActive: false,
+      houseMaterials: { wood: 0, stone: 0, sand: 0 },
       planksPlaced: 0,
       glassPlaced: 0,
+      roofPlaced: 0,
       houseComplete: false,
       crystals: 0,
       shinyTag: false,
       discoveries: Object.fromEntries(LANDMARKS.map((spot) => [spot.id, false])),
-      skyMode: "day"
+      skyMode: "day",
+      povMode: "first"
     };
   },
 
@@ -1942,11 +1985,25 @@ return {
     try {
       const saved = JSON.parse(safeStorage.getItem(`${SAVE_KEY}:adventure`));
       if (!saved || typeof saved !== "object") return defaults;
-      return {
+      const merged = {
         ...defaults,
         ...saved,
+        houseMaterials: { ...defaults.houseMaterials, ...(saved.houseMaterials || {}) },
         discoveries: { ...defaults.discoveries, ...(saved.discoveries || {}) }
       };
+      if ((merged.houseActive || merged.houseComplete) && !saved.houseMaterials) {
+        merged.houseMaterials = {
+          wood: HOUSE_REQUIREMENTS.wood,
+          stone: HOUSE_REQUIREMENTS.stone,
+          sand: HOUSE_REQUIREMENTS.sand
+        };
+      }
+      if (merged.houseComplete) {
+        merged.planksPlaced = Math.max(HOUSE_REQUIREMENTS.walls, merged.planksPlaced || 0);
+        merged.glassPlaced = Math.max(HOUSE_REQUIREMENTS.windows, merged.glassPlaced || 0);
+        merged.roofPlaced = Math.max(HOUSE_REQUIREMENTS.roof, merged.roofPlaced || 0);
+      }
+      return merged;
     } catch {
       return defaults;
     }
@@ -1955,29 +2012,114 @@ return {
   _saveAdventure() {
     if (!this._adventure) return;
     this._adventure.skyMode = this._skyMode;
+    this._adventure.povMode = this._povMode;
     try { safeStorage.setItem(`${SAVE_KEY}:adventure`, JSON.stringify(this._adventure)); } catch (_error) {}
+  },
+
+  _suppliesReady() {
+    const materials = this._adventure?.houseMaterials || {};
+    return (materials.wood || 0) >= HOUSE_REQUIREMENTS.wood &&
+      (materials.stone || 0) >= HOUSE_REQUIREMENTS.stone &&
+      (materials.sand || 0) >= HOUSE_REQUIREMENTS.sand;
+  },
+
+  _missionStep() {
+    if (this._adventure?.houseComplete) return 7;
+    if (!this._benny?.tamed) return 1;
+    if (!this._suppliesReady()) return 2;
+    if (!this._adventure?.houseActive) return 3;
+    if ((this._adventure.planksPlaced || 0) < HOUSE_REQUIREMENTS.walls) return 4;
+    if ((this._adventure.glassPlaced || 0) < HOUSE_REQUIREMENTS.windows) return 5;
+    if ((this._adventure.roofPlaced || 0) < HOUSE_REQUIREMENTS.roof) return 6;
+    return 7;
   },
 
   _houseProgress() {
     if (!this._adventure) return 0;
-    const plankPart = Math.min(1, this._adventure.planksPlaced / 20);
-    const glassPart = Math.min(1, this._adventure.glassPlaced / 4);
-    return Math.round((plankPart * .75 + glassPart * .25) * 100);
+    const materials = this._adventure.houseMaterials || {};
+    const supplyPart = (
+      Math.min(1, (materials.wood || 0) / HOUSE_REQUIREMENTS.wood) +
+      Math.min(1, (materials.stone || 0) / HOUSE_REQUIREMENTS.stone) +
+      Math.min(1, (materials.sand || 0) / HOUSE_REQUIREMENTS.sand)
+    ) / 3;
+    if (!this._adventure.houseActive) return Math.round(supplyPart * 25);
+    const wallPart = Math.min(1, (this._adventure.planksPlaced || 0) / HOUSE_REQUIREMENTS.walls);
+    const glassPart = Math.min(1, (this._adventure.glassPlaced || 0) / HOUSE_REQUIREMENTS.windows);
+    const roofPart = Math.min(1, (this._adventure.roofPlaced || 0) / HOUSE_REQUIREMENTS.roof);
+    return Math.round(25 + wallPart * 40 + glassPart * 15 + roofPart * 20);
   },
 
   _updateAdventureUI() {
     if (!this._root || !this._adventure) return;
-    const house = this._root.querySelector("[data-house-activity]");
+    const step = this._missionStep();
+    const materials = this._adventure.houseMaterials || { wood: 0, stone: 0, sand: 0 };
+    const missionCopy = {
+      1: ["1. Find and tame Benny", "Walk close to Benny and press E."],
+      2: ["2. Gather the house supplies", `Mine ${HOUSE_REQUIREMENTS.wood} wood, ${HOUSE_REQUIREMENTS.stone} stone, and ${HOUSE_REQUIREMENTS.sand} sand.`],
+      3: ["3. Lay the foundation", "Press Start House Challenge. The foundation and guide will appear."],
+      4: ["4. Raise the walls", `Place ${HOUSE_REQUIREMENTS.walls} planks inside the glowing guide.`],
+      5: ["5. Add the windows", `Place ${HOUSE_REQUIREMENTS.windows} glass blocks in the walls.`],
+      6: ["6. Finish the roof", `Place ${HOUSE_REQUIREMENTS.roof} planks, stone, or bricks across the top.`],
+      7: ["7. Housewarming complete!", "Benny has a finished home. Explore and finish the bonus adventures."]
+    };
+    const current = this._root.querySelector("[data-current-mission]");
+    if (current) {
+      current.querySelector("strong").textContent = missionCopy[step][0];
+      current.querySelector("small").textContent = missionCopy[step][1];
+      current.classList.toggle("complete", step === 7);
+    }
+
+    this._root.querySelectorAll("[data-mission-step]").forEach((row) => {
+      const rowStep = Number(row.dataset.missionStep);
+      row.classList.toggle("active", rowStep === step);
+      row.classList.toggle("complete", rowStep < step || (rowStep === 7 && this._adventure.houseComplete));
+      row.classList.toggle("locked", rowStep > step);
+    });
+
+    const supplyList = this._root.querySelector("[data-house-materials]");
+    if (supplyList) {
+      const values = [
+        ["🪵", "Wood", materials.wood || 0, HOUSE_REQUIREMENTS.wood],
+        ["🪨", "Stone", materials.stone || 0, HOUSE_REQUIREMENTS.stone],
+        ["🟨", "Sand", materials.sand || 0, HOUSE_REQUIREMENTS.sand]
+      ];
+      supplyList.innerHTML = values.map(([icon, label, value, target]) =>
+        `<span class="${value >= target ? "complete" : ""}">${icon} ${label} <strong>${Math.min(value, target)}/${target}</strong></span>`
+      ).join("");
+    }
+
+    const startButton = this._root.querySelector("[data-house-start]");
+    if (startButton) {
+      if (this._adventure.houseComplete) {
+        startButton.disabled = true;
+        startButton.textContent = "House complete ♥";
+      } else if (this._adventure.houseActive) {
+        startButton.disabled = true;
+        startButton.textContent = "House challenge active";
+      } else if (!this._benny.tamed) {
+        startButton.disabled = true;
+        startButton.textContent = "Tame Benny first";
+      } else if (!this._suppliesReady()) {
+        startButton.disabled = true;
+        startButton.textContent = "Collect house supplies";
+      } else {
+        startButton.disabled = false;
+        startButton.textContent = "Start house challenge";
+      }
+    }
+
+    const feed = this._root.querySelector("[data-feed-activity]");
+    const toy = this._root.querySelector("[data-toy-activity]");
     const explore = this._root.querySelector("[data-explore-activity]");
     const crystal = this._root.querySelector("[data-crystal-activity]");
     const found = Object.values(this._adventure.discoveries).filter(Boolean).length;
-    if (house) {
-      house.classList.toggle("complete", this._adventure.houseComplete);
-      house.querySelector("small").textContent = this._adventure.houseComplete
-        ? "House complete — Benny loves it!"
-        : this._adventure.houseActive
-          ? `${Math.min(20, this._adventure.planksPlaced)}/20 planks · ${Math.min(4, this._adventure.glassPlaced)}/4 glass`
-          : "Start the guided foundation challenge.";
+    if (feed) {
+      feed.classList.toggle("complete", this._bennyRewards?.fed);
+      feed.querySelector("small").textContent = this._bennyRewards?.fed ? "Benny has been fed!" : `Mine ${Math.min(10, this._bennyRewards?.leaves || 0)}/10 leaves`;
+    }
+    if (toy) {
+      toy.classList.toggle("complete", this._bennyRewards?.toy);
+      toy.querySelector("small").textContent = this._bennyRewards?.toy ? "Benny has his toy!" : `Mine ${Math.min(5, this._bennyRewards?.wood || 0)}/5 wood`;
     }
     if (explore) {
       explore.classList.toggle("complete", found === LANDMARKS.length);
@@ -1994,9 +2136,12 @@ return {
       const next = this._skyMode === "day" ? "sunset" : this._skyMode === "sunset" ? "night" : "day";
       timeButton.textContent = `Switch to ${next}`;
     }
+    this._updateViewUI();
   },
 
   _startHouseChallenge() {
+    if (!this._benny.tamed) return this._showMessage("Tame Benny before building his house.");
+    if (!this._suppliesReady()) return this._showMessage(`Collect ${HOUSE_REQUIREMENTS.wood} wood, ${HOUSE_REQUIREMENTS.stone} stone, and ${HOUSE_REQUIREMENTS.sand} sand first.`);
     const { x, z, size, foundationY } = HOUSE_SITE;
     for (let dx = -1; dx <= size; dx++) {
       for (let dz = -1; dz <= size; dz++) {
@@ -2010,8 +2155,11 @@ return {
     this._adventure.houseActive = true;
     this._adventure.planksPlaced = 0;
     this._adventure.glassPlaced = 0;
+    this._adventure.roofPlaced = 0;
     this._adventure.houseComplete = false;
-    this._teleportNear(x + 3, z - 3, "Foundation ready. Build 20 planks and place 4 windows inside the glowing guide.");
+    this._selected = HOTBAR.indexOf("planks");
+    this._renderHotbar();
+    this._teleportNear(x + 3, z - 3, `Foundation ready. Mission 4: place ${HOUSE_REQUIREMENTS.walls} planks inside the glowing guide.`);
     this._rebuildMinimap();
     this._saveAdventure();
     this._updateAdventureUI();
@@ -2026,12 +2174,15 @@ return {
 
   _checkHouseCompletion() {
     if (!this._adventure.houseActive || this._adventure.houseComplete) return;
-    if (this._adventure.planksPlaced >= 20 && this._adventure.glassPlaced >= 4) {
+    if (this._adventure.planksPlaced >= HOUSE_REQUIREMENTS.walls &&
+        this._adventure.glassPlaced >= HOUSE_REQUIREMENTS.windows &&
+        this._adventure.roofPlaced >= HOUSE_REQUIREMENTS.roof) {
       this._adventure.houseComplete = true;
-      this._celebration = 7;
-      this._benny.petBoost = 5;
-      this._showMessage("House complete! Benny is celebrating with you! 🏠♥");
+      this._celebration = 8;
+      this._benny.petBoost = 6;
+      this._showMessage("House complete! Benny is celebrating the housewarming with you! 🏠♥");
       this._saveAdventure();
+      this._updateAdventureUI();
     }
   },
 
@@ -2056,10 +2207,37 @@ return {
     this._showMessage(`${this._skyMode[0].toUpperCase() + this._skyMode.slice(1)} mode enabled.`);
   },
 
-  _setZoom(value) {
-    this._zoomTarget = clamp(value, .58, 1.55);
+  _cyclePov() {
+    const modes = ["first", "third", "builder"];
+    this._povMode = modes[(modes.indexOf(this._povMode) + 1) % modes.length];
+    if (this._povMode === "first") {
+      this._lookTargetPitch = clamp(this._lookTargetPitch, -.85, .85);
+      this._setZoom(.92);
+      this._showMessage("First-person view enabled.");
+    } else if (this._povMode === "third") {
+      this._lookTargetPitch = -.2;
+      this._setZoom(.68);
+      this._showMessage("Third-person view enabled. You can see your character.");
+    } else {
+      this._lookTargetPitch = -.72;
+      this._setZoom(.46);
+      this._showMessage("Builder view enabled. Zoomed out for house construction.");
+    }
+    this._saveAdventure();
+    this._updateViewUI();
+  },
+
+  _updateViewUI() {
+    const labels = { first: "First person", third: "Third person", builder: "Builder view" };
+    const button = this._root?.querySelector("[data-mc-pov]");
+    if (button) button.textContent = `POV: ${labels[this._povMode] || labels.first}`;
     const label = this._root?.querySelector("[data-zoom-label]");
     if (label) label.textContent = `${Math.round(this._zoomTarget / .92 * 100)}%`;
+  },
+
+  _setZoom(value) {
+    this._zoomTarget = clamp(value, .32, 1.7);
+    this._updateViewUI();
   },
 
   _teleportNear(x, z, message) {
@@ -2080,6 +2258,8 @@ return {
       safeStorage.setItem(`${SAVE_KEY}:tamed`, "true");
       this._benny.petBoost = 2;
       this._showMessage("Benny is tamed! He will follow you everywhere. ♥");
+      this._saveAdventure();
+      this._updateAdventureUI();
     } else {
       this._benny.petBoost = 2;
       this._showMessage("You pet Benny. His tail is going wild! 🐕");
@@ -2132,17 +2312,36 @@ return {
       return;
     }
 
+    const houseMessage = this._collectHouseMaterial(target.type);
+    let bennyMessage = "";
     if (target.type === "leaves" || target.type === "wood") {
-      this._collectForBenny(target.type);
-      return;
+      bennyMessage = this._collectForBenny(target.type, true);
     }
-
-    this._showMessage(`${BLOCKS[target.type]?.label || target.type} mined.`);
+    this._showMessage([houseMessage, bennyMessage].filter(Boolean).join(" · ") || `${BLOCKS[target.type]?.label || target.type} mined.`);
+    this._updateAdventureUI();
   },
 
-  _collectForBenny(type) {
+  _collectHouseMaterial(type) {
+    if (!this._adventure || this._adventure.houseActive || this._adventure.houseComplete) return "";
+    if (!this._benny?.tamed) return "";
+    if (!["wood", "stone", "sand"].includes(type)) return "";
+    const target = HOUSE_REQUIREMENTS[type];
+    const current = this._adventure.houseMaterials[type] || 0;
+    if (current >= target) return `${BLOCKS[type].label} mined`;
+    this._adventure.houseMaterials[type] = Math.min(target, current + 1);
+    this._saveAdventure();
+    const value = this._adventure.houseMaterials[type];
+    if (this._suppliesReady()) {
+      this._celebration = 3;
+      return `All house supplies collected! Press Start House Challenge`;
+    }
+    return `${BLOCKS[type].label} for the house ${value}/${target}`;
+  },
+
+  _collectForBenny(type, returnOnly = false) {
     const rewards = this._bennyRewards;
-    if (!rewards) return;
+    if (!rewards) return "";
+    let message = "";
 
     if (type === "leaves" && !rewards.fed) {
       rewards.leaves += 1;
@@ -2150,9 +2349,9 @@ return {
         rewards.leaves = 10;
         rewards.fed = true;
         this._benny.petBoost = 4;
-        this._showMessage("You mined 10 leaves and fed Benny! He is very happy. 🍃🐕");
+        message = "You mined 10 leaves and fed Benny! 🍃🐕";
       } else {
-        this._showMessage(`Leaf collected for Benny · ${rewards.leaves}/10`);
+        message = `Leaf for Benny ${rewards.leaves}/10`;
       }
     } else if (type === "wood" && !rewards.toy) {
       rewards.wood += 1;
@@ -2160,15 +2359,15 @@ return {
         rewards.wood = 5;
         rewards.toy = true;
         this._benny.petBoost = 4;
-        this._showMessage("You mined 5 wood blocks and made Benny a toy! 🪵🧸");
+        message = "You mined 5 wood blocks and made Benny a toy! 🪵🧸";
       } else {
-        this._showMessage(`Wood collected for Benny's toy · ${rewards.wood}/5`);
+        message = `Wood for Benny’s toy ${rewards.wood}/5`;
       }
-    } else {
-      this._showMessage(`${BLOCKS[type]?.label || type} mined · Benny's reward is already complete!`);
     }
 
     this._saveRewards();
+    if (!returnOnly && message) this._showMessage(message);
+    return message;
   },
 
   _build() {
@@ -2183,26 +2382,94 @@ return {
     this._world.set(key(x,y,z), type);
     this._rebuildMinimap();
     if (this._isInsideHouseSite(x, y, z)) {
-      if (type === "planks") this._adventure.planksPlaced += 1;
-      if (type === "glass") this._adventure.glassPlaced += 1;
+      const roofLevel = HOUSE_SITE.foundationY + 4;
+      const missionBefore = this._missionStep();
+      let counted = false;
+
+      if (missionBefore === 4 && y < roofLevel && ["planks", "wood", "brick"].includes(type)) {
+        this._adventure.planksPlaced += 1;
+        counted = true;
+      } else if (missionBefore === 5 && y < roofLevel && type === "glass") {
+        this._adventure.glassPlaced += 1;
+        counted = true;
+      } else if (missionBefore === 6 && y >= roofLevel && ["planks", "stone", "brick"].includes(type)) {
+        this._adventure.roofPlaced += 1;
+        counted = true;
+      }
+
+      if (!counted) {
+        const guidance = missionBefore === 4
+          ? "Mission 4: use planks, wood, or brick below the roof line."
+          : missionBefore === 5
+            ? "Mission 5: select glass and place four windows in the walls."
+            : missionBefore === 6
+              ? "Mission 6: place planks, stone, or brick across the glowing roof guide."
+              : "Follow the active mission shown in Benny’s Adventure Book.";
+        this._showMessage(guidance);
+        return;
+      }
+
       this._checkHouseCompletion();
       this._saveAdventure();
       this._updateAdventureUI();
-      this._showMessage(`House progress · ${Math.min(20, this._adventure.planksPlaced)}/20 planks · ${Math.min(4, this._adventure.glassPlaced)}/4 glass`);
+      const step = this._missionStep();
+      if (missionBefore === 4 && step === 5) {
+        this._selected = HOTBAR.indexOf("glass");
+        this._renderHotbar();
+        this._showMessage("Walls complete! Glass selected — now add 4 windows.");
+      } else if (missionBefore === 5 && step === 6) {
+        this._selected = HOTBAR.indexOf("planks");
+        this._renderHotbar();
+        this._showMessage("Windows complete! Planks selected — now build the roof.");
+      } else {
+        const nextText = step === 4
+          ? `Walls ${Math.min(HOUSE_REQUIREMENTS.walls, this._adventure.planksPlaced)}/${HOUSE_REQUIREMENTS.walls}`
+          : step === 5
+            ? `Windows ${Math.min(HOUSE_REQUIREMENTS.windows, this._adventure.glassPlaced)}/${HOUSE_REQUIREMENTS.windows}`
+            : step === 6
+              ? `Roof ${Math.min(HOUSE_REQUIREMENTS.roof, this._adventure.roofPlaced)}/${HOUSE_REQUIREMENTS.roof}`
+              : "House complete";
+        this._showMessage(nextText);
+      }
     } else {
       this._showMessage(`${BLOCKS[type].label} placed.`);
     }
   },
 
-  _cameraTransform(point) {
+  _cameraPose() {
     const p = this._player;
-    const dx = point.x - p.x;
-    const dy = point.y - (p.y + EYE_HEIGHT);
-    const dz = point.z - p.z;
-    const cy = Math.cos(p.yaw), sy = Math.sin(p.yaw);
+    if (this._povMode === "third") {
+      const distance = 6.2;
+      return {
+        x: p.x - Math.sin(p.yaw) * distance,
+        y: p.y + 3.1,
+        z: p.z - Math.cos(p.yaw) * distance,
+        yaw: p.yaw,
+        pitch: clamp(p.pitch * .45 - .12, -.7, .45)
+      };
+    }
+    if (this._povMode === "builder") {
+      const distance = 9.5;
+      return {
+        x: p.x - Math.sin(p.yaw) * distance,
+        y: p.y + 11.5,
+        z: p.z - Math.cos(p.yaw) * distance,
+        yaw: p.yaw,
+        pitch: -.72
+      };
+    }
+    return { x: p.x, y: p.y + EYE_HEIGHT, z: p.z, yaw: p.yaw, pitch: p.pitch };
+  },
+
+  _cameraTransform(point) {
+    const camera = this._cameraPose();
+    const dx = point.x - camera.x;
+    const dy = point.y - camera.y;
+    const dz = point.z - camera.z;
+    const cy = Math.cos(camera.yaw), sy = Math.sin(camera.yaw);
     const x1 = cy * dx - sy * dz;
     const z1 = sy * dx + cy * dz;
-    const cp = Math.cos(p.pitch), sp = Math.sin(p.pitch);
+    const cp = Math.cos(camera.pitch), sp = Math.sin(camera.pitch);
     const y2 = cp * dy - sp * z1;
     const z2 = sp * dy + cp * z1;
     return { x: x1, y: y2, z: z2 };
@@ -2261,6 +2528,7 @@ return {
         faces.push({ projected, depth, fill: block[face.shade] || block.side, type, x,y,z });
       }
     }
+    this._addPlayerFaces(faces,width,height,time);
     this._addBennyFaces(faces,width,height,time);
     this._addAnimalFaces(faces,width,height,time);
     this._addHouseGuideFaces(faces,width,height,time);
@@ -2352,6 +2620,25 @@ return {
     }
   },
 
+  _addPlayerFaces(faces,width,height,time) {
+    if (this._povMode === "first") return;
+    const p = this._player;
+    const walking = this._keys.has("KeyW") || this._keys.has("KeyA") || this._keys.has("KeyS") || this._keys.has("KeyD");
+    const swing = walking ? Math.sin(time * 9) * .1 : 0;
+    const base = { x: p.x, y: p.y, z: p.z };
+    const local = (side, up, front) => ({
+      x: base.x + Math.cos(p.yaw) * side + Math.sin(p.yaw) * front,
+      y: base.y + up,
+      z: base.z - Math.sin(p.yaw) * side + Math.cos(p.yaw) * front
+    });
+    this._modelBox(faces, local(0,.76,0), [.56,.72,.34], "#8f1730", p.yaw, width, height);
+    this._modelBox(faces, local(0,1.48,.02), [.48,.48,.48], "#d7ae91", p.yaw, width, height);
+    this._modelBox(faces, local(-.17,.05,swing), [.2,.72,.24], "#34303d", p.yaw, width, height);
+    this._modelBox(faces, local(.17,.05,-swing), [.2,.72,.24], "#34303d", p.yaw, width, height);
+    this._modelBox(faces, local(-.39,.72,-swing), [.18,.68,.2], "#d7ae91", p.yaw, width, height);
+    this._modelBox(faces, local(.39,.72,swing), [.18,.68,.2], "#d7ae91", p.yaw, width, height);
+  },
+
   _addBennyFaces(faces,width,height,time) {
     const b=this._benny;
     const moving = b.tamed ? distance2D(b,this._player)>1.7 : true;
@@ -2420,6 +2707,13 @@ return {
         this._modelBox(faces, {x:x+i+.5,y:foundationY+dy,z:z+size-.5}, [.94,.08,.94], guide, 0, width, height);
         this._modelBox(faces, {x:x+.5,y:foundationY+dy,z:z+i+.5}, [.94,.08,.94], guide, 0, width, height);
         this._modelBox(faces, {x:x+size-.5,y:foundationY+dy,z:z+i+.5}, [.94,.08,.94], guide, 0, width, height);
+      }
+    }
+    if (this._missionStep() >= 6) {
+      for (let dx = 0; dx < size; dx += 2) {
+        for (let dz = 0; dz < size; dz += 2) {
+          this._modelBox(faces, {x:x+dx+.5,y:foundationY+4.05,z:z+dz+.5}, [.92,.08,.92], guide, 0, width, height);
+        }
       }
     }
   },
@@ -2927,16 +3221,16 @@ const screenDiary = (() => {
   const STORAGE_KEY = "happy6:cozy-screen-diary:v1";
 
   const STARTER_WATCHED = [
-    { id: "anand", title: "Anand", note: "Watched together", status: "watched" },
-    { id: "ye-maaya-chesave", title: "Ye Maaya Chesave", note: "Watched together", status: "watched" },
-    { id: "with-love", title: "With Love", note: "Watched together", status: "watched" },
-    { id: "anaganaga-oka-raju", title: "Anaganaga Oka Raju", note: "Watched together", status: "watched" },
-    { id: "queen-of-tears", title: "Queen of Tears", note: "Watched together", status: "watched" },
-    { id: "mike-and-molly", title: "Mike & Molly", note: "Watched together", status: "watched" },
-    { id: "tamil-padam-2", title: "Tamil Padam 2", note: "Halfway… lmao", status: "halfway" },
-    { id: "little-things", title: "Little Things", note: "Watched together", status: "watched" },
-    { id: "atharintiki-daaredi", title: "Atharintiki Daaredi", note: "Watched together", status: "watched" },
-    { id: "seethamma-vakitlo-sirimalle-chettu", title: "Seethamma Vakitlo Sirimalle Chettu", note: "Watched together", status: "watched" }
+    { id: "anand", title: "Anand", note: "Watched together", status: "watched", poster: "https://play-lh.googleusercontent.com/proxy/VujXcineAs2bBiwz7OeBbGn3bbkuT7aSQGotjV0KCIx2faddcYOR8iYmwoWx_9DkzudFRiB8YdnVc7lPwxR1eaGv10O8mMuSnzUIo5mA-MH8ql5bmxqdYOxUCwNSvAnx261ZAonQ5h_BHMSn-vgj7I5f3jgx5sFjFSAvKw=w480-h960" },
+    { id: "ye-maaya-chesave", title: "Ye Maaya Chesave", note: "Watched together", status: "watched", poster: "https://play-lh.googleusercontent.com/dRqoM-6maw4enTL-g1RU2iek4erAPukRdg5k7U4bdUz1CT5cZEQtrUC-P9tCcvXWJ5w=w480-h960" },
+    { id: "with-love", title: "With Love", note: "Watched together", status: "watched", poster: "https://images.fandango.com/ImageRenderer/400/0/redesign/static/img/default_poster--dark-mode.png/0/images/masterrepository/Fandango/244298/withlove.jpg" },
+    { id: "anaganaga-oka-raju", title: "Anaganaga Oka Raju", note: "Watched together", status: "watched", poster: "https://images.fandango.com/ImageRenderer/400/0/redesign/static/img/default_poster--dark-mode.png/0/images/masterrepository/Fandango/243701/1290220-anaganaga-oka-raju-0-230-0-345-crop.jpg" },
+    { id: "queen-of-tears", title: "Queen of Tears", note: "Watched together", status: "watched", poster: "https://upload.wikimedia.org/wikipedia/commons/6/69/Queen_of_Tears_20240307_1.png" },
+    { id: "mike-and-molly", title: "Mike & Molly", note: "Watched together", status: "watched", poster: "https://upload.wikimedia.org/wikipedia/commons/9/95/Mike-and-molly-13.jpg" },
+    { id: "tamizh-padam-2", title: "Tamizh Padam 2", note: "Halfway… lmao", status: "halfway", poster: "https://play-lh.googleusercontent.com/vnGWrt5NYKGGLYUJ5kEJFugzOXhRjr_1E5LFiuzaOINF9K_iBiFZMcxH31xfIuYSyWLHrmRmcEzBt7d2sV8=w480-h960" },
+    { id: "little-things", title: "Little Things", note: "Watched together", status: "watched", poster: "https://resizing.flixster.com/8edPB5rPK5_2cyFuICY5bNT6LJc%3D/342x513/v2/https%3A//resizing.flixster.com/uKRM5V-4Sdx-eXjCYhkC7ecmzew%3D/ems.cHJkLWVtcy1hc3NldHMvdHZzZXJpZXMvNDQ0ZDk4MGMtN2FmNy00MDJjLTgwNTAtZTExMmFiMGMzODJiLmpwZw%3D%3D" },
+    { id: "attarintiki-daredi", title: "Attarintiki Daredi", note: "Watched together", status: "watched", poster: "https://play-lh.googleusercontent.com/RTPgLMluBxCFjmM-crWQS_38zUuboxajlLWRvFx3KSvBpOocVzWRAfA16u-8vgWd_Nez=w480-h960" },
+    { id: "seethamma-vakitlo-sirimalle-chettu", title: "Seethamma Vakitlo Sirimalle Chettu", note: "Watched together", status: "watched", poster: "https://play-lh.googleusercontent.com/ztyP5jIJ9pRuz-gxXAlGC7DTfFEQNNt78RdYZRh-Ufr1YRZdvWW8yoilmvxvjevjmr5O=w480-h960" }
   ];
 
   function makeId(value) {
@@ -3114,18 +3408,32 @@ const screenDiary = (() => {
 
       watched.forEach((item, index) => {
         const card = document.createElement("article");
-        card.className = `watch-card ${item.status === "halfway" ? "halfway" : ""}`;
+        card.className = `watch-card poster-card ${item.status === "halfway" ? "halfway" : ""}`;
         const isFavorite = favorites.has(item.id);
-        card.innerHTML = `
+
+        const cover = document.createElement("div");
+        cover.className = "watch-poster";
+        const initials = item.title.split(/\s+/).slice(0, 3).map((word) => word[0] || "").join("").toUpperCase();
+        cover.innerHTML = `
+          <div class="watch-poster-fallback" aria-hidden="true"><span>🎞️</span><strong>${escapeHtml(initials)}</strong></div>
+          <div class="watch-poster-shade"></div>
           <div class="watch-card-number">${String(index + 1).padStart(2, "0")}</div>
-          <div class="watch-card-copy">
-            <h5>${escapeHtml(item.title)}</h5>
-            <p>${escapeHtml(item.note)}</p>
-          </div>
-          <span class="watch-status ${item.status}">
-            ${item.status === "halfway" ? "Still watching" : "Watched"}
-          </span>
+          <span class="watch-status ${item.status}">${item.status === "halfway" ? "Still watching" : "Watched"}</span>
         `;
+        if (item.poster) {
+          const image = document.createElement("img");
+          image.src = item.poster;
+          image.alt = `${item.title} poster`;
+          image.loading = "lazy";
+          image.referrerPolicy = "no-referrer";
+          image.addEventListener("load", () => cover.classList.add("loaded"));
+          image.addEventListener("error", () => image.remove());
+          cover.prepend(image);
+        }
+
+        const copy = document.createElement("div");
+        copy.className = "watch-card-copy";
+        copy.innerHTML = `<h5>${escapeHtml(item.title)}</h5><p>${escapeHtml(item.note)}</p>`;
 
         const heart = document.createElement("button");
         heart.type = "button";
@@ -3133,7 +3441,8 @@ const screenDiary = (() => {
         heart.setAttribute("aria-label", `${isFavorite ? "Remove" : "Add"} ${item.title} ${isFavorite ? "from" : "to"} favorites`);
         heart.textContent = isFavorite ? "♥" : "♡";
         heart.addEventListener("click", () => this._toggleFavorite(item.id));
-        card.appendChild(heart);
+
+        card.append(cover, copy, heart);
         watchedGrid.appendChild(card);
       });
 
