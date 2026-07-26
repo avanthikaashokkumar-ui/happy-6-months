@@ -3956,16 +3956,15 @@ document.addEventListener("keydown", (event) => {
   const closeButton = document.querySelector("#soundtrack-close");
   const audio = document.querySelector("#site-audio");
   const songButtons = [...document.querySelectorAll(".soundtrack-song")];
-  const welcome = document.querySelector("#soundtrack-welcome");
-  const welcomeStart = document.querySelector("#soundtrack-welcome-start");
-  const welcomeSkip = document.querySelector("#soundtrack-welcome-skip");
 
+  const heroStart = document.querySelector("#hero-soundtrack-start");
+  const heroNote = document.querySelector("#hero-audio-note");
   const playButton = document.querySelector("#local-play");
   const previousButton = document.querySelector("#local-previous");
   const nextButton = document.querySelector("#local-next");
   const shuffleButton = document.querySelector("#local-shuffle");
   const repeatButton = document.querySelector("#local-repeat");
-  const momentButton = document.querySelector("#soundtrack-valentine-moment");
+  const restartButton = document.querySelector("#soundtrack-restart");
   const progress = document.querySelector("#local-progress");
   const volume = document.querySelector("#local-volume");
   const currentTimeLabel = document.querySelector("#local-current-time");
@@ -3979,14 +3978,16 @@ document.addEventListener("keydown", (event) => {
 
   if (!shell || !launcher || !panel || !audio || !songButtons.length) return;
 
-  const STATE_KEY = "happy6:local-soundtrack:v1";
+  const STATE_KEY = "happy6:local-soundtrack:v3";
   const VALENTINE_INDEX = 0;
   const VALENTINE_MOMENT_SECONDS = 40;
 
-  let currentIndex = 0;
+  let currentIndex = VALENTINE_INDEX;
   let shuffleOn = false;
   let repeatOn = true;
   let seeking = false;
+  let hasStarted = false;
+  let pendingSeek = VALENTINE_MOMENT_SECONDS;
 
   const tracks = songButtons.map((button, index) => ({
     index,
@@ -4003,9 +4004,7 @@ document.addEventListener("keydown", (event) => {
   function formatTime(seconds) {
     if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
     const whole = Math.floor(seconds);
-    const minutes = Math.floor(whole / 60);
-    const remaining = whole % 60;
-    return `${minutes}:${String(remaining).padStart(2, "0")}`;
+    return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
   }
 
   function setOpen(open) {
@@ -4014,17 +4013,24 @@ document.addEventListener("keydown", (event) => {
     panel.setAttribute("aria-hidden", String(!open));
   }
 
-  function setPlayingVisuals(playing) {
+  function updatePlayVisuals() {
+    const playing = !audio.paused && !audio.ended;
     shell.classList.toggle("playing", playing);
     equalizer?.classList.toggle("paused", !playing);
     playButton.textContent = playing ? "❚❚" : "▶";
     playButton.setAttribute("aria-label", playing ? "Pause" : "Play");
+
+    if (heroStart) {
+      heroStart.classList.toggle("playing", playing);
+      heroStart.innerHTML = playing
+        ? '<span aria-hidden="true">❚❚</span> Pause soundtrack'
+        : '<span aria-hidden="true">▶</span> Play soundtrack';
+    }
   }
 
-  function saveState() {
+  function savePreferences() {
     try {
       safeStorage.setItem(STATE_KEY, JSON.stringify({
-        currentIndex,
         volume: audio.volume,
         shuffleOn,
         repeatOn
@@ -4032,7 +4038,23 @@ document.addEventListener("keydown", (event) => {
     } catch (_error) {}
   }
 
-  function loadTrack(index, {
+  function seekWhenReady(seconds) {
+    pendingSeek = Math.max(0, Number(seconds) || 0);
+
+    const applySeek = () => {
+      if (!Number.isFinite(audio.duration) || audio.duration <= 0) return;
+      audio.currentTime = Math.min(pendingSeek, Math.max(0, audio.duration - 0.2));
+      pendingSeek = 0;
+    };
+
+    if (audio.readyState >= 1) {
+      try { applySeek(); } catch (_error) {}
+    } else {
+      audio.addEventListener("loadedmetadata", applySeek, { once: true });
+    }
+  }
+
+  function selectTrack(index, {
     autoplay = false,
     startAt = 0,
     announce = true
@@ -4053,43 +4075,62 @@ document.addEventListener("keydown", (event) => {
     durationLabel.textContent = track.durationText;
     cover.textContent = track.art;
     cover.className = `local-cover ${track.artClass}`;
-    status.textContent = announce ? `Selected ${track.title}` : "Ready to play";
 
-    const sameSource = audio.getAttribute("src") === track.src;
-    if (!sameSource) {
+    const currentSource = audio.getAttribute("src") || "";
+    if (currentSource !== track.src) {
       audio.src = track.src;
       audio.load();
     }
 
-    const begin = () => {
-      const safeStart = Math.max(0, Math.min(startAt, Math.max(0, audio.duration - 0.25)));
-      if (Number.isFinite(audio.duration) && safeStart > 0) {
-        audio.currentTime = safeStart;
-      }
-      if (autoplay) {
-        audio.play().catch(() => {
-          status.textContent = "Tap Play to start the song.";
-          setPlayingVisuals(false);
-        });
-      }
-    };
+    seekWhenReady(startAt);
 
-    if (audio.readyState >= 1) begin();
-    else audio.addEventListener("loadedmetadata", begin, { once: true });
+    if (announce) status.textContent = `Selected ${track.title}`;
 
-    saveState();
+    if (autoplay) {
+      playAudio();
+    }
+
+    savePreferences();
+  }
+
+  function playAudio() {
+    hasStarted = true;
+
+    const result = audio.play();
+    if (result && typeof result.catch === "function") {
+      result.catch(() => {
+        status.textContent = "Tap Play once more to start the song.";
+        if (heroNote) heroNote.textContent = "Your browser blocked the first attempt—tap Play soundtrack once more.";
+        updatePlayVisuals();
+      });
+    }
+  }
+
+  function startValentine() {
+    if (currentIndex !== VALENTINE_INDEX || audio.getAttribute("src") !== tracks[0].src) {
+      selectTrack(VALENTINE_INDEX, {
+        autoplay: false,
+        startAt: VALENTINE_MOMENT_SECONDS,
+        announce: false
+      });
+    } else if (!hasStarted && audio.currentTime < 2) {
+      seekWhenReady(VALENTINE_MOMENT_SECONDS);
+    }
+
+    if (audio.paused) playAudio();
+    else audio.pause();
+
+    if (heroNote) {
+      heroNote.textContent = audio.paused
+        ? "Valentine is ready in the floating playlist."
+        : "Valentine is playing in the background ♥";
+    }
   }
 
   function nextTrack({ fromEnded = false } = {}) {
-    if (fromEnded && repeatOn && !shuffleOn && currentIndex === tracks.length - 1) {
-      loadTrack(0, { autoplay: true });
-      return;
-    }
-
     if (fromEnded && !repeatOn && !shuffleOn && currentIndex === tracks.length - 1) {
       audio.pause();
       audio.currentTime = 0;
-      setPlayingVisuals(false);
       status.textContent = "Playlist finished ♥";
       return;
     }
@@ -4101,7 +4142,7 @@ document.addEventListener("keydown", (event) => {
       } while (nextIndex === currentIndex);
     }
 
-    loadTrack(nextIndex, { autoplay: true });
+    selectTrack(nextIndex, { autoplay: true });
   }
 
   function previousTrack() {
@@ -4109,52 +4150,35 @@ document.addEventListener("keydown", (event) => {
       audio.currentTime = 0;
       return;
     }
-    loadTrack(currentIndex - 1, { autoplay: true });
+    selectTrack(currentIndex - 1, { autoplay: true });
   }
 
-  function closeWelcome() {
-    welcome?.classList.add("hidden");
-    document.body.classList.remove("soundtrack-welcome-open");
-  }
-
-  function beginValentineMoment() {
-    closeWelcome();
-    setOpen(true);
-    loadTrack(VALENTINE_INDEX, {
-      autoplay: true,
-      startAt: VALENTINE_MOMENT_SECONDS,
-      announce: false
-    });
-    status.textContent = "Playing our Valentine moment ♥";
-  }
-
-  launcher.addEventListener("click", () => setOpen(!shell.classList.contains("open")));
-  closeButton?.addEventListener("click", () => setOpen(false));
-
-  welcomeStart?.addEventListener("click", beginValentineMoment);
-  welcomeSkip?.addEventListener("click", () => {
-    closeWelcome();
-    loadTrack(VALENTINE_INDEX, { autoplay: false, announce: false });
+  launcher.addEventListener("click", () => {
+    setOpen(!shell.classList.contains("open"));
   });
 
-  momentButton?.addEventListener("click", beginValentineMoment);
+  closeButton?.addEventListener("click", () => setOpen(false));
+
+  heroStart?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    startValentine();
+  });
+
+  restartButton?.addEventListener("click", () => {
+    audio.currentTime = 0;
+    playAudio();
+  });
 
   songButtons.forEach((button, index) => {
     button.addEventListener("click", () => {
-      const wasPlaying = !audio.paused;
-      loadTrack(index, { autoplay: wasPlaying || true, startAt: 0 });
+      selectTrack(index, { autoplay: true, startAt: 0 });
+      setOpen(true);
     });
   });
 
   playButton.addEventListener("click", () => {
-    if (!audio.src) loadTrack(currentIndex);
-    if (audio.paused) {
-      audio.play().catch(() => {
-        status.textContent = "Your browser needs another tap to start audio.";
-      });
-    } else {
-      audio.pause();
-    }
+    if (audio.paused) playAudio();
+    else audio.pause();
   });
 
   previousButton.addEventListener("click", previousTrack);
@@ -4165,7 +4189,7 @@ document.addEventListener("keydown", (event) => {
     shuffleButton.classList.toggle("active", shuffleOn);
     shuffleButton.setAttribute("aria-pressed", String(shuffleOn));
     status.textContent = shuffleOn ? "Shuffle is on" : "Shuffle is off";
-    saveState();
+    savePreferences();
   });
 
   repeatButton.addEventListener("click", () => {
@@ -4173,7 +4197,7 @@ document.addEventListener("keydown", (event) => {
     repeatButton.classList.toggle("active", repeatOn);
     repeatButton.setAttribute("aria-pressed", String(repeatOn));
     status.textContent = repeatOn ? "Playlist repeat is on" : "Playlist repeat is off";
-    saveState();
+    savePreferences();
   });
 
   progress.addEventListener("input", () => {
@@ -4191,11 +4215,12 @@ document.addEventListener("keydown", (event) => {
 
   volume.addEventListener("input", () => {
     audio.volume = Number(volume.value);
-    saveState();
+    savePreferences();
   });
 
   audio.addEventListener("loadedmetadata", () => {
     durationLabel.textContent = formatTime(audio.duration);
+    if (pendingSeek > 0) seekWhenReady(pendingSeek);
   });
 
   audio.addEventListener("timeupdate", () => {
@@ -4206,53 +4231,71 @@ document.addEventListener("keydown", (event) => {
   });
 
   audio.addEventListener("play", () => {
-    setPlayingVisuals(true);
+    updatePlayVisuals();
     status.textContent = `Playing ${tracks[currentIndex].title}`;
+    if (heroNote) heroNote.textContent = `${tracks[currentIndex].title} is playing in the background ♥`;
   });
 
   audio.addEventListener("pause", () => {
-    setPlayingVisuals(false);
+    updatePlayVisuals();
     if (!audio.ended) status.textContent = `Paused ${tracks[currentIndex].title}`;
   });
 
   audio.addEventListener("ended", () => nextTrack({ fromEnded: true }));
 
   audio.addEventListener("error", () => {
-    status.textContent = `Could not load ${tracks[currentIndex].title}. Check that every MP3 was uploaded.`;
-    setPlayingVisuals(false);
+    status.textContent = `Could not load ${tracks[currentIndex].title}. Upload every MP3 file to GitHub.`;
+    if (heroNote) heroNote.textContent = "A song file is missing. Make sure every MP3 was uploaded.";
+    updatePlayVisuals();
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && welcome && !welcome.classList.contains("hidden")) {
-      closeWelcome();
-      return;
-    }
-
     if (event.key === "Escape" && shell.classList.contains("open") && !document.pointerLockElement) {
       setOpen(false);
     }
   });
 
-  // Restore preferences, but always open the anniversary with Valentine selected.
+  // The page is visible immediately. The first ordinary dashboard tap starts
+  // Valentine because browsers require one user interaction before audible audio.
+  function startOnFirstDashboardInteraction(event) {
+    if (event.target.closest("#floating-soundtrack, #hero-soundtrack-start, input, select, textarea")) {
+      return;
+    }
+
+    if (!hasStarted && audio.paused) {
+      seekWhenReady(VALENTINE_MOMENT_SECONDS);
+      playAudio();
+    }
+
+    document.removeEventListener("pointerdown", startOnFirstDashboardInteraction, true);
+  }
+
+  document.addEventListener("pointerdown", startOnFirstDashboardInteraction, true);
+
   try {
     const saved = JSON.parse(safeStorage.getItem(STATE_KEY));
     if (saved && typeof saved === "object") {
-      if (Number.isFinite(Number(saved.volume))) {
-        audio.volume = Math.max(0, Math.min(1, Number(saved.volume)));
-        volume.value = String(audio.volume);
-      }
+      audio.volume = Math.max(0, Math.min(1, Number(saved.volume ?? 0.72)));
       shuffleOn = Boolean(saved.shuffleOn);
       repeatOn = saved.repeatOn !== false;
+    } else {
+      audio.volume = 0.72;
     }
-  } catch (_error) {}
+  } catch (_error) {
+    audio.volume = 0.72;
+  }
 
+  volume.value = String(audio.volume);
   shuffleButton.classList.toggle("active", shuffleOn);
   shuffleButton.setAttribute("aria-pressed", String(shuffleOn));
   repeatButton.classList.toggle("active", repeatOn);
   repeatButton.setAttribute("aria-pressed", String(repeatOn));
 
-  document.body.classList.add("soundtrack-welcome-open");
-  loadTrack(VALENTINE_INDEX, { autoplay: false, announce: false });
-  setPlayingVisuals(false);
+  selectTrack(VALENTINE_INDEX, {
+    autoplay: false,
+    startAt: VALENTINE_MOMENT_SECONDS,
+    announce: false
+  });
+  updatePlayVisuals();
 })();
 

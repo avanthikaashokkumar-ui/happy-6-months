@@ -1847,3 +1847,140 @@ body.soundtrack-welcome-open { overflow: hidden; }
   .welcome-vinyl { animation: none !important; }
 }
 
+
+
+/* ---------- Dashboard soundtrack opening ---------- */
+body {
+  overflow-x: hidden;
+}
+.soundtrack-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: clamp(30px, 7vw, 64px) clamp(18px, 4vw, 42px);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 36px;
+  background:
+    radial-gradient(circle at 82% 18%, rgba(242, 161, 179, .14), transparent 20rem),
+    linear-gradient(145deg, rgba(82, 7, 23, .84), rgba(40, 3, 11, .78));
+  box-shadow: 0 28px 75px rgba(25,0,6,.28);
+}
+.hero-lyric-backdrop {
+  position: absolute;
+  inset: auto -4% 4% -4%;
+  z-index: -1;
+  color: rgba(255,255,255,.045);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(3.5rem, 10vw, 8.8rem);
+  font-style: italic;
+  font-weight: 800;
+  line-height: .86;
+  text-align: center;
+  letter-spacing: -.06em;
+  pointer-events: none;
+  user-select: none;
+}
+.hero-soundtrack-card {
+  width: min(690px, 100%);
+  margin: 26px auto 0;
+  padding: 12px 13px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 22px;
+  display: grid;
+  grid-template-columns: 50px minmax(0,1fr) auto;
+  gap: 12px;
+  align-items: center;
+  text-align: left;
+  background: rgba(21, 2, 7, .46);
+  backdrop-filter: blur(15px);
+}
+.hero-song-art {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #5a091a;
+  background:
+    radial-gradient(circle, #fff 0 8%, transparent 9%),
+    conic-gradient(from 10deg, #f8dce3, #b93f5a, #f3bcc9, #75142b, #f8dce3);
+  box-shadow: inset 0 0 0 7px rgba(64,5,18,.12);
+  font-weight: 900;
+}
+.hero-song-copy {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.hero-song-copy small {
+  color: rgba(255,246,242,.55);
+  font-size: .65rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.hero-song-copy strong {
+  color: #fff;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.08rem;
+}
+.hero-song-copy em {
+  overflow: hidden;
+  color: #efbbc7;
+  font-size: .73rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hero-soundtrack-start {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px;
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  color: #4a0615;
+  background: #f2c5cf;
+  cursor: pointer;
+  font-weight: 900;
+  white-space: nowrap;
+  transition: transform .15s ease, background .15s ease;
+}
+.hero-soundtrack-start:hover {
+  transform: translateY(-2px);
+  background: #ffe7ec;
+}
+.hero-soundtrack-start.playing {
+  color: #fff;
+  background: rgba(255,255,255,.12);
+}
+.hero-audio-note {
+  margin: 10px auto 0;
+  color: rgba(255,246,242,.56);
+  font-size: .72rem;
+  font-weight: 700;
+}
+.soundtrack-welcome {
+  display: none !important;
+}
+@media (max-width: 650px) {
+  .soundtrack-hero {
+    border-radius: 28px;
+  }
+  .hero-soundtrack-card {
+    grid-template-columns: 44px minmax(0,1fr);
+  }
+  .hero-song-art {
+    width: 44px;
+    height: 44px;
+  }
+  .hero-soundtrack-start {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+  .hero-lyric-backdrop {
+    bottom: 12%;
+    font-size: clamp(3rem, 16vw, 5.6rem);
+  }
+}

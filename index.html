@@ -4,49 +4,42 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#3a0710" />
-  <meta name="description" content="A private six-month anniversary game night with games, Benny’s Block World, a cozy screen diary, and a floating Spotify soundtrack." />
+  <meta name="description" content="A private six-month anniversary game night with games, Benny’s Block World, a cozy screen diary, and a floating full-song soundtrack." />
   <title>Happy 6 Months — Game Night</title>
-  <link rel="stylesheet" href="styles.css?v=11" />
+  <link rel="stylesheet" href="styles.css?v=13" />
 
 </head>
 <body>
-
-  <div class="soundtrack-welcome" id="soundtrack-welcome" role="dialog" aria-modal="true" aria-labelledby="soundtrack-welcome-title">
-    <div class="soundtrack-welcome-card">
-      <span class="welcome-vinyl" aria-hidden="true">♥</span>
-      <p class="welcome-kicker">Our six-month opening song</p>
-      <h2 id="soundtrack-welcome-title">Begin with “Valentine”</h2>
-      <blockquote>
-        ’Cause I think I’ve fallen<br />
-        In love this time<br />
-        I blinked and suddenly, I had a valentine
-      </blockquote>
-      <p class="welcome-note">
-        Tap below to enter the site and start Laufey’s “Valentine” near this moment.
-        For the full song, stay signed in to Spotify in this browser.
-      </p>
-      <div class="welcome-actions">
-        <button class="welcome-start" id="soundtrack-welcome-start" type="button">♥ Open our six months</button>
-        <button class="welcome-skip" id="soundtrack-welcome-skip" type="button">Enter without music</button>
-      </div>
-      <a
-        class="welcome-spotify-link"
-        href="https://open.spotify.com/track/2EjuEHTRZRgE9pvaBm5Hh3"
-        target="_blank"
-        rel="noopener noreferrer"
-      >Sign in or open “Valentine” on Spotify ↗</a>
-    </div>
-  </div>
 
   <div class="ambient ambient-one" aria-hidden="true"></div>
   <div class="ambient ambient-two" aria-hidden="true"></div>
 
   <main class="page-shell" id="home-view">
-    <header class="hero">
+    <header class="hero soundtrack-hero">
+      <div class="hero-lyric-backdrop" aria-hidden="true">
+        ’Cause I think I’ve fallen in love this time
+      </div>
+
       <p class="eyebrow">Six months of us</p>
       <h1>Happy 6 Months</h1>
-      <p class="subtitle">Choose a game. Everything opens and plays right here.</p>
-      <div class="hero-badge"><span>♥</span> Game night made for two</div>
+      <p class="subtitle">Choose a game while our soundtrack plays in the background.</p>
+
+      <div class="hero-soundtrack-card">
+        <span class="hero-song-art" aria-hidden="true">♥</span>
+        <span class="hero-song-copy">
+          <small>Opening with</small>
+          <strong>Valentine · Laufey</strong>
+          <em>“’Cause I think I’ve fallen in love this time”</em>
+        </span>
+        <button id="hero-soundtrack-start" class="hero-soundtrack-start" type="button">
+          <span aria-hidden="true">▶</span>
+          Play soundtrack
+        </button>
+      </div>
+
+      <p class="hero-audio-note" id="hero-audio-note" aria-live="polite">
+        Tap Play—or tap anywhere on the dashboard once—to begin the full local song.
+      </p>
     </header>
 
     <section class="game-grid" aria-label="Choose a game">
@@ -108,7 +101,7 @@
   </div>
 
 
-  <aside class="floating-soundtrack" id="floating-soundtrack" aria-label="Us, On Repeat Spotify playlist">
+  <aside class="floating-soundtrack" id="floating-soundtrack" aria-label="Us, On Repeat music player">
     <button
       class="soundtrack-launcher"
       id="soundtrack-launcher"
@@ -121,7 +114,7 @@
         <strong>Us, On Repeat</strong>
         <small id="soundtrack-mini-title">Valentine · Laufey</small>
       </span>
-      <span class="soundtrack-equalizer" aria-hidden="true">
+      <span class="soundtrack-equalizer" id="soundtrack-equalizer" aria-hidden="true">
         <i></i><i></i><i></i>
       </span>
     </button>
@@ -135,159 +128,133 @@
         <button class="soundtrack-close" id="soundtrack-close" type="button" aria-label="Minimize playlist">×</button>
       </header>
 
-      <div class="soundtrack-player-wrap">
-        <div
-          id="spotify-player"
-          class="spotify-player spotify-player-host"
-          aria-label="Spotify player for Valentine by Laufey"
-        >
-          <p class="spotify-loading">Loading our soundtrack…</p>
+      <div class="local-player">
+        <audio id="site-audio" src="valentine.mp3" preload="auto"></audio>
+
+        <div class="local-now-playing">
+          <span class="local-cover art-valentine" id="local-cover" aria-hidden="true">V</span>
+          <div>
+            <strong id="local-title">Valentine</strong>
+            <small id="local-artist">Laufey</small>
+          </div>
+          <button class="local-heart active" type="button" aria-label="Our soundtrack">♥</button>
         </div>
-        <div class="soundtrack-player-actions">
-          <button class="soundtrack-moment-button" id="soundtrack-valentine-moment" type="button">
-            ♥ Play our Valentine moment
-          </button>
-          <a
-            class="soundtrack-login-link"
-            href="https://open.spotify.com/track/2EjuEHTRZRgE9pvaBm5Hh3"
-            target="_blank"
-            rel="noopener noreferrer"
-          >Open in Spotify for full playback ↗</a>
+
+        <div class="local-progress-row">
+          <span id="local-current-time">0:00</span>
+          <input
+            id="local-progress"
+            class="local-progress"
+            type="range"
+            min="0"
+            max="100"
+            value="0"
+            step="0.1"
+            aria-label="Song progress"
+          />
+          <span id="local-duration">2:49</span>
         </div>
-        <p class="soundtrack-start-note">
-          Spotify may show only a preview when you are signed out. Sign in to Spotify in this browser for full-track playback.
-        </p>
+
+        <div class="local-controls" aria-label="Music controls">
+          <button id="local-shuffle" type="button" aria-label="Shuffle playlist" title="Shuffle">⤨</button>
+          <button id="local-previous" type="button" aria-label="Previous song" title="Previous song">◀◀</button>
+          <button id="local-play" class="local-play" type="button" aria-label="Play">▶</button>
+          <button id="local-next" type="button" aria-label="Next song" title="Next song">▶▶</button>
+          <button id="local-repeat" type="button" aria-label="Repeat playlist" title="Repeat playlist">↻</button>
+        </div>
+
+        <div class="local-player-tools">
+          <button id="soundtrack-restart" class="soundtrack-moment-button" type="button">↺ Restart current song</button>
+          <label class="local-volume-label" for="local-volume">
+            <span aria-hidden="true">🔊</span>
+            <input id="local-volume" type="range" min="0" max="1" step="0.02" value="0.72" aria-label="Volume" />
+          </label>
+        </div>
       </div>
 
-      <div class="soundtrack-list" role="list" aria-label="Songs in our playlist">
-        <button
-          class="soundtrack-song active"
-          type="button"
-          role="listitem"
-          data-kind="track"
-          data-spotify-id="2EjuEHTRZRgE9pvaBm5Hh3"
-          data-title="Valentine"
-          data-artist="Laufey"
-          data-duration="2:48"
-          data-start-at="47"
-        >
-          <span class="song-number">07</span>
+      <div class="soundtrack-list" id="soundtrack-list" role="list" aria-label="Songs in our playlist">
+        <button class="soundtrack-song active" type="button" role="listitem"
+          data-index="0" data-src="valentine.mp3" data-title="Valentine" data-artist="Laufey"
+          data-duration="2:49" data-start-at="40" data-art="V" data-art-class="art-valentine">
+          <span class="song-number">01</span>
           <span class="song-art art-valentine" aria-hidden="true">V</span>
           <span class="song-copy"><strong>Valentine</strong><small>Laufey · our opening song</small></span>
-          <span class="song-duration">2:48</span>
+          <span class="song-duration">2:49</span>
         </button>
-        <button
-          class="soundtrack-song"
-          type="button"
-          role="listitem"
-          data-kind="track"
-          data-spotify-id="2GBgiuXwY1KzJMA0gSAr9J"
-          data-title="Flatline"
-          data-artist="Justin Bieber"
-          data-duration="3:39"
-        >
-          <span class="song-number">01</span>
+
+        <button class="soundtrack-song" type="button" role="listitem"
+          data-index="1" data-src="bewitched.mp3" data-title="Bewitched" data-artist="Laufey"
+          data-duration="4:07" data-art="B" data-art-class="art-bewitched">
+          <span class="song-number">02</span>
+          <span class="song-art art-bewitched" aria-hidden="true">B</span>
+          <span class="song-copy"><strong>Bewitched</strong><small>Laufey</small></span>
+          <span class="song-duration">4:07</span>
+        </button>
+
+        <button class="soundtrack-song" type="button" role="listitem"
+          data-index="2" data-src="flatline.mp3" data-title="Flatline" data-artist="Justin Bieber"
+          data-duration="3:39" data-art="F" data-art-class="art-flatline">
+          <span class="song-number">03</span>
           <span class="song-art art-flatline" aria-hidden="true">F</span>
           <span class="song-copy"><strong>Flatline</strong><small>Justin Bieber</small></span>
           <span class="song-duration">3:39</span>
         </button>
 
-        <button
-          class="soundtrack-song"
-          type="button"
-          role="listitem"
-          data-kind="album"
-          data-spotify-id="7pO73AlT4Yqhs8oeQgBka6"
-          data-title="Another You"
-          data-artist="Anthony Lazaro & Matthew Ifield"
-          data-duration="3:27"
-        >
-          <span class="song-number">02</span>
+        <button class="soundtrack-song" type="button" role="listitem"
+          data-index="3" data-src="another-you.mp3" data-title="Another You" data-artist="Anthony Lazaro & Matthew Ifield"
+          data-duration="3:27" data-art="A" data-art-class="art-another">
+          <span class="song-number">04</span>
           <span class="song-art art-another" aria-hidden="true">A</span>
           <span class="song-copy"><strong>Another You</strong><small>Anthony Lazaro & Matthew Ifield</small></span>
           <span class="song-duration">3:27</span>
         </button>
 
-        <button
-          class="soundtrack-song"
-          type="button"
-          role="listitem"
-          data-kind="track"
-          data-spotify-id="3lqxjjIAsmq8tb8ufj3NW9"
-          data-title="CAGÖLE"
-          data-artist="Ajar"
-          data-duration="2:44"
-        >
-          <span class="song-number">03</span>
+        <button class="soundtrack-song" type="button" role="listitem"
+          data-index="4" data-src="cagole.mp3" data-title="CAGÖLE" data-artist="Ajar"
+          data-duration="2:44" data-art="C" data-art-class="art-cagole">
+          <span class="song-number">05</span>
           <span class="song-art art-cagole" aria-hidden="true">C</span>
           <span class="song-copy"><strong>CAGÖLE</strong><small>Ajar</small></span>
           <span class="song-duration">2:44</span>
         </button>
 
-        <button
-          class="soundtrack-song"
-          type="button"
-          role="listitem"
-          data-kind="track"
-          data-spotify-id="5DZrNCtCKXV7lsBkN0qFBc"
-          data-title="Sweatshirt"
-          data-artist="Patrick Hizon & EJEAN"
-          data-duration="2:45"
-        >
-          <span class="song-number">04</span>
+        <button class="soundtrack-song" type="button" role="listitem"
+          data-index="5" data-src="sweatshirt.mp3" data-title="Sweatshirt" data-artist="Patrick Hizon & EJEAN"
+          data-duration="2:46" data-art="S" data-art-class="art-sweatshirt">
+          <span class="song-number">06</span>
           <span class="song-art art-sweatshirt" aria-hidden="true">S</span>
           <span class="song-copy"><strong>Sweatshirt</strong><small>Patrick Hizon & EJEAN</small></span>
-          <span class="song-duration">2:45</span>
+          <span class="song-duration">2:46</span>
         </button>
 
-        <button
-          class="soundtrack-song"
-          type="button"
-          role="listitem"
-          data-kind="track"
-          data-spotify-id="2nzED6Q3yWuvSQnxw6QTlU"
-          data-title="If I Could Ride a Bike"
-          data-artist="Park Bird & Chevy"
-          data-duration="3:23"
-        >
-          <span class="song-number">05</span>
-          <span class="song-art art-bike" aria-hidden="true">B</span>
+        <button class="soundtrack-song" type="button" role="listitem"
+          data-index="6" data-src="if-i-could-ride-a-bike.mp3" data-title="If I Could Ride a Bike" data-artist="Park Bird & Chevy"
+          data-duration="3:24" data-art="R" data-art-class="art-bike">
+          <span class="song-number">07</span>
+          <span class="song-art art-bike" aria-hidden="true">R</span>
           <span class="song-copy"><strong>If I Could Ride a Bike</strong><small>Park Bird & Chevy</small></span>
-          <span class="song-duration">3:23</span>
+          <span class="song-duration">3:24</span>
         </button>
 
-        <button
-          class="soundtrack-song"
-          type="button"
-          role="listitem"
-          data-kind="track"
-          data-spotify-id="1vxhCATyjDXRjteXeRtUKQ"
-          data-title="Tongue Tied"
-          data-artist="Ebony Loren"
-          data-duration="2:52"
-        >
-          <span class="song-number">06</span>
+        <button class="soundtrack-song" type="button" role="listitem"
+          data-index="7" data-src="tongue-tied.mp3" data-title="Tongue Tied" data-artist="Ebony Loren"
+          data-duration="2:53" data-art="T" data-art-class="art-tongue">
+          <span class="song-number">08</span>
           <span class="song-art art-tongue" aria-hidden="true">T</span>
           <span class="song-copy"><strong>Tongue Tied</strong><small>Ebony Loren</small></span>
-          <span class="song-duration">2:52</span>
+          <span class="song-duration">2:53</span>
         </button>
       </div>
 
       <footer class="soundtrack-footer">
-        <span>Made for our little universe ♥</span>
-        <a
-          id="soundtrack-open-spotify"
-          href="https://open.spotify.com/track/2EjuEHTRZRgE9pvaBm5Hh3"
-          target="_blank"
-          rel="noopener noreferrer"
-        >Open “Valentine” in Spotify ↗</a>
+        <span>Full songs from the files included with this website ♥</span>
+        <span id="soundtrack-status" aria-live="polite">Ready to play</span>
       </footer>
     </section>
   </aside>
 
 
-  <script src="script.js?v=11" defer></script>
-  <script src="https://open.spotify.com/embed/iframe-api/v1" defer></script>
+  <script src="script.js?v=13" defer></script>
 
 </body>
 </html>
