@@ -1193,26 +1193,41 @@ return {
 
 })();
 const minecraft = (() => {
-const WORLD_RADIUS = 12;
-const SAVE_KEY = "happySixMonthsBennyWorldV3";
+const WORLD_RADIUS = 30;
+const RENDER_DISTANCE = 27;
+const SAVE_KEY = "happySixMonthsBennyWorldV4";
 const EYE_HEIGHT = 1.62;
 const PLAYER_RADIUS = 0.28;
-const MAX_REACH = 6;
+const MAX_REACH = 8;
 
 const BLOCKS = {
-  grass:  { label: "Grass",  icon: "🌿", top: "#70b84d", side: "#568d3b", dark: "#3f6f2d" },
-  dirt:   { label: "Dirt",   icon: "🟫", top: "#a8754e", side: "#8a5e3e", dark: "#68452e" },
-  stone:  { label: "Stone",  icon: "🪨", top: "#aaa9a5", side: "#85847f", dark: "#666561" },
-  wood:   { label: "Wood",   icon: "🪵", top: "#c39055", side: "#9e6e3d", dark: "#744d2b" },
-  planks: { label: "Planks", icon: "🏠", top: "#d0a363", side: "#b17e43", dark: "#865d31" },
-  glass:  { label: "Glass",  icon: "◇",  top: "rgba(196,232,244,.58)", side: "rgba(142,202,225,.48)", dark: "rgba(95,166,197,.5)" },
-  leaves: { label: "Leaves", icon: "🍃", top: "#4d9950", side: "#3c7d40", dark: "#2e6534" },
-  water:  { label: "Water",  icon: "💧", top: "rgba(73,157,218,.72)", side: "rgba(44,118,178,.66)", dark: "rgba(31,87,143,.7)" },
-  flower: { label: "Flower", icon: "🌹", top: "#d84662", side: "#a52e45", dark: "#772234" },
-  bedrock:{ label: "Bedrock",icon: "⬛", top: "#4a4849", side: "#343233", dark: "#242223" }
+  grass:   { label: "Grass",   icon: "🌿", top: "#70b84d", side: "#568d3b", dark: "#3f6f2d" },
+  dirt:    { label: "Dirt",    icon: "🟫", top: "#a8754e", side: "#8a5e3e", dark: "#68452e" },
+  stone:   { label: "Stone",   icon: "🪨", top: "#aaa9a5", side: "#85847f", dark: "#666561" },
+  sand:    { label: "Sand",    icon: "🟨", top: "#e6d08a", side: "#cbb36b", dark: "#a58e4f" },
+  wood:    { label: "Wood",    icon: "🪵", top: "#c39055", side: "#9e6e3d", dark: "#744d2b" },
+  planks:  { label: "Planks",  icon: "🏠", top: "#d0a363", side: "#b17e43", dark: "#865d31" },
+  brick:   { label: "Brick",   icon: "🧱", top: "#b95e55", side: "#97453f", dark: "#73332f" },
+  glass:   { label: "Glass",   icon: "◇",  top: "rgba(196,232,244,.58)", side: "rgba(142,202,225,.48)", dark: "rgba(95,166,197,.5)" },
+  lantern: { label: "Lantern", icon: "🏮", top: "#ffe58a", side: "#e9a93b", dark: "#a96a20" },
+  leaves:  { label: "Leaves",  icon: "🍃", top: "#4d9950", side: "#3c7d40", dark: "#2e6534" },
+  water:   { label: "Water",   icon: "💧", top: "rgba(73,157,218,.72)", side: "rgba(44,118,178,.66)", dark: "rgba(31,87,143,.7)" },
+  flower:  { label: "Flower",  icon: "🌹", top: "#d84662", side: "#a52e45", dark: "#772234" },
+  crop:    { label: "Crops",   icon: "🌾", top: "#d9c95a", side: "#9a9a3d", dark: "#6c6e2d" },
+  crystal: { label: "Crystal", icon: "💎", top: "#83e4ff", side: "#4eb8dc", dark: "#2e7194" },
+  coal:    { label: "Coal",    icon: "⚫", top: "#53515a", side: "#37353c", dark: "#222126" },
+  bedrock: { label: "Bedrock", icon: "⬛", top: "#4a4849", side: "#343233", dark: "#242223" }
 };
 
-const HOTBAR = ["grass", "dirt", "stone", "wood", "planks", "glass"];
+const HOTBAR = ["grass", "dirt", "stone", "wood", "planks", "glass", "brick", "lantern"];
+const LANDMARKS = [
+  { id: "pond", name: "Moon Pond", x: -14, z: 10, icon: "💧" },
+  { id: "meadow", name: "Rose Meadow", x: 15, z: -12, icon: "🌹" },
+  { id: "village", name: "Tiny Village", x: 18, z: 15, icon: "🏘️" },
+  { id: "tower", name: "Old Lookout", x: -20, z: -17, icon: "🗼" },
+  { id: "cave", name: "Crystal Cave", x: 0, z: 24, icon: "💎" }
+];
+const HOUSE_SITE = { x: -7, z: -10, size: 7, foundationY: 4 };
 const FACE_DEFS = [
   { n: [0, 1, 0], shade: "top", verts: [[0,1,0],[1,1,0],[1,1,1],[0,1,1]] },
   { n: [0,-1, 0], shade: "dark", verts: [[0,0,1],[1,0,1],[1,0,0],[0,0,0]] },
@@ -1226,71 +1241,195 @@ function key(x, y, z) { return `${x},${y},${z}`; }
 function parseKey(value) { return value.split(",").map(Number); }
 function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
 function distance2D(a, b) { return Math.hypot(a.x - b.x, a.z - b.z); }
+function hash2(x, z) {
+  const value = Math.sin(x * 127.1 + z * 311.7) * 43758.5453123;
+  return value - Math.floor(value);
+}
+
 function seededHeight(x, z) {
-  const wave = Math.sin(x * .42) * .7 + Math.cos(z * .37) * .62 + Math.sin((x + z) * .22) * .38;
-  return clamp(2 + Math.round(wave), 1, 4);
+  const broad = Math.sin(x * .19) * 1.05 + Math.cos(z * .17) * .9;
+  const detail = Math.sin((x + z) * .31) * .5 + Math.cos((x - z) * .27) * .35;
+  const mountain = Math.max(0, 1 - Math.hypot(x - 1, z - 23) / 11) * 4.2;
+  return clamp(2 + Math.round(broad + detail + mountain), 1, 8);
+}
+
+function riverCenter(x) {
+  return Math.round(Math.sin((x + 7) * .18) * 4 + 4);
+}
+
+function nearPoint(x, z, px, pz, radius) {
+  return Math.hypot(x - px, z - pz) <= radius;
 }
 
 function createWorld() {
   const world = new Map();
   for (let x = -WORLD_RADIUS; x <= WORLD_RADIUS; x++) {
     for (let z = -WORLD_RADIUS; z <= WORLD_RADIUS; z++) {
-      let height = seededHeight(x, z);
-      const pond = x >= -7 && x <= -3 && z >= 4 && z <= 8;
-      if (pond) height = 1;
+      const pond = ((x + 14) ** 2) / 34 + ((z - 10) ** 2) / 24 <= 1;
+      const river = x < 7 && Math.abs(z - riverCenter(x)) <= 1;
+      const water = pond || river;
+      let height = water ? 1 : seededHeight(x, z);
+
       world.set(key(x, 0, z), "bedrock");
       for (let y = 1; y <= height; y++) {
-        const type = y === height ? (pond ? "sand" : "grass") : y >= height - 1 ? "dirt" : "stone";
-        world.set(key(x, y, z), type === "sand" ? "dirt" : type);
+        let type = "stone";
+        if (water && y === height) type = "sand";
+        else if (y === height) type = "grass";
+        else if (y >= height - 1) type = "dirt";
+        world.set(key(x, y, z), type);
       }
-      if (pond) world.set(key(x, 2, z), "water");
+      if (water) world.set(key(x, 2, z), "water");
     }
   }
 
-  const trees = [[-8,-6],[8,-7],[7,7],[-9,8],[4,-10]];
-  for (const [x,z] of trees) addTree(world, x, z);
-  const flowers = [[-2,-3],[0,-5],[3,-4],[-6,-1],[5,4],[8,2],[-1,8]];
-  for (const [x,z] of flowers) {
-    const y = highestSolid(world, x, z);
-    if (y > 0) world.set(key(x, y, z), "flower");
+  // A broad forest, with denser tree clusters away from the landmarks.
+  for (let x = -27; x <= 27; x += 3) {
+    for (let z = -27; z <= 27; z += 3) {
+      const reserved = LANDMARKS.some((spot) => nearPoint(x, z, spot.x, spot.z, 5.5)) || nearPoint(x, z, HOUSE_SITE.x + 3, HOUSE_SITE.z + 3, 6);
+      const top = topBlockType(world, x, z);
+      if (!reserved && top === "grass" && hash2(x, z) > .82) addTree(world, x, z, 4 + Math.floor(hash2(z, x) * 3));
+    }
   }
 
-  // A tiny starting shelter so the world already feels alive.
-  const baseX = 4, baseZ = 3;
-  const ground = highestSolid(world, baseX, baseZ);
-  for (let dx = 0; dx < 4; dx++) for (let dz = 0; dz < 4; dz++) world.set(key(baseX + dx, ground, baseZ + dz), "planks");
-  for (let dy = 1; dy <= 3; dy++) {
-    for (let dx = 0; dx < 4; dx++) {
-      if (!(dx === 1 && dy <= 2)) world.set(key(baseX + dx, ground + dy, baseZ), "planks");
-      world.set(key(baseX + dx, ground + dy, baseZ + 3), dx === 1 && dy === 2 ? "glass" : "planks");
-    }
-    for (let dz = 1; dz < 3; dz++) {
-      world.set(key(baseX, ground + dy, baseZ + dz), "planks");
-      world.set(key(baseX + 3, ground + dy, baseZ + dz), dy === 2 ? "glass" : "planks");
+  // A flower meadow and crop field make the map feel more alive.
+  for (let x = 10; x <= 21; x++) {
+    for (let z = -18; z <= -7; z++) {
+      if (hash2(x * 2, z * 3) > .57 && topBlockType(world, x, z) === "grass") {
+        world.set(key(x, highestSolid(world, x, z), z), "flower");
+      }
     }
   }
-  for (let dx = -1; dx <= 4; dx++) for (let dz = -1; dz <= 4; dz++) world.set(key(baseX + dx, ground + 4, baseZ + dz), "wood");
+
+  addVillage(world, 16, 13);
+  addTower(world, -20, -17);
+  addBridge(world, -8);
+  addCampfire(world, -2, -5);
+  addCrystalCave(world, 0, 24);
+  addStarterCabin(world, 5, 3);
   return world;
 }
 
-function addTree(world, x, z) {
+function topBlockType(world, x, z) {
+  for (let y = 24; y >= 0; y--) {
+    const type = world.get(key(x, y, z));
+    if (type && type !== "water" && type !== "flower" && type !== "crop") return type;
+  }
+  return null;
+}
+
+function addTree(world, x, z, trunkHeight = 5) {
   const ground = highestSolid(world, x, z);
-  if (ground < 1) return;
-  for (let y = ground; y < ground + 4; y++) world.set(key(x, y, z), "wood");
+  if (ground < 1 || topBlockType(world, x, z) !== "grass") return;
+  for (let y = ground; y < ground + trunkHeight; y++) world.set(key(x, y, z), "wood");
   for (let dx = -2; dx <= 2; dx++) {
     for (let dz = -2; dz <= 2; dz++) {
-      for (let dy = 2; dy <= 4; dy++) {
-        if (Math.abs(dx) + Math.abs(dz) + Math.abs(dy - 3) <= 4) world.set(key(x + dx, ground + dy, z + dz), "leaves");
+      for (let dy = trunkHeight - 2; dy <= trunkHeight + 1; dy++) {
+        if (Math.abs(dx) + Math.abs(dz) + Math.abs(dy - trunkHeight) <= 4) {
+          world.set(key(x + dx, ground + dy, z + dz), "leaves");
+        }
       }
     }
   }
+}
+
+function addHut(world, baseX, baseZ, width = 5, depth = 5) {
+  const floorY = Math.max(...Array.from({length: width * depth}, (_, i) => {
+    const dx = i % width, dz = Math.floor(i / width);
+    return highestSolid(world, baseX + dx, baseZ + dz);
+  }));
+  for (let dx = 0; dx < width; dx++) for (let dz = 0; dz < depth; dz++) world.set(key(baseX + dx, floorY, baseZ + dz), "planks");
+  for (let dy = 1; dy <= 3; dy++) {
+    for (let dx = 0; dx < width; dx++) {
+      if (!(dx === 2 && dy <= 2)) world.set(key(baseX + dx, floorY + dy, baseZ), "planks");
+      world.set(key(baseX + dx, floorY + dy, baseZ + depth - 1), dx === 2 && dy === 2 ? "glass" : "planks");
+    }
+    for (let dz = 1; dz < depth - 1; dz++) {
+      world.set(key(baseX, floorY + dy, baseZ + dz), dy === 2 ? "glass" : "planks");
+      world.set(key(baseX + width - 1, floorY + dy, baseZ + dz), dy === 2 ? "glass" : "planks");
+    }
+  }
+  for (let dx = -1; dx <= width; dx++) for (let dz = -1; dz <= depth; dz++) world.set(key(baseX + dx, floorY + 4, baseZ + dz), "brick");
+  world.set(key(baseX + 1, floorY + 2, baseZ + 1), "lantern");
+}
+
+function addVillage(world, x, z) {
+  addHut(world, x, z, 5, 5);
+  addHut(world, x + 7, z + 2, 5, 5);
+  const wellY = highestSolid(world, x + 5, z + 7);
+  for (let dx = 0; dx < 3; dx++) for (let dz = 0; dz < 3; dz++) world.set(key(x + 4 + dx, wellY, z + 6 + dz), "stone");
+  world.set(key(x + 5, wellY + 1, z + 7), "water");
+  for (let row = 0; row < 5; row++) {
+    for (let col = 0; col < 7; col++) {
+      const gx = x - 2 + col, gz = z + 7 + row;
+      if (topBlockType(world, gx, gz) === "grass") world.set(key(gx, highestSolid(world, gx, gz), gz), "crop");
+    }
+  }
+}
+
+function addTower(world, x, z) {
+  const y = highestSolid(world, x, z);
+  for (let dy = 0; dy < 9; dy++) {
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        const edge = Math.abs(dx) === 2 || Math.abs(dz) === 2;
+        const doorway = dz === -2 && dx === 0 && dy < 3;
+        if (edge && !doorway) world.set(key(x + dx, y + dy, z + dz), dy > 6 ? "brick" : "stone");
+      }
+    }
+  }
+  for (let dx = -3; dx <= 3; dx++) for (let dz = -3; dz <= 3; dz++) if (Math.abs(dx) === 3 || Math.abs(dz) === 3) world.set(key(x + dx, y + 9, z + dz), "brick");
+  world.set(key(x, y + 10, z), "lantern");
+}
+
+function addBridge(world, x) {
+  const centerZ = riverCenter(x);
+  for (let dz = -3; dz <= 3; dz++) {
+    for (let dx = -2; dx <= 2; dx++) world.set(key(x + dx, 3, centerZ + dz), "planks");
+    world.set(key(x - 3, 4, centerZ + dz), "wood");
+    world.set(key(x + 3, 4, centerZ + dz), "wood");
+  }
+  world.set(key(x - 3, 5, centerZ), "lantern");
+  world.set(key(x + 3, 5, centerZ), "lantern");
+}
+
+function addCampfire(world, x, z) {
+  const y = highestSolid(world, x, z);
+  for (const [dx, dz] of [[-1,0],[1,0],[0,-1],[0,1]]) world.set(key(x + dx, y, z + dz), "stone");
+  world.set(key(x, y, z), "lantern");
+  for (let i = -2; i <= 2; i++) {
+    world.set(key(x + i, y, z + 3), "planks");
+    world.set(key(x + i, y, z - 3), "planks");
+  }
+}
+
+function addCrystalCave(world, x, z) {
+  const base = highestSolid(world, x, z);
+  for (let dx = -6; dx <= 6; dx++) {
+    for (let dz = -5; dz <= 5; dz++) {
+      const height = Math.max(0, Math.round(6 - Math.hypot(dx * .8, dz)));
+      for (let dy = 0; dy <= height; dy++) world.set(key(x + dx, base + dy, z + dz), hash2(dx, dz) > .88 ? "coal" : "stone");
+    }
+  }
+  // Carve a walkable tunnel from the south side into the hill.
+  for (let dz = -7; dz <= 2; dz++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = 1; dy <= 3; dy++) world.delete(key(x + dx, base + dy, z + dz));
+    }
+  }
+  const crystals = [[-1,1,1],[1,1,0],[-1,2,-1],[1,2,-2],[0,1,-4],[0,3,-3],[2,1,-3],[-2,1,-2]];
+  crystals.forEach(([dx,dy,dz]) => world.set(key(x + dx, base + dy, z + dz), "crystal"));
+  world.set(key(x, base + 1, z - 5), "lantern");
+}
+
+function addStarterCabin(world, baseX, baseZ) {
+  addHut(world, baseX, baseZ, 5, 5);
 }
 
 function highestSolid(world, x, z) {
   let highest = 1;
   for (const [id, type] of world) {
     const [bx, by, bz] = parseKey(id);
-    if (bx === x && bz === z && type !== "water" && type !== "flower" && type !== "leaves") highest = Math.max(highest, by + 1);
+    if (bx === x && bz === z && type !== "water" && type !== "flower" && type !== "leaves" && type !== "crop") highest = Math.max(highest, by + 1);
   }
   return highest;
 }
@@ -1334,6 +1473,15 @@ return {
   _lookTargetYaw: 0,
   _lookTargetPitch: 0,
   _bennyRewards: null,
+  _adventure: null,
+  _animals: [],
+  _zoom: .92,
+  _zoomTarget: .92,
+  _skyMode: "day",
+  _celebration: 0,
+  _minimapCanvas: null,
+  _minimapCtx: null,
+  _minimapBase: null,
 
   mount(root) {
     this._root = root;
@@ -1341,11 +1489,17 @@ return {
     this._player = { x: 0.5, y: highestSolid(this._world, 0, -2), z: -2.5, yaw: 0, pitch: -0.08, vy: 0, grounded: true };
     this._benny = { x: 1.5, z: 1.5, y: highestSolid(this._world, 1, 1), yaw: Math.PI, tamed: this._loadTamed(), phase: 0, petBoost: 0 };
     this._bennyRewards = this._loadRewards();
+    this._adventure = this._loadAdventure();
+    this._skyMode = this._adventure.skyMode || "day";
+    this._animals = this._createAnimals();
+    this._zoom = .92;
+    this._zoomTarget = .92;
     this._lookTargetYaw = this._player.yaw;
     this._lookTargetPitch = this._player.pitch;
     this._selected = 0;
     this._keys = new Set();
     this._buildUI();
+    this._rebuildMinimap();
     this._bindEvents();
     this._lastTime = performance.now();
     this._loop(this._lastTime);
@@ -1363,6 +1517,9 @@ return {
     this._root = null;
     this._canvas = null;
     this._ctx = null;
+    this._minimapCanvas = null;
+    this._minimapCtx = null;
+    this._minimapBase = null;
   },
 
   _buildUI() {
@@ -1379,9 +1536,17 @@ return {
                 <div class="mc-quest" data-mc-quest>
                   <span>🍃 Leaves <strong>0/10</strong></span>
                   <span>🪵 Wood <strong>0/5</strong></span>
+                  <span>🏠 House <strong>0%</strong></span>
+                  <span>💎 Tag <strong>0/6</strong></span>
                 </div>
               </div>
-              <div class="mc-help">WASD move · mouse look · Space jump · left-click mine · right-click build · E tame/pet · 1–6 blocks</div>
+              <div class="mc-help">WASD move · mouse look · Space jump · Shift sprint · wheel/Z/X zoom · left-click mine · right-click place · E Benny · 1–8 blocks</div>
+            </div>
+            <canvas class="mc-minimap" data-mc-minimap width="160" height="160" aria-label="Block World minimap"></canvas>
+            <div class="mc-zoom-controls" aria-label="Zoom controls">
+              <button type="button" data-zoom-out aria-label="Zoom out">−</button>
+              <span data-zoom-label>100%</span>
+              <button type="button" data-zoom-in aria-label="Zoom in">+</button>
             </div>
             <div class="mc-crosshair"></div>
             <div class="mc-message" data-mc-message></div>
@@ -1390,7 +1555,7 @@ return {
             <div class="mc-lock-screen" data-mc-lock>
               <div class="mc-lock-card">
                 <h3>Enter Benny’s Block World</h3>
-                <p>This is a real-time, first-person browser voxel world. Explore, mine blocks, build a house, and find Benny.</p>
+                <p>Explore a much larger voxel world with forests, a river, village, tower, meadow, crystal cave, animals, quests, building, mining, day/night, and Benny.</p>
                 <button class="mc-start" type="button">Start exploring</button>
               </div>
             </div>
@@ -1413,20 +1578,32 @@ return {
         <div class="mc-benny-panel">
           <img class="mc-benny-photo" src="benny-standing.jpeg" alt="Benny standing happily on his back legs" />
           <div class="mc-benny-copy">
-            <h3>Meet Benny 🐕</h3>
-            <p>The animated block dog inside the world is based on Benny. Tame him, then mine <strong>10 leaves</strong> to feed him and <strong>5 wood blocks</strong> to make him a toy.</p>
-            <div class="game-controls" style="justify-content:flex-start;margin:12px 0 0">
-              <button class="btn secondary" data-mc-save type="button">Save world</button>
-              <button class="btn secondary" data-mc-reset type="button">Reset world</button>
+            <h3>Benny’s Adventure Book 🐕</h3>
+            <p>Tame Benny, feed him, make his toy and crystal tag, explore five landmarks, and complete a guided house challenge.</p>
+            <div class="mc-adventure-grid">
+              <div class="mc-activity" data-house-activity><span>🏠</span><div><strong>Build a house</strong><small>Start the challenge below.</small></div></div>
+              <div class="mc-activity" data-explore-activity><span>🧭</span><div><strong>Explore the map</strong><small>0/5 landmarks found</small></div></div>
+              <div class="mc-activity" data-crystal-activity><span>💎</span><div><strong>Benny’s shiny tag</strong><small>Mine 0/6 crystals</small></div></div>
             </div>
-            <p class="mc-disclaimer">This is an original Minecraft-inspired browser sandbox, not Minecraft, TLauncher, Mojang, or an official clone.</p>
+            <div class="mc-adventure-actions">
+              <button class="btn" data-house-start type="button">Start house challenge</button>
+              <button class="btn secondary" data-mc-time type="button">Switch to sunset</button>
+              <button class="btn secondary" data-mc-benny type="button">Go to Benny</button>
+              <button class="btn secondary" data-mc-home type="button">Go home</button>
+              <button class="btn secondary" data-mc-save type="button">Save world</button>
+              <button class="btn secondary" data-mc-reset type="button">New world</button>
+            </div>
+            <p class="mc-disclaimer">This is a much larger original Minecraft-inspired browser sandbox, not Minecraft, TLauncher, Mojang, or an official clone.</p>
           </div>
         </div>
       </div>`;
     this._root.replaceChildren(panel);
-    this._canvas = panel.querySelector("canvas");
+    this._canvas = panel.querySelector(".minecraft-canvas");
     this._ctx = this._canvas.getContext("2d");
+    this._minimapCanvas = panel.querySelector("[data-mc-minimap]");
+    this._minimapCtx = this._minimapCanvas?.getContext("2d") || null;
     this._renderHotbar();
+    this._updateAdventureUI();
 
     const resize = () => {
       const rect = this._canvas.getBoundingClientRect();
@@ -1467,12 +1644,14 @@ return {
         this._keys.add(event.code);
         event.preventDefault();
       }
-      if (/^Digit[1-6]$/.test(event.code)) {
+      if (/^Digit[1-8]$/.test(event.code)) {
         this._selected = Number(event.code.slice(-1)) - 1;
         this._renderHotbar();
       }
       if (event.code === "KeyE") this._interactWithBenny();
       if (event.code === "KeyR") this._saveWorld();
+      if (event.code === "KeyZ") this._setZoom(this._zoomTarget - .12);
+      if (event.code === "KeyX") this._setZoom(this._zoomTarget + .12);
     });
     this._on(document, "keyup", (event) => this._keys.delete(event.code));
     this._on(document, "mousemove", (event) => {
@@ -1486,6 +1665,12 @@ return {
       if (event.button === 0) this._mine();
       if (event.button === 2) this._build();
     });
+    this._on(this._canvas, "wheel", (event) => {
+      event.preventDefault();
+      this._setZoom(this._zoomTarget + (event.deltaY < 0 ? .1 : -.1));
+    }, { passive: false });
+    this._on(this._root.querySelector("[data-zoom-in]"), "click", () => this._setZoom(this._zoomTarget + .12));
+    this._on(this._root.querySelector("[data-zoom-out]"), "click", () => this._setZoom(this._zoomTarget - .12));
 
     // Touch drag controls camera direction. Dragging left now turns left.
     // Camera targets are eased in the animation loop to prevent jerky movement.
@@ -1530,19 +1715,29 @@ return {
         if (action === "tame") this._interactWithBenny();
       });
     });
+    this._on(this._root.querySelector("[data-house-start]"), "click", () => this._startHouseChallenge());
+    this._on(this._root.querySelector("[data-mc-time]"), "click", () => this._cycleSky());
+    this._on(this._root.querySelector("[data-mc-benny]"), "click", () => this._teleportNear(this._benny.x, this._benny.z, "Teleported near Benny."));
+    this._on(this._root.querySelector("[data-mc-home]"), "click", () => this._teleportNear(6, 1, "Teleported home."));
     this._on(this._root.querySelector("[data-mc-save]"), "click", () => this._saveWorld(true));
     this._on(this._root.querySelector("[data-mc-reset]"), "click", () => {
       if (!confirm("Reset the block world and Benny's tame status?")) return;
       safeStorage.removeItem(SAVE_KEY);
       safeStorage.removeItem(`${SAVE_KEY}:tamed`);
       safeStorage.removeItem(`${SAVE_KEY}:rewards`);
+      safeStorage.removeItem(`${SAVE_KEY}:adventure`);
       this._world = createWorld();
       this._benny = { x: 1.5, z: 1.5, y: highestSolid(this._world, 1, 1), yaw: Math.PI, tamed: false, phase: 0, petBoost: 0 };
       this._bennyRewards = { leaves: 0, wood: 0, fed: false, toy: false };
+      this._adventure = this._defaultAdventure();
+      this._skyMode = "day";
+      this._animals = this._createAnimals();
       this._player.x = .5; this._player.z = -2.5; this._player.y = highestSolid(this._world, 0, -2);
       this._lookTargetYaw = this._player.yaw;
       this._lookTargetPitch = this._player.pitch;
-      this._showMessage("The world and Benny's gifts have been reset.");
+      this._rebuildMinimap();
+      this._updateAdventureUI();
+      this._showMessage("A new expanded world has been generated.");
     });
   },
 
@@ -1576,6 +1771,8 @@ return {
     const lookEase = 1 - Math.exp(-15 * dt);
     p.yaw += (this._lookTargetYaw - p.yaw) * lookEase;
     p.pitch += (this._lookTargetPitch - p.pitch) * lookEase;
+    this._zoom += (this._zoomTarget - this._zoom) * (1 - Math.exp(-10 * dt));
+    this._celebration = Math.max(0, this._celebration - dt);
 
     let forward = 0, strafe = 0;
     if (this._keys.has("KeyW")) forward += 1;
@@ -1604,6 +1801,8 @@ return {
     p.x = clamp(p.x, -WORLD_RADIUS + .4, WORLD_RADIUS + .6);
     p.z = clamp(p.z, -WORLD_RADIUS + .4, WORLD_RADIUS + .6);
     this._updateBenny(dt);
+    this._updateAnimals(dt);
+    this._checkDiscoveries();
     this._target = this._raycast();
 
     const near = distance2D(p, this._benny) < 2.7;
@@ -1614,14 +1813,19 @@ return {
     stat.textContent = `${this._benny.tamed ? "Benny tamed ♥" : "Find and tame Benny"} · ${BLOCKS[HOTBAR[this._selected]].label} selected`;
 
     const quest = this._root.querySelector("[data-mc-quest]");
-    if (quest && this._bennyRewards) {
+    if (quest && this._bennyRewards && this._adventure) {
       const leaves = Math.min(10, this._bennyRewards.leaves);
       const wood = Math.min(5, this._bennyRewards.wood);
+      const houseProgress = this._houseProgress();
+      const crystals = Math.min(6, this._adventure.crystals);
       quest.innerHTML = `
-        <span class="${this._bennyRewards.fed ? "complete" : ""}">🍃 Leaves <strong>${leaves}/10</strong>${this._bennyRewards.fed ? " ✓ Fed Benny" : ""}</span>
-        <span class="${this._bennyRewards.toy ? "complete" : ""}">🪵 Wood <strong>${wood}/5</strong>${this._bennyRewards.toy ? " ✓ Toy made" : ""}</span>
+        <span class="${this._bennyRewards.fed ? "complete" : ""}">🍃 Leaves <strong>${leaves}/10</strong>${this._bennyRewards.fed ? " ✓" : ""}</span>
+        <span class="${this._bennyRewards.toy ? "complete" : ""}">🪵 Wood <strong>${wood}/5</strong>${this._bennyRewards.toy ? " ✓" : ""}</span>
+        <span class="${this._adventure.houseComplete ? "complete" : ""}">🏠 House <strong>${houseProgress}%</strong>${this._adventure.houseComplete ? " ✓" : ""}</span>
+        <span class="${this._adventure.shinyTag ? "complete" : ""}">💎 Tag <strong>${crystals}/6</strong>${this._adventure.shinyTag ? " ✓" : ""}</span>
       `;
     }
+    this._updateAdventureUI();
   },
 
   _moveHorizontal(dx, dz) {
@@ -1646,7 +1850,7 @@ return {
       const feet = Math.floor(y + .1), head = Math.floor(y + 1.7);
       for (let by = feet; by <= head; by++) {
         const type = this._world.get(key(bx,by,bz));
-        if (type && type !== "water" && type !== "flower" && type !== "leaves") return true;
+        if (type && type !== "water" && type !== "flower" && type !== "leaves" && type !== "crop") return true;
       }
     }
     return false;
@@ -1655,9 +1859,9 @@ return {
   _groundAt(x, z) {
     const bx = Math.floor(x), bz = Math.floor(z);
     let top = 1;
-    for (let y = 0; y < 16; y++) {
+    for (let y = 0; y < 28; y++) {
       const type = this._world.get(key(bx,y,bz));
-      if (type && type !== "water" && type !== "flower" && type !== "leaves") top = y + 1;
+      if (type && type !== "water" && type !== "flower" && type !== "leaves" && type !== "crop") top = y + 1;
     }
     return top;
   },
@@ -1691,6 +1895,182 @@ return {
       b.z = this._player.z - Math.cos(this._player.yaw) * 2;
       b.y = this._groundAt(b.x,b.z);
     }
+  },
+
+  _createAnimals() {
+    return [
+      { type: "sheep", x: -5.5, z: -4.5, homeX: -5.5, homeZ: -4.5, yaw: 0, phase: .2 },
+      { type: "sheep", x: 10.5, z: -10.5, homeX: 10.5, homeZ: -10.5, yaw: 1, phase: 1.4 },
+      { type: "sheep", x: 19.5, z: 11.5, homeX: 19.5, homeZ: 11.5, yaw: 2, phase: 2.3 },
+      { type: "duck", x: -14.5, z: 9.5, homeX: -14.5, homeZ: 9.5, yaw: 0, phase: .7 },
+      { type: "duck", x: -11.5, z: 11.5, homeX: -11.5, homeZ: 11.5, yaw: 2.2, phase: 1.8 }
+    ];
+  },
+
+  _updateAnimals(dt) {
+    for (const animal of this._animals) {
+      animal.phase += dt * (animal.type === "duck" ? 1.1 : .7);
+      const targetX = animal.homeX + Math.sin(animal.phase * .57) * 2.4;
+      const targetZ = animal.homeZ + Math.cos(animal.phase * .49) * 2.1;
+      const dx = targetX - animal.x, dz = targetZ - animal.z;
+      const dist = Math.hypot(dx, dz);
+      if (dist > .1) {
+        const speed = animal.type === "duck" ? .45 : .62;
+        animal.x += dx / dist * Math.min(dist, speed * dt);
+        animal.z += dz / dist * Math.min(dist, speed * dt);
+        animal.yaw = Math.atan2(dx, dz);
+      }
+      animal.y = this._groundAt(animal.x, animal.z);
+    }
+  },
+
+  _defaultAdventure() {
+    return {
+      houseActive: false,
+      planksPlaced: 0,
+      glassPlaced: 0,
+      houseComplete: false,
+      crystals: 0,
+      shinyTag: false,
+      discoveries: Object.fromEntries(LANDMARKS.map((spot) => [spot.id, false])),
+      skyMode: "day"
+    };
+  },
+
+  _loadAdventure() {
+    const defaults = this._defaultAdventure();
+    try {
+      const saved = JSON.parse(safeStorage.getItem(`${SAVE_KEY}:adventure`));
+      if (!saved || typeof saved !== "object") return defaults;
+      return {
+        ...defaults,
+        ...saved,
+        discoveries: { ...defaults.discoveries, ...(saved.discoveries || {}) }
+      };
+    } catch {
+      return defaults;
+    }
+  },
+
+  _saveAdventure() {
+    if (!this._adventure) return;
+    this._adventure.skyMode = this._skyMode;
+    try { safeStorage.setItem(`${SAVE_KEY}:adventure`, JSON.stringify(this._adventure)); } catch (_error) {}
+  },
+
+  _houseProgress() {
+    if (!this._adventure) return 0;
+    const plankPart = Math.min(1, this._adventure.planksPlaced / 20);
+    const glassPart = Math.min(1, this._adventure.glassPlaced / 4);
+    return Math.round((plankPart * .75 + glassPart * .25) * 100);
+  },
+
+  _updateAdventureUI() {
+    if (!this._root || !this._adventure) return;
+    const house = this._root.querySelector("[data-house-activity]");
+    const explore = this._root.querySelector("[data-explore-activity]");
+    const crystal = this._root.querySelector("[data-crystal-activity]");
+    const found = Object.values(this._adventure.discoveries).filter(Boolean).length;
+    if (house) {
+      house.classList.toggle("complete", this._adventure.houseComplete);
+      house.querySelector("small").textContent = this._adventure.houseComplete
+        ? "House complete — Benny loves it!"
+        : this._adventure.houseActive
+          ? `${Math.min(20, this._adventure.planksPlaced)}/20 planks · ${Math.min(4, this._adventure.glassPlaced)}/4 glass`
+          : "Start the guided foundation challenge.";
+    }
+    if (explore) {
+      explore.classList.toggle("complete", found === LANDMARKS.length);
+      explore.querySelector("small").textContent = `${found}/${LANDMARKS.length} landmarks found`;
+    }
+    if (crystal) {
+      crystal.classList.toggle("complete", this._adventure.shinyTag);
+      crystal.querySelector("small").textContent = this._adventure.shinyTag
+        ? "Benny is wearing his shiny tag!"
+        : `Mine ${Math.min(6, this._adventure.crystals)}/6 crystals in the cave`;
+    }
+    const timeButton = this._root.querySelector("[data-mc-time]");
+    if (timeButton) {
+      const next = this._skyMode === "day" ? "sunset" : this._skyMode === "sunset" ? "night" : "day";
+      timeButton.textContent = `Switch to ${next}`;
+    }
+  },
+
+  _startHouseChallenge() {
+    const { x, z, size, foundationY } = HOUSE_SITE;
+    for (let dx = -1; dx <= size; dx++) {
+      for (let dz = -1; dz <= size; dz++) {
+        for (let y = 1; y <= 18; y++) this._world.delete(key(x + dx, y, z + dz));
+        this._world.set(key(x + dx, 1, z + dz), "dirt");
+        this._world.set(key(x + dx, 2, z + dz), "dirt");
+        this._world.set(key(x + dx, 3, z + dz), "grass");
+      }
+    }
+    for (let dx = 0; dx < size; dx++) for (let dz = 0; dz < size; dz++) this._world.set(key(x + dx, foundationY, z + dz), "planks");
+    this._adventure.houseActive = true;
+    this._adventure.planksPlaced = 0;
+    this._adventure.glassPlaced = 0;
+    this._adventure.houseComplete = false;
+    this._teleportNear(x + 3, z - 3, "Foundation ready. Build 20 planks and place 4 windows inside the glowing guide.");
+    this._rebuildMinimap();
+    this._saveAdventure();
+    this._updateAdventureUI();
+  },
+
+  _isInsideHouseSite(x, y, z) {
+    return this._adventure?.houseActive &&
+      x >= HOUSE_SITE.x && x < HOUSE_SITE.x + HOUSE_SITE.size &&
+      z >= HOUSE_SITE.z && z < HOUSE_SITE.z + HOUSE_SITE.size &&
+      y >= HOUSE_SITE.foundationY + 1 && y <= HOUSE_SITE.foundationY + 5;
+  },
+
+  _checkHouseCompletion() {
+    if (!this._adventure.houseActive || this._adventure.houseComplete) return;
+    if (this._adventure.planksPlaced >= 20 && this._adventure.glassPlaced >= 4) {
+      this._adventure.houseComplete = true;
+      this._celebration = 7;
+      this._benny.petBoost = 5;
+      this._showMessage("House complete! Benny is celebrating with you! 🏠♥");
+      this._saveAdventure();
+    }
+  },
+
+  _checkDiscoveries() {
+    if (!this._adventure) return;
+    for (const spot of LANDMARKS) {
+      if (this._adventure.discoveries[spot.id]) continue;
+      if (Math.hypot(this._player.x - spot.x, this._player.z - spot.z) < 5) {
+        this._adventure.discoveries[spot.id] = true;
+        this._celebration = 2.4;
+        this._showMessage(`${spot.icon} Landmark discovered: ${spot.name}`);
+        this._saveAdventure();
+        this._updateAdventureUI();
+      }
+    }
+  },
+
+  _cycleSky() {
+    this._skyMode = this._skyMode === "day" ? "sunset" : this._skyMode === "sunset" ? "night" : "day";
+    this._saveAdventure();
+    this._updateAdventureUI();
+    this._showMessage(`${this._skyMode[0].toUpperCase() + this._skyMode.slice(1)} mode enabled.`);
+  },
+
+  _setZoom(value) {
+    this._zoomTarget = clamp(value, .58, 1.55);
+    const label = this._root?.querySelector("[data-zoom-label]");
+    if (label) label.textContent = `${Math.round(this._zoomTarget / .92 * 100)}%`;
+  },
+
+  _teleportNear(x, z, message) {
+    const px = clamp(x, -WORLD_RADIUS + 1, WORLD_RADIUS - 1);
+    const pz = clamp(z, -WORLD_RADIUS + 1, WORLD_RADIUS - 1);
+    this._player.x = px;
+    this._player.z = pz;
+    this._player.y = this._groundAt(px, pz);
+    this._player.vy = 0;
+    this._player.grounded = true;
+    this._showMessage(message);
   },
 
   _interactWithBenny() {
@@ -1735,6 +2115,22 @@ return {
     if (!target) return this._showMessage("No block within reach.");
     if (target.hit.y === 0 || target.type === "bedrock") return this._showMessage("Bedrock cannot be mined.");
     this._world.delete(key(target.hit.x,target.hit.y,target.hit.z));
+    this._rebuildMinimap();
+
+    if (target.type === "crystal") {
+      this._adventure.crystals = Math.min(6, this._adventure.crystals + 1);
+      if (this._adventure.crystals >= 6 && !this._adventure.shinyTag) {
+        this._adventure.shinyTag = true;
+        this._benny.petBoost = 6;
+        this._celebration = 6;
+        this._showMessage("You crafted Benny a shiny crystal tag! 💎🐕");
+      } else {
+        this._showMessage(`Crystal collected · ${this._adventure.crystals}/6`);
+      }
+      this._saveAdventure();
+      this._updateAdventureUI();
+      return;
+    }
 
     if (target.type === "leaves" || target.type === "wood") {
       this._collectForBenny(target.type);
@@ -1783,8 +2179,19 @@ return {
     const nearPlayer = Math.abs(this._player.x - (x + .5)) < .75 && Math.abs(this._player.z - (z + .5)) < .75 && y >= Math.floor(this._player.y) && y <= Math.floor(this._player.y + 1.8);
     const nearBenny = Math.abs(this._benny.x - (x + .5)) < .7 && Math.abs(this._benny.z - (z + .5)) < .7 && y <= this._benny.y + 1;
     if (nearPlayer || nearBenny) return this._showMessage("That space is occupied.");
-    this._world.set(key(x,y,z), HOTBAR[this._selected]);
-    this._showMessage(`${BLOCKS[HOTBAR[this._selected]].label} placed.`);
+    const type = HOTBAR[this._selected];
+    this._world.set(key(x,y,z), type);
+    this._rebuildMinimap();
+    if (this._isInsideHouseSite(x, y, z)) {
+      if (type === "planks") this._adventure.planksPlaced += 1;
+      if (type === "glass") this._adventure.glassPlaced += 1;
+      this._checkHouseCompletion();
+      this._saveAdventure();
+      this._updateAdventureUI();
+      this._showMessage(`House progress · ${Math.min(20, this._adventure.planksPlaced)}/20 planks · ${Math.min(4, this._adventure.glassPlaced)}/4 glass`);
+    } else {
+      this._showMessage(`${BLOCKS[type].label} placed.`);
+    }
   },
 
   _cameraTransform(point) {
@@ -1804,7 +2211,7 @@ return {
   _project(point, width, height) {
     const v = this._cameraTransform(point);
     if (v.z <= .08) return null;
-    const focal = Math.min(width, height) * .92;
+    const focal = Math.min(width, height) * this._zoom;
     return { x: width / 2 + v.x * focal / v.z, y: height / 2 - v.y * focal / v.z, z: v.z };
   },
 
@@ -1817,10 +2224,22 @@ return {
     ctx.clearRect(0,0,width,height);
 
     const sky = ctx.createLinearGradient(0,0,0,height);
-    sky.addColorStop(0,"#79bce9");
-    sky.addColorStop(.58,"#c4e6f6");
-    sky.addColorStop(.59,"#d8e8ce");
-    sky.addColorStop(1,"#688f54");
+    if (this._skyMode === "night") {
+      sky.addColorStop(0,"#071426");
+      sky.addColorStop(.58,"#17395a");
+      sky.addColorStop(.59,"#273f43");
+      sky.addColorStop(1,"#334d35");
+    } else if (this._skyMode === "sunset") {
+      sky.addColorStop(0,"#4d315f");
+      sky.addColorStop(.45,"#da6e67");
+      sky.addColorStop(.59,"#f6bb79");
+      sky.addColorStop(1,"#667548");
+    } else {
+      sky.addColorStop(0,"#79bce9");
+      sky.addColorStop(.58,"#c4e6f6");
+      sky.addColorStop(.59,"#d8e8ce");
+      sky.addColorStop(1,"#688f54");
+    }
     ctx.fillStyle = sky;
     ctx.fillRect(0,0,width,height);
     this._drawSky(ctx,width,height,time);
@@ -1829,7 +2248,7 @@ return {
     const px = this._player.x, pz = this._player.z;
     for (const [id,type] of this._world) {
       const [x,y,z] = parseKey(id);
-      if ((x - px) ** 2 + (z - pz) ** 2 > 24 ** 2) continue;
+      if ((x - px) ** 2 + (z - pz) ** 2 > RENDER_DISTANCE ** 2) continue;
       for (const face of FACE_DEFS) {
         const nx = x + face.n[0], ny = y + face.n[1], nz = z + face.n[2];
         const neighbor = this._world.get(key(nx,ny,nz));
@@ -1843,6 +2262,8 @@ return {
       }
     }
     this._addBennyFaces(faces,width,height,time);
+    this._addAnimalFaces(faces,width,height,time);
+    this._addHouseGuideFaces(faces,width,height,time);
     faces.sort((a,b) => b.depth - a.depth);
 
     for (const face of faces) {
@@ -1859,19 +2280,42 @@ return {
         ctx.strokeStyle = "rgba(255,255,255,.5)";
         ctx.stroke();
       }
+      if (face.type === "lantern") {
+        ctx.save();
+        ctx.globalCompositeOperation = "screen";
+        ctx.fillStyle = "rgba(255,201,77,.18)";
+        ctx.fill();
+        ctx.restore();
+      }
     }
 
     this._drawBennyName(ctx,width,height);
     this._drawTargetOutline(ctx,width,height);
+    this._drawCelebration(ctx,width,height,time);
+    this._renderMinimap();
   },
 
   _drawSky(ctx,width,height,time) {
     ctx.save();
-    ctx.fillStyle = "rgba(255,245,190,.94)";
-    ctx.beginPath();
-    ctx.arc(width * .82, height * .18, 34, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "rgba(255,255,255,.7)";
+    if (this._skyMode === "night") {
+      ctx.fillStyle = "rgba(245,248,224,.92)";
+      ctx.beginPath();
+      ctx.arc(width * .82, height * .18, 28, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,.82)";
+      for (let i = 0; i < 48; i++) {
+        const x = (i * 97) % Math.max(1, width);
+        const y = 18 + ((i * 53) % Math.max(40, Math.floor(height * .48)));
+        const r = i % 7 === 0 ? 1.7 : .8;
+        ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+      }
+    } else {
+      ctx.fillStyle = this._skyMode === "sunset" ? "rgba(255,202,117,.94)" : "rgba(255,245,190,.94)";
+      ctx.beginPath();
+      ctx.arc(width * .82, height * (this._skyMode === "sunset" ? .38 : .18), 34, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.fillStyle = this._skyMode === "night" ? "rgba(190,207,226,.35)" : "rgba(255,255,255,.7)";
     const drift = (time * 6) % (width + 240) - 120;
     for (let i=0;i<3;i++) {
       const x = (drift + i * width * .48) % (width + 180) - 90;
@@ -1914,7 +2358,7 @@ return {
     const walk = moving ? Math.sin(b.phase*1.7)*.07 : 0;
     const bounce = moving ? Math.abs(Math.sin(b.phase*1.7))*.05 : 0;
     const base={x:b.x,y:b.y+bounce,z:b.z};
-    const tan="#d5b58c", cream="#ead7bb", dark="#5c3d36", collar="#8f1730";
+    const tan="#d5b58c", cream="#ead7bb", dark="#5c3d36", collar=this._adventure?.shinyTag?"#f1d36c":"#8f1730";
     const local=(side,up,front)=>({
       x:base.x+Math.cos(b.yaw)*side+Math.sin(b.yaw)*front,
       y:base.y+up,
@@ -1941,6 +2385,104 @@ return {
       this._modelBox(faces,local(.46,.08 + toyBounce,.72),[.24,.22,.24],"#d7a52e",b.yaw + time * .7,width,height);
       this._modelBox(faces,local(.46,.27 + toyBounce,.72),[.1,.12,.1],"#8f1730",b.yaw,width,height);
     }
+  },
+
+  _addAnimalFaces(faces,width,height,time) {
+    for (const animal of this._animals) {
+      const ground = animal.y || this._groundAt(animal.x, animal.z);
+      const bob = Math.abs(Math.sin(animal.phase * 2)) * .025;
+      const base = { x: animal.x, y: ground + bob, z: animal.z };
+      const local = (side, up, front) => ({
+        x: base.x + Math.cos(animal.yaw) * side + Math.sin(animal.yaw) * front,
+        y: base.y + up,
+        z: base.z - Math.sin(animal.yaw) * side + Math.cos(animal.yaw) * front
+      });
+      if (animal.type === "sheep") {
+        this._modelBox(faces, local(0,.34,0), [.72,.62,1.08], "#e7e1d3", animal.yaw, width, height);
+        this._modelBox(faces, local(0,.58,.67), [.48,.5,.48], "#4b423d", animal.yaw, width, height);
+        for (const sx of [-.24,.24]) for (const fz of [-.32,.32]) this._modelBox(faces, local(sx,.04,fz), [.14,.38,.14], "#3b3430", animal.yaw, width, height);
+      } else {
+        this._modelBox(faces, local(0,.18,0), [.44,.32,.65], "#f2d45f", animal.yaw, width, height);
+        this._modelBox(faces, local(0,.37,.38), [.34,.36,.34], "#f4df75", animal.yaw, width, height);
+        this._modelBox(faces, local(0,.39,.62), [.25,.12,.28], "#e58f37", animal.yaw, width, height);
+      }
+    }
+  },
+
+  _addHouseGuideFaces(faces,width,height,time) {
+    if (!this._adventure?.houseActive || this._adventure.houseComplete) return;
+    const { x, z, size, foundationY } = HOUSE_SITE;
+    const pulse = .17 + Math.sin(time * 3) * .04;
+    const guide = `rgba(255,255,255,${pulse})`;
+    for (let dy = 1; dy <= 3; dy++) {
+      for (let i = 0; i < size; i += 2) {
+        this._modelBox(faces, {x:x+i+.5,y:foundationY+dy,z:z+.5}, [.94,.08,.94], guide, 0, width, height);
+        this._modelBox(faces, {x:x+i+.5,y:foundationY+dy,z:z+size-.5}, [.94,.08,.94], guide, 0, width, height);
+        this._modelBox(faces, {x:x+.5,y:foundationY+dy,z:z+i+.5}, [.94,.08,.94], guide, 0, width, height);
+        this._modelBox(faces, {x:x+size-.5,y:foundationY+dy,z:z+i+.5}, [.94,.08,.94], guide, 0, width, height);
+      }
+    }
+  },
+
+  _drawCelebration(ctx,width,height,time) {
+    if (this._celebration <= 0) return;
+    ctx.save();
+    ctx.textAlign = "center";
+    for (let i = 0; i < 18; i++) {
+      const x = ((i * 83 + time * (28 + i)) % (width + 80)) - 40;
+      const y = height - ((time * (42 + i * 1.3) + i * 47) % (height + 90));
+      ctx.globalAlpha = .45 + (i % 4) * .12;
+      ctx.font = `${18 + (i % 5) * 4}px sans-serif`;
+      ctx.fillText(i % 3 === 0 ? "♥" : i % 3 === 1 ? "✦" : "🐾", x, y);
+    }
+    ctx.restore();
+  },
+
+  _rebuildMinimap() {
+    if (!this._minimapCanvas || !this._minimapCtx || !this._world) return;
+    const size = this._minimapCanvas.width;
+    const base = document.createElement("canvas");
+    base.width = size; base.height = size;
+    const ctx = base.getContext("2d");
+    const cell = size / (WORLD_RADIUS * 2 + 1);
+    const colors = {
+      grass: "#5f9d47", dirt: "#8a5e3e", stone: "#7e7d79", sand: "#ddc77d",
+      water: "#397fbd", wood: "#865a35", leaves: "#376f3c", planks: "#ba874d",
+      brick: "#93433e", crystal: "#5ed4f5", crop: "#c8b94e", flower: "#c23a59"
+    };
+    for (let x = -WORLD_RADIUS; x <= WORLD_RADIUS; x++) {
+      for (let z = -WORLD_RADIUS; z <= WORLD_RADIUS; z++) {
+        let top = "bedrock";
+        for (let y = 24; y >= 0; y--) {
+          const type = this._world.get(key(x,y,z));
+          if (type) { top = type; break; }
+        }
+        ctx.fillStyle = colors[top] || "#4b4a4a";
+        ctx.fillRect((x + WORLD_RADIUS) * cell, (z + WORLD_RADIUS) * cell, Math.ceil(cell)+.2, Math.ceil(cell)+.2);
+      }
+    }
+    this._minimapBase = base;
+  },
+
+  _renderMinimap() {
+    const ctx = this._minimapCtx;
+    const canvas = this._minimapCanvas;
+    if (!ctx || !canvas || !this._minimapBase) return;
+    const size = canvas.width;
+    const toMap = (value) => (value + WORLD_RADIUS) / (WORLD_RADIUS * 2 + 1) * size;
+    ctx.clearRect(0,0,size,size);
+    ctx.drawImage(this._minimapBase,0,0);
+    for (const spot of LANDMARKS) {
+      ctx.fillStyle = this._adventure?.discoveries?.[spot.id] ? "#fff2a8" : "rgba(255,255,255,.4)";
+      ctx.beginPath(); ctx.arc(toMap(spot.x),toMap(spot.z),3.2,0,Math.PI*2); ctx.fill();
+    }
+    ctx.fillStyle = "#8f1730";
+    ctx.beginPath(); ctx.arc(toMap(this._benny.x),toMap(this._benny.z),4.2,0,Math.PI*2); ctx.fill();
+    const px = toMap(this._player.x), pz = toMap(this._player.z);
+    ctx.save(); ctx.translate(px,pz); ctx.rotate(-this._player.yaw);
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath(); ctx.moveTo(0,-7); ctx.lineTo(5,6); ctx.lineTo(0,3); ctx.lineTo(-5,6); ctx.closePath(); ctx.fill();
+    ctx.restore();
   },
 
   _drawBennyName(ctx,width,height) {
@@ -1990,7 +2532,8 @@ return {
       safeStorage.setItem(SAVE_KEY,JSON.stringify(custom));
       safeStorage.setItem(`${SAVE_KEY}:tamed`,String(this._benny?.tamed||false));
       this._saveRewards();
-      if(showMessage)this._showMessage("World and Benny's gifts saved in this browser.");
+      this._saveAdventure();
+      if(showMessage)this._showMessage("World, quests, and Benny's progress saved in this browser.");
     } catch(error) {
       if(showMessage)this._showMessage("The browser could not save this world.");
     }
@@ -2379,6 +2922,330 @@ return {
 };
 
 })();
+
+const screenDiary = (() => {
+  const STORAGE_KEY = "happy6:cozy-screen-diary:v1";
+
+  const STARTER_WATCHED = [
+    { id: "anand", title: "Anand", note: "Watched together", status: "watched" },
+    { id: "ye-maaya-chesave", title: "Ye Maaya Chesave", note: "Watched together", status: "watched" },
+    { id: "with-love", title: "With Love", note: "Watched together", status: "watched" },
+    { id: "anaganaga-oka-raju", title: "Anaganaga Oka Raju", note: "Watched together", status: "watched" },
+    { id: "queen-of-tears", title: "Queen of Tears", note: "Watched together", status: "watched" },
+    { id: "mike-and-molly", title: "Mike & Molly", note: "Watched together", status: "watched" },
+    { id: "tamil-padam-2", title: "Tamil Padam 2", note: "Halfway… lmao", status: "halfway" },
+    { id: "little-things", title: "Little Things", note: "Watched together", status: "watched" },
+    { id: "atharintiki-daaredi", title: "Atharintiki Daaredi", note: "Watched together", status: "watched" },
+    { id: "seethamma-vakitlo-sirimalle-chettu", title: "Seethamma Vakitlo Sirimalle Chettu", note: "Watched together", status: "watched" }
+  ];
+
+  function makeId(value) {
+    const clean = String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+    return `${clean || "watch"}-${Date.now().toString(36)}`;
+  }
+
+  function loadState() {
+    const fallback = {
+      favorites: [],
+      toWatch: [],
+      extraWatched: [],
+      pickerMessage: ""
+    };
+
+    try {
+      const stored = JSON.parse(safeStorage.getItem(STORAGE_KEY));
+      if (!stored || typeof stored !== "object") return fallback;
+      return {
+        favorites: Array.isArray(stored.favorites) ? stored.favorites : [],
+        toWatch: Array.isArray(stored.toWatch) ? stored.toWatch : [],
+        extraWatched: Array.isArray(stored.extraWatched) ? stored.extraWatched : [],
+        pickerMessage: ""
+      };
+    } catch (_error) {
+      return fallback;
+    }
+  }
+
+  return {
+    _root: null,
+    _state: null,
+
+    mount(root) {
+      this._root = root;
+      this._state = loadState();
+      this._render();
+    },
+
+    unmount() {
+      this._root = null;
+      this._state = null;
+    },
+
+    _save() {
+      if (!this._state) return;
+      safeStorage.setItem(STORAGE_KEY, JSON.stringify({
+        favorites: this._state.favorites,
+        toWatch: this._state.toWatch,
+        extraWatched: this._state.extraWatched
+      }));
+    },
+
+    _allWatched() {
+      return [...STARTER_WATCHED, ...(this._state?.extraWatched || [])];
+    },
+
+    _toggleFavorite(id) {
+      const favorites = new Set(this._state.favorites);
+      if (favorites.has(id)) favorites.delete(id);
+      else favorites.add(id);
+      this._state.favorites = [...favorites];
+      this._save();
+      this._render();
+    },
+
+    _addToWatch(title) {
+      const cleanTitle = String(title || "").trim();
+      if (!cleanTitle) return;
+
+      const alreadyExists = [
+        ...this._allWatched(),
+        ...this._state.toWatch
+      ].some((item) => item.title.toLowerCase() === cleanTitle.toLowerCase());
+
+      if (alreadyExists) {
+        this._state.pickerMessage = "That one is already in our diary ♥";
+        this._render();
+        return;
+      }
+
+      this._state.toWatch.push({
+        id: makeId(cleanTitle),
+        title: cleanTitle
+      });
+      this._state.pickerMessage = `${cleanTitle} was added to our couch queue.`;
+      this._save();
+      this._render();
+    },
+
+    _removeToWatch(id) {
+      this._state.toWatch = this._state.toWatch.filter((item) => item.id !== id);
+      this._state.pickerMessage = "Removed from our couch queue.";
+      this._save();
+      this._render();
+    },
+
+    _markWatched(id) {
+      const item = this._state.toWatch.find((entry) => entry.id === id);
+      if (!item) return;
+
+      this._state.toWatch = this._state.toWatch.filter((entry) => entry.id !== id);
+      this._state.extraWatched.push({
+        id: item.id,
+        title: item.title,
+        note: "Watched together",
+        status: "watched"
+      });
+      this._state.pickerMessage = `${item.title} moved into our watched memories ♥`;
+      this._save();
+      this._render();
+    },
+
+    _pickNext() {
+      if (!this._state.toWatch.length) {
+        this._state.pickerMessage = "Add a few things first, then let fate choose our next watch.";
+      } else {
+        const choice = this._state.toWatch[
+          Math.floor(Math.random() * this._state.toWatch.length)
+        ];
+        this._state.pickerMessage = `Tonight’s pick: ${choice.title} 🍿`;
+      }
+      this._render();
+    },
+
+    _render() {
+      const root = this._root;
+      const state = this._state;
+      if (!root || !state) return;
+
+      const watched = this._allWatched();
+      const favorites = new Set(state.favorites);
+      const finishedCount = watched.filter((item) => item.status === "watched").length;
+      const halfwayCount = watched.filter((item) => item.status === "halfway").length;
+
+      const panel = document.createElement("section");
+      panel.className = "game-panel wide screen-diary-panel";
+
+      const intro = document.createElement("div");
+      intro.className = "screen-diary-hero";
+      intro.innerHTML = `
+        <div>
+          <p class="screen-diary-kicker">Six months, one couch, many stories</p>
+          <h3>Our Cozy Screen Diary</h3>
+          <p>A little home for everything we have watched, laughed through, cried over, paused halfway, and still want to see together.</p>
+        </div>
+        <div class="screen-diary-stats" aria-label="Watch statistics">
+          <span><strong>${finishedCount}</strong> finished</span>
+          <span><strong>${halfwayCount}</strong> halfway</span>
+          <span><strong>${state.toWatch.length}</strong> next up</span>
+        </div>
+      `;
+
+      const columns = document.createElement("div");
+      columns.className = "screen-diary-columns";
+
+      const watchedSection = document.createElement("section");
+      watchedSection.className = "screen-diary-section";
+      watchedSection.innerHTML = `
+        <div class="screen-section-heading">
+          <div>
+            <p class="screen-section-kicker">Already part of our story</p>
+            <h4>Watched With You ♥</h4>
+          </div>
+          <span class="screen-count">${watched.length}</span>
+        </div>
+      `;
+
+      const watchedGrid = document.createElement("div");
+      watchedGrid.className = "watched-grid";
+
+      watched.forEach((item, index) => {
+        const card = document.createElement("article");
+        card.className = `watch-card ${item.status === "halfway" ? "halfway" : ""}`;
+        const isFavorite = favorites.has(item.id);
+        card.innerHTML = `
+          <div class="watch-card-number">${String(index + 1).padStart(2, "0")}</div>
+          <div class="watch-card-copy">
+            <h5>${escapeHtml(item.title)}</h5>
+            <p>${escapeHtml(item.note)}</p>
+          </div>
+          <span class="watch-status ${item.status}">
+            ${item.status === "halfway" ? "Still watching" : "Watched"}
+          </span>
+        `;
+
+        const heart = document.createElement("button");
+        heart.type = "button";
+        heart.className = `watch-heart ${isFavorite ? "active" : ""}`;
+        heart.setAttribute("aria-label", `${isFavorite ? "Remove" : "Add"} ${item.title} ${isFavorite ? "from" : "to"} favorites`);
+        heart.textContent = isFavorite ? "♥" : "♡";
+        heart.addEventListener("click", () => this._toggleFavorite(item.id));
+        card.appendChild(heart);
+        watchedGrid.appendChild(card);
+      });
+
+      watchedSection.appendChild(watchedGrid);
+
+      const queueSection = document.createElement("section");
+      queueSection.className = "screen-diary-section queue-section";
+      queueSection.innerHTML = `
+        <div class="screen-section-heading">
+          <div>
+            <p class="screen-section-kicker">Blanket ready, snacks pending</p>
+            <h4>Next on Our Couch</h4>
+          </div>
+          <span class="screen-count">${state.toWatch.length}</span>
+        </div>
+        <p class="queue-intro">Add anything we should watch next. This list stays saved on this browser.</p>
+      `;
+
+      const addRow = document.createElement("div");
+      addRow.className = "watch-add-row";
+
+      const label = document.createElement("label");
+      label.htmlFor = "next-watch-input";
+      label.className = "sr-only";
+      label.textContent = "Movie or show title";
+
+      const input = document.createElement("input");
+      input.id = "next-watch-input";
+      input.type = "text";
+      input.maxLength = 90;
+      input.placeholder = "Add a movie or show…";
+      input.autocomplete = "off";
+
+      const addButton = document.createElement("button");
+      addButton.type = "button";
+      addButton.className = "btn";
+      addButton.textContent = "Add to our list";
+      addButton.addEventListener("click", () => this._addToWatch(input.value));
+      input.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter") return;
+        event.preventDefault();
+        this._addToWatch(input.value);
+      });
+
+      addRow.append(label, input, addButton);
+
+      const pickButton = document.createElement("button");
+      pickButton.type = "button";
+      pickButton.className = "btn secondary screen-pick-button";
+      pickButton.textContent = "🎲 Pick our next watch";
+      pickButton.addEventListener("click", () => this._pickNext());
+
+      const pickerMessage = document.createElement("p");
+      pickerMessage.className = "screen-picker-message";
+      pickerMessage.setAttribute("aria-live", "polite");
+      pickerMessage.textContent = state.pickerMessage || (
+        state.toWatch.length
+          ? "When we cannot decide, let the diary choose."
+          : "Our couch queue is empty—for now."
+      );
+
+      const queueList = document.createElement("div");
+      queueList.className = "watch-queue-list";
+
+      if (!state.toWatch.length) {
+        const empty = document.createElement("div");
+        empty.className = "watch-queue-empty";
+        empty.innerHTML = `
+          <span>🍿</span>
+          <p>Add our next comfort watch, dramatic series, or chaotic movie night.</p>
+        `;
+        queueList.appendChild(empty);
+      } else {
+        state.toWatch.forEach((item, index) => {
+          const row = document.createElement("article");
+          row.className = "watch-queue-item";
+          row.innerHTML = `
+            <span class="queue-number">${index + 1}</span>
+            <strong>${escapeHtml(item.title)}</strong>
+          `;
+
+          const actions = document.createElement("div");
+          actions.className = "queue-actions";
+
+          const watchedButton = document.createElement("button");
+          watchedButton.type = "button";
+          watchedButton.className = "queue-action watched";
+          watchedButton.textContent = "✓ Watched";
+          watchedButton.addEventListener("click", () => this._markWatched(item.id));
+
+          const removeButton = document.createElement("button");
+          removeButton.type = "button";
+          removeButton.className = "queue-action remove";
+          removeButton.textContent = "Remove";
+          removeButton.addEventListener("click", () => this._removeToWatch(item.id));
+
+          actions.append(watchedButton, removeButton);
+          row.appendChild(actions);
+          queueList.appendChild(row);
+        });
+      }
+
+      queueSection.append(addRow, pickButton, pickerMessage, queueList);
+      columns.append(watchedSection, queueSection);
+      panel.append(intro, columns);
+
+      root.innerHTML = "";
+      root.appendChild(panel);
+    }
+  };
+})();
+
 const games = {
   wordle: {
     title: "Cute Memory Wordle",
@@ -2415,6 +3282,12 @@ const games = {
     emoji: "🃏",
     tagline: "Classic one-card Klondike inspired by the clean Google Solitaire layout.",
     module: solitaire
+  },
+  screendiary: {
+    title: "Our Cozy Screen Diary",
+    emoji: "🎬",
+    tagline: "The movies and shows already in our story—and the ones waiting for our next couch night.",
+    module: screenDiary
   }
 };
 
