@@ -3948,42 +3948,168 @@ document.addEventListener("keydown", (event) => {
 });
 
 
-/* ---------- Floating Spotify soundtrack ---------- */
+/* ---------- Floating local full-song soundtrack ---------- */
 (() => {
   const shell = document.querySelector("#floating-soundtrack");
   const launcher = document.querySelector("#soundtrack-launcher");
   const panel = document.querySelector("#soundtrack-panel");
   const closeButton = document.querySelector("#soundtrack-close");
-  const playerHost = document.querySelector("#spotify-player");
-  const miniTitle = document.querySelector("#soundtrack-mini-title");
-  const openSpotify = document.querySelector("#soundtrack-open-spotify");
-  const valentineMomentButton = document.querySelector("#soundtrack-valentine-moment");
+  const audio = document.querySelector("#site-audio");
+  const songButtons = [...document.querySelectorAll(".soundtrack-song")];
   const welcome = document.querySelector("#soundtrack-welcome");
   const welcomeStart = document.querySelector("#soundtrack-welcome-start");
   const welcomeSkip = document.querySelector("#soundtrack-welcome-skip");
-  const songButtons = [...document.querySelectorAll(".soundtrack-song")];
 
-  if (!shell || !launcher || !panel || !playerHost) return;
+  const playButton = document.querySelector("#local-play");
+  const previousButton = document.querySelector("#local-previous");
+  const nextButton = document.querySelector("#local-next");
+  const shuffleButton = document.querySelector("#local-shuffle");
+  const repeatButton = document.querySelector("#local-repeat");
+  const momentButton = document.querySelector("#soundtrack-valentine-moment");
+  const progress = document.querySelector("#local-progress");
+  const volume = document.querySelector("#local-volume");
+  const currentTimeLabel = document.querySelector("#local-current-time");
+  const durationLabel = document.querySelector("#local-duration");
+  const titleLabel = document.querySelector("#local-title");
+  const artistLabel = document.querySelector("#local-artist");
+  const miniTitle = document.querySelector("#soundtrack-mini-title");
+  const cover = document.querySelector("#local-cover");
+  const equalizer = document.querySelector("#soundtrack-equalizer");
+  const status = document.querySelector("#soundtrack-status");
 
-  const PLAYLIST_STORAGE_KEY = "happy6:soundtrack:v2";
-  const VALENTINE_ID = "2EjuEHTRZRgE9pvaBm5Hh3";
-  const VALENTINE_START_SECONDS = 47;
+  if (!shell || !launcher || !panel || !audio || !songButtons.length) return;
 
-  let spotifyController = null;
-  let controllerReady = false;
-  let pendingStart = false;
-  let pendingSong = null;
+  const STATE_KEY = "happy6:local-soundtrack:v1";
+  const VALENTINE_INDEX = 0;
+  const VALENTINE_MOMENT_SECONDS = 40;
 
-  function setOpen(isOpen) {
-    shell.classList.toggle("open", isOpen);
-    launcher.setAttribute("aria-expanded", String(isOpen));
-    panel.setAttribute("aria-hidden", String(!isOpen));
+  let currentIndex = 0;
+  let shuffleOn = false;
+  let repeatOn = true;
+  let seeking = false;
 
-    if (isOpen) {
-      window.setTimeout(() => {
-        panel.querySelector(".soundtrack-song.active")?.focus({ preventScroll: true });
-      }, 220);
+  const tracks = songButtons.map((button, index) => ({
+    index,
+    button,
+    src: button.dataset.src,
+    title: button.dataset.title,
+    artist: button.dataset.artist,
+    durationText: button.dataset.duration,
+    startAt: Number(button.dataset.startAt || 0),
+    art: button.dataset.art || "♫",
+    artClass: button.dataset.artClass || "art-valentine"
+  }));
+
+  function formatTime(seconds) {
+    if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+    const whole = Math.floor(seconds);
+    const minutes = Math.floor(whole / 60);
+    const remaining = whole % 60;
+    return `${minutes}:${String(remaining).padStart(2, "0")}`;
+  }
+
+  function setOpen(open) {
+    shell.classList.toggle("open", open);
+    launcher.setAttribute("aria-expanded", String(open));
+    panel.setAttribute("aria-hidden", String(!open));
+  }
+
+  function setPlayingVisuals(playing) {
+    shell.classList.toggle("playing", playing);
+    equalizer?.classList.toggle("paused", !playing);
+    playButton.textContent = playing ? "❚❚" : "▶";
+    playButton.setAttribute("aria-label", playing ? "Pause" : "Play");
+  }
+
+  function saveState() {
+    try {
+      safeStorage.setItem(STATE_KEY, JSON.stringify({
+        currentIndex,
+        volume: audio.volume,
+        shuffleOn,
+        repeatOn
+      }));
+    } catch (_error) {}
+  }
+
+  function loadTrack(index, {
+    autoplay = false,
+    startAt = 0,
+    announce = true
+  } = {}) {
+    const normalized = (index + tracks.length) % tracks.length;
+    const track = tracks[normalized];
+    currentIndex = normalized;
+
+    songButtons.forEach((button, buttonIndex) => {
+      const active = buttonIndex === normalized;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-current", active ? "true" : "false");
+    });
+
+    titleLabel.textContent = track.title;
+    artistLabel.textContent = track.artist;
+    miniTitle.textContent = `${track.title} · ${track.artist}`;
+    durationLabel.textContent = track.durationText;
+    cover.textContent = track.art;
+    cover.className = `local-cover ${track.artClass}`;
+    status.textContent = announce ? `Selected ${track.title}` : "Ready to play";
+
+    const sameSource = audio.getAttribute("src") === track.src;
+    if (!sameSource) {
+      audio.src = track.src;
+      audio.load();
     }
+
+    const begin = () => {
+      const safeStart = Math.max(0, Math.min(startAt, Math.max(0, audio.duration - 0.25)));
+      if (Number.isFinite(audio.duration) && safeStart > 0) {
+        audio.currentTime = safeStart;
+      }
+      if (autoplay) {
+        audio.play().catch(() => {
+          status.textContent = "Tap Play to start the song.";
+          setPlayingVisuals(false);
+        });
+      }
+    };
+
+    if (audio.readyState >= 1) begin();
+    else audio.addEventListener("loadedmetadata", begin, { once: true });
+
+    saveState();
+  }
+
+  function nextTrack({ fromEnded = false } = {}) {
+    if (fromEnded && repeatOn && !shuffleOn && currentIndex === tracks.length - 1) {
+      loadTrack(0, { autoplay: true });
+      return;
+    }
+
+    if (fromEnded && !repeatOn && !shuffleOn && currentIndex === tracks.length - 1) {
+      audio.pause();
+      audio.currentTime = 0;
+      setPlayingVisuals(false);
+      status.textContent = "Playlist finished ♥";
+      return;
+    }
+
+    let nextIndex = currentIndex + 1;
+    if (shuffleOn && tracks.length > 1) {
+      do {
+        nextIndex = Math.floor(Math.random() * tracks.length);
+      } while (nextIndex === currentIndex);
+    }
+
+    loadTrack(nextIndex, { autoplay: true });
+  }
+
+  function previousTrack() {
+    if (audio.currentTime > 4) {
+      audio.currentTime = 0;
+      return;
+    }
+    loadTrack(currentIndex - 1, { autoplay: true });
   }
 
   function closeWelcome() {
@@ -3991,142 +4117,109 @@ document.addEventListener("keydown", (event) => {
     document.body.classList.remove("soundtrack-welcome-open");
   }
 
-  function updateSelectedSong(button) {
-    if (!button) return null;
-
-    const kind = button.dataset.kind === "album" ? "album" : "track";
-    const spotifyId = button.dataset.spotifyId;
-    const title = button.dataset.title || "Our song";
-    const artist = button.dataset.artist || "";
-    const startAt = Number(button.dataset.startAt || 0);
-    const spotifyUri = `spotify:${kind}:${spotifyId}`;
-    const spotifyUrl = `https://open.spotify.com/${kind}/${spotifyId}`;
-
-    songButtons.forEach((item) => {
-      const active = item === button;
-      item.classList.toggle("active", active);
-      item.setAttribute("aria-current", active ? "true" : "false");
-    });
-
-    miniTitle.textContent = `${title} · ${artist}`;
-    openSpotify.href = spotifyUrl;
-    openSpotify.textContent = `Open “${title}” in Spotify ↗`;
-
-    try {
-      safeStorage.setItem(PLAYLIST_STORAGE_KEY, JSON.stringify({
-        kind,
-        spotifyId,
-        title,
-        artist,
-        startAt
-      }));
-    } catch (_error) {}
-
-    return { kind, spotifyId, title, artist, startAt, spotifyUri, spotifyUrl };
-  }
-
-  function playSelection(selection, { forceStartAt = false } = {}) {
-    if (!selection) return;
-
-    if (!spotifyController || !controllerReady) {
-      pendingSong = { selection, forceStartAt };
-      return;
-    }
-
-    const startAt = forceStartAt
-      ? VALENTINE_START_SECONDS
-      : Math.max(0, Number(selection.startAt || 0));
-
-    spotifyController.loadEntity(selection.spotifyUri, false, startAt);
-
-    // The user click that called this function is the browser-required gesture.
-    window.setTimeout(() => {
-      spotifyController.play();
-
-      // Spotify's documented startAt handling varies by browser/account.
-      // A follow-up seek makes the Valentine moment more reliable when supported.
-      if (startAt > 0 && typeof spotifyController.seek === "function") {
-        window.setTimeout(() => {
-          try { spotifyController.seek(startAt); } catch (_error) {}
-        }, 500);
-      }
-    }, 180);
-  }
-
-  function chooseSong(button, {
-    openPanel = true,
-    play = true,
-    forceStartAt = false
-  } = {}) {
-    const selection = updateSelectedSong(button);
-    if (!selection) return;
-
-    if (openPanel) setOpen(true);
-    if (play) playSelection(selection, { forceStartAt });
-  }
-
-  function startValentineMoment() {
-    const valentineButton = songButtons.find(
-      (button) => button.dataset.spotifyId === VALENTINE_ID
-    );
-
+  function beginValentineMoment() {
     closeWelcome();
-    chooseSong(valentineButton, {
-      openPanel: true,
-      play: true,
-      forceStartAt: true
+    setOpen(true);
+    loadTrack(VALENTINE_INDEX, {
+      autoplay: true,
+      startAt: VALENTINE_MOMENT_SECONDS,
+      announce: false
     });
+    status.textContent = "Playing our Valentine moment ♥";
   }
 
-  window.onSpotifyIframeApiReady = (IFrameAPI) => {
-    const options = {
-      width: "100%",
-      height: 152,
-      uri: `spotify:track:${VALENTINE_ID}`
-    };
+  launcher.addEventListener("click", () => setOpen(!shell.classList.contains("open")));
+  closeButton?.addEventListener("click", () => setOpen(false));
 
-    IFrameAPI.createController(playerHost, options, (EmbedController) => {
-      spotifyController = EmbedController;
-
-      EmbedController.addListener("ready", () => {
-        controllerReady = true;
-
-        if (pendingSong) {
-          const queued = pendingSong;
-          pendingSong = null;
-          playSelection(queued.selection, {
-            forceStartAt: queued.forceStartAt
-          });
-        } else if (pendingStart) {
-          pendingStart = false;
-          startValentineMoment();
-        }
-      });
-    });
-  };
-
-  launcher.addEventListener("click", () => {
-    setOpen(!shell.classList.contains("open"));
-  });
-
-  closeButton?.addEventListener("click", () => {
-    setOpen(false);
-    launcher.focus({ preventScroll: true });
-  });
-
-  welcomeStart?.addEventListener("click", () => {
-    if (!controllerReady) pendingStart = true;
-    startValentineMoment();
-  });
-
+  welcomeStart?.addEventListener("click", beginValentineMoment);
   welcomeSkip?.addEventListener("click", () => {
     closeWelcome();
+    loadTrack(VALENTINE_INDEX, { autoplay: false, announce: false });
   });
 
-  valentineMomentButton?.addEventListener("click", startValentineMoment);
+  momentButton?.addEventListener("click", beginValentineMoment);
 
-  songButtons.forEach((button) => {
-    button.addEventListener("click", () => chooseSong(button));
+  songButtons.forEach((button, index) => {
+    button.addEventListener("click", () => {
+      const wasPlaying = !audio.paused;
+      loadTrack(index, { autoplay: wasPlaying || true, startAt: 0 });
+    });
+  });
+
+  playButton.addEventListener("click", () => {
+    if (!audio.src) loadTrack(currentIndex);
+    if (audio.paused) {
+      audio.play().catch(() => {
+        status.textContent = "Your browser needs another tap to start audio.";
+      });
+    } else {
+      audio.pause();
+    }
+  });
+
+  previousButton.addEventListener("click", previousTrack);
+  nextButton.addEventListener("click", () => nextTrack());
+
+  shuffleButton.addEventListener("click", () => {
+    shuffleOn = !shuffleOn;
+    shuffleButton.classList.toggle("active", shuffleOn);
+    shuffleButton.setAttribute("aria-pressed", String(shuffleOn));
+    status.textContent = shuffleOn ? "Shuffle is on" : "Shuffle is off";
+    saveState();
+  });
+
+  repeatButton.addEventListener("click", () => {
+    repeatOn = !repeatOn;
+    repeatButton.classList.toggle("active", repeatOn);
+    repeatButton.setAttribute("aria-pressed", String(repeatOn));
+    status.textContent = repeatOn ? "Playlist repeat is on" : "Playlist repeat is off";
+    saveState();
+  });
+
+  progress.addEventListener("input", () => {
+    seeking = true;
+    if (!Number.isFinite(audio.duration)) return;
+    currentTimeLabel.textContent = formatTime((Number(progress.value) / 100) * audio.duration);
+  });
+
+  progress.addEventListener("change", () => {
+    if (Number.isFinite(audio.duration)) {
+      audio.currentTime = (Number(progress.value) / 100) * audio.duration;
+    }
+    seeking = false;
+  });
+
+  volume.addEventListener("input", () => {
+    audio.volume = Number(volume.value);
+    saveState();
+  });
+
+  audio.addEventListener("loadedmetadata", () => {
+    durationLabel.textContent = formatTime(audio.duration);
+  });
+
+  audio.addEventListener("timeupdate", () => {
+    if (!seeking && Number.isFinite(audio.duration) && audio.duration > 0) {
+      progress.value = String((audio.currentTime / audio.duration) * 100);
+      currentTimeLabel.textContent = formatTime(audio.currentTime);
+    }
+  });
+
+  audio.addEventListener("play", () => {
+    setPlayingVisuals(true);
+    status.textContent = `Playing ${tracks[currentIndex].title}`;
+  });
+
+  audio.addEventListener("pause", () => {
+    setPlayingVisuals(false);
+    if (!audio.ended) status.textContent = `Paused ${tracks[currentIndex].title}`;
+  });
+
+  audio.addEventListener("ended", () => nextTrack({ fromEnded: true }));
+
+  audio.addEventListener("error", () => {
+    status.textContent = `Could not load ${tracks[currentIndex].title}. Check that every MP3 was uploaded.`;
+    setPlayingVisuals(false);
   });
 
   document.addEventListener("keydown", (event) => {
@@ -4137,17 +4230,29 @@ document.addEventListener("keydown", (event) => {
 
     if (event.key === "Escape" && shell.classList.contains("open") && !document.pointerLockElement) {
       setOpen(false);
-      launcher.focus({ preventScroll: true });
     }
   });
 
-  // Always begin each new page visit with the Valentine entry moment.
-  document.body.classList.add("soundtrack-welcome-open");
+  // Restore preferences, but always open the anniversary with Valentine selected.
+  try {
+    const saved = JSON.parse(safeStorage.getItem(STATE_KEY));
+    if (saved && typeof saved === "object") {
+      if (Number.isFinite(Number(saved.volume))) {
+        audio.volume = Math.max(0, Math.min(1, Number(saved.volume)));
+        volume.value = String(audio.volume);
+      }
+      shuffleOn = Boolean(saved.shuffleOn);
+      repeatOn = saved.repeatOn !== false;
+    }
+  } catch (_error) {}
 
-  // Keep Valentine selected by default. We do not start audio until the user taps.
-  const valentineButton = songButtons.find(
-    (button) => button.dataset.spotifyId === VALENTINE_ID
-  );
-  updateSelectedSong(valentineButton);
+  shuffleButton.classList.toggle("active", shuffleOn);
+  shuffleButton.setAttribute("aria-pressed", String(shuffleOn));
+  repeatButton.classList.toggle("active", repeatOn);
+  repeatButton.setAttribute("aria-pressed", String(repeatOn));
+
+  document.body.classList.add("soundtrack-welcome-open");
+  loadTrack(VALENTINE_INDEX, { autoplay: false, announce: false });
+  setPlayingVisuals(false);
 })();
 
