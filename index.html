@@ -1,1 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#3a0710" />
+  <meta name="description" content="A private six-month anniversary game night with Wordle, Sudoku, Chess, Block Blast, Minecraft-inspired building, and Solitaire." />
+  <title>Happy 6 Months — Game Night</title>
+  <link rel="stylesheet" href="styles.css" />
 
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <main class="page-shell" id="home-view">
+    <header class="hero">
+      <p class="eyebrow">Six months of us</p>
+      <h1>Happy 6 Months</h1>
+      <p class="subtitle">Choose a game. Everything opens and plays right here.</p>
+      <div class="hero-badge"><span>♥</span> Game night made for two</div>
+    </header>
+
+    <section class="game-grid" aria-label="Choose a game">
+      <button class="game-card" data-game="wordle" aria-label="Play Cute Memory Wordle">
+        <span class="game-icon" aria-hidden="true">💌</span>
+        <span class="game-copy"><strong>Cute Memory Wordle</strong><small>Guess our sweetest little moments</small></span>
+      </button>
+
+      <button class="game-card" data-game="sudoku" aria-label="Play Easy Sudoku">
+        <span class="game-icon" aria-hidden="true">🔢</span>
+        <span class="game-copy"><strong>Easy Sudoku</strong><small>Relaxed, beginner friendly</small></span>
+      </button>
+
+      <button class="game-card" data-game="chess" aria-label="Play Chess">
+        <span class="game-icon" aria-hidden="true">♟️</span>
+        <span class="game-copy"><strong>Chess</strong><small>Play together or vs Benny Bot</small></span>
+      </button>
+
+      <button class="game-card" data-game="blockblast" aria-label="Play Block Blast">
+        <span class="game-icon" aria-hidden="true">🧩</span>
+        <span class="game-copy"><strong>Block Blast</strong><small>Place, clear, and combo</small></span>
+      </button>
+
+      <button class="game-card featured" data-game="minecraft" aria-label="Open Benny's Block World">
+        <span class="game-icon" aria-hidden="true">🐕</span>
+        <span class="game-copy"><strong>Benny’s Block World</strong><small>Mine, build, explore, and tame Benny</small></span>
+        <span class="featured-pill">3D world</span>
+      </button>
+
+      <button class="game-card" data-game="solitaire" aria-label="Play Solitaire">
+        <span class="game-icon" aria-hidden="true">🃏</span>
+        <span class="game-copy"><strong>Solitaire</strong><small>Classic Klondike on green felt</small></span>
+      </button>
+    </section>
+
+    <p class="footer-note">Winner chooses the next date night ♥</p>
+  </main>
+
+  <div class="game-view" id="game-view" aria-hidden="true">
+    <header class="game-view-header">
+      <button class="back-button" id="back-button" aria-label="Back to games">
+        <span aria-hidden="true">←</span> Back to games
+      </button>
+      <div class="game-view-title">
+        <span class="game-view-emoji" id="game-view-emoji" aria-hidden="true"></span>
+        <div>
+          <h2 id="game-view-heading">Game</h2>
+          <p class="game-view-tagline" id="game-view-tagline"></p>
+        </div>
+      </div>
+    </header>
+    <div class="game-root" id="game-root"></div>
+  </div>
+
+  <script src="script.js" defer></script>
+
+</body>
+</html>
