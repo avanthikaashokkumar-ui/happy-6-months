@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#3a0710" />
   <meta name="description" content="A private six-month anniversary game night with games, Benny’s Block World, a cozy screen diary, and a floating full-song soundtrack." />
   <title>Happy 6 Months — Game Night</title>
-  <link rel="stylesheet" href="styles.css?v=13" />
+  <link rel="stylesheet" href="styles.css?v=15" />
 
 </head>
 <body>
@@ -27,18 +27,18 @@
       <div class="hero-soundtrack-card">
         <span class="hero-song-art" aria-hidden="true">♥</span>
         <span class="hero-song-copy">
-          <small>Opening with</small>
+          <small>Opening automatically with</small>
           <strong>Valentine · Laufey</strong>
           <em>“’Cause I think I’ve fallen in love this time”</em>
         </span>
-        <button id="hero-soundtrack-start" class="hero-soundtrack-start" type="button">
-          <span aria-hidden="true">▶</span>
-          Play soundtrack
-        </button>
+        <span class="hero-autoplay-state" id="hero-autoplay-state" aria-live="polite">
+          <i aria-hidden="true"></i>
+          Starting…
+        </span>
       </div>
 
       <p class="hero-audio-note" id="hero-audio-note" aria-live="polite">
-        Tap Play—or tap anywhere on the dashboard once—to begin the full local song.
+        Valentine is set to begin automatically at our lyric moment.
       </p>
     </header>
 
@@ -129,7 +129,7 @@
       </header>
 
       <div class="local-player">
-        <audio id="site-audio" src="valentine.mp3" preload="auto"></audio>
+        <audio id="site-audio" src="valentine.mp3" preload="auto" autoplay playsinline></audio>
 
         <div class="local-now-playing">
           <span class="local-cover art-valentine" id="local-cover" aria-hidden="true">V</span>
@@ -254,7 +254,7 @@
   </aside>
 
 
-  <script src="script.js?v=13" defer></script>
+  <script src="script.js?v=15" defer></script>
 
 </body>
 </html>

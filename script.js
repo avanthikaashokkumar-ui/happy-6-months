@@ -1543,8 +1543,57 @@ return {
                   <span>💎 Tag <strong>0/6</strong></span>
                 </div>
               </div>
-              <div class="mc-help">WASD move · mouse look · Space jump · Shift sprint · wheel/Z/X zoom · C changes POV · left-click mine · right-click place · E Benny · 1–8 blocks</div>
+              <div class="mc-help">WASD move · mouse look · Space jump · Shift sprint · wheel/Z/X zoom · C changes POV · M tasks · left-click mine · right-click place · E Benny · 1–8 blocks</div>
             </div>
+            <aside class="mc-task-drawer" data-mc-task-drawer aria-label="Benny mission drawer">
+              <section class="mc-task-drawer-panel">
+                <header class="mc-task-drawer-heading">
+                  <div>
+                    <span>Benny’s Adventure Book</span>
+                    <strong data-mc-peek-heading>Mission 1 of 7</strong>
+                  </div>
+                  <kbd>M</kbd>
+                </header>
+
+                <div class="mc-task-now">
+                  <small>Current mission</small>
+                  <strong data-mc-peek-title>1. Find and tame Benny</strong>
+                  <p data-mc-peek-detail>Walk close to Benny and press E.</p>
+                  <div class="mc-task-house-progress">
+                    <span><i data-mc-peek-progress-bar></i></span>
+                    <small data-mc-peek-progress-label>House progress · 0%</small>
+                  </div>
+                </div>
+
+                <div class="mc-task-drawer-supplies" data-mc-peek-supplies>
+                  <span>🪵 <strong>0/12</strong></span>
+                  <span>🪨 <strong>0/8</strong></span>
+                  <span>🟨 <strong>0/4</strong></span>
+                </div>
+
+                <div class="mc-task-drawer-list" aria-label="All ordered missions">
+                  <div data-mc-peek-step="1"><b>1</b><span>Tame Benny</span></div>
+                  <div data-mc-peek-step="2"><b>2</b><span>Gather supplies</span></div>
+                  <div data-mc-peek-step="3"><b>3</b><span>Lay foundation</span></div>
+                  <div data-mc-peek-step="4"><b>4</b><span>Raise walls</span></div>
+                  <div data-mc-peek-step="5"><b>5</b><span>Add windows</span></div>
+                  <div data-mc-peek-step="6"><b>6</b><span>Finish roof</span></div>
+                  <div data-mc-peek-step="7"><b>7</b><span>Housewarming</span></div>
+                </div>
+
+                <div class="mc-task-drawer-bonus" data-mc-peek-bonus>
+                  <span>🍃 Feed <strong>0/10</strong></span>
+                  <span>🧸 Toy <strong>0/5</strong></span>
+                  <span>💎 Tag <strong>0/6</strong></span>
+                </div>
+              </section>
+
+              <div class="mc-task-drawer-tab" aria-hidden="true">
+                <span>📜</span>
+                <strong>Tasks</strong>
+                <small>Hover</small>
+              </div>
+            </aside>
             <canvas class="mc-minimap" data-mc-minimap width="160" height="160" aria-label="Block World minimap"></canvas>
             <div class="mc-zoom-controls" aria-label="Zoom controls">
               <button type="button" data-zoom-out aria-label="Zoom out">−</button>
@@ -1668,7 +1717,13 @@ return {
       if (matchMedia("(pointer:fine)").matches && !document.pointerLockElement) this._canvas.requestPointerLock?.();
     });
     this._on(document, "pointerlockchange", () => {
-      if (document.pointerLockElement !== this._canvas && matchMedia("(pointer:fine)").matches) lock.style.display = "grid";
+      const playing = document.pointerLockElement === this._canvas;
+      const drawer = this._root?.querySelector("[data-mc-task-drawer]");
+      drawer?.classList.toggle("playing", playing);
+
+      if (!playing && matchMedia("(pointer:fine)").matches) {
+        lock.style.display = "grid";
+      }
     });
 
     this._on(document, "keydown", (event) => {
@@ -1686,6 +1741,11 @@ return {
       if (event.code === "KeyZ") this._setZoom(this._zoomTarget - .12);
       if (event.code === "KeyX") this._setZoom(this._zoomTarget + .12);
       if (event.code === "KeyC") this._cyclePov();
+      if (event.code === "KeyM") {
+        const drawer = this._root.querySelector("[data-mc-task-drawer]");
+        drawer?.classList.toggle("manual-collapsed");
+        event.preventDefault();
+      }
     });
     this._on(document, "keyup", (event) => this._keys.delete(event.code));
     this._on(document, "mousemove", (event) => {
@@ -2069,6 +2129,26 @@ return {
       current.classList.toggle("complete", step === 7);
     }
 
+    const peekHeading = this._root.querySelector("[data-mc-peek-heading]");
+    const peekTitle = this._root.querySelector("[data-mc-peek-title]");
+    const peekDetail = this._root.querySelector("[data-mc-peek-detail]");
+    const peekProgressBar = this._root.querySelector("[data-mc-peek-progress-bar]");
+    const peekProgressLabel = this._root.querySelector("[data-mc-peek-progress-label]");
+    const housePercent = this._housePercent();
+
+    if (peekHeading) peekHeading.textContent = `Mission ${step} of 7`;
+    if (peekTitle) peekTitle.textContent = missionCopy[step][0];
+    if (peekDetail) peekDetail.textContent = missionCopy[step][1];
+    if (peekProgressBar) peekProgressBar.style.width = `${housePercent}%`;
+    if (peekProgressLabel) peekProgressLabel.textContent = `House progress · ${housePercent}%`;
+
+    this._root.querySelectorAll("[data-mc-peek-step]").forEach((row) => {
+      const rowStep = Number(row.dataset.mcPeekStep);
+      row.classList.toggle("active", rowStep === step);
+      row.classList.toggle("complete", rowStep < step || (rowStep === 7 && this._adventure.houseComplete));
+      row.classList.toggle("locked", rowStep > step);
+    });
+
     this._root.querySelectorAll("[data-mission-step]").forEach((row) => {
       const rowStep = Number(row.dataset.missionStep);
       row.classList.toggle("active", rowStep === step);
@@ -2085,6 +2165,19 @@ return {
       ];
       supplyList.innerHTML = values.map(([icon, label, value, target]) =>
         `<span class="${value >= target ? "complete" : ""}">${icon} ${label} <strong>${Math.min(value, target)}/${target}</strong></span>`
+      ).join("");
+    }
+
+    const peekSupplies = this._root.querySelector("[data-mc-peek-supplies]");
+    if (peekSupplies) {
+      const supplyValues = [
+        ["🪵", materials.wood || 0, HOUSE_REQUIREMENTS.wood],
+        ["🪨", materials.stone || 0, HOUSE_REQUIREMENTS.stone],
+        ["🟨", materials.sand || 0, HOUSE_REQUIREMENTS.sand]
+      ];
+
+      peekSupplies.innerHTML = supplyValues.map(([icon, value, target]) =>
+        `<span class="${value >= target ? "complete" : ""}">${icon} <strong>${Math.min(value, target)}/${target}</strong></span>`
       ).join("");
     }
 
@@ -2131,6 +2224,19 @@ return {
         ? "Benny is wearing his shiny tag!"
         : `Mine ${Math.min(6, this._adventure.crystals)}/6 crystals in the cave`;
     }
+    const peekBonus = this._root.querySelector("[data-mc-peek-bonus]");
+    if (peekBonus) {
+      const leafCount = Math.min(10, this._bennyRewards?.leaves || 0);
+      const toyCount = Math.min(5, this._bennyRewards?.wood || 0);
+      const crystalCount = Math.min(6, this._adventure.crystals || 0);
+
+      peekBonus.innerHTML = `
+        <span class="${this._bennyRewards?.fed ? "complete" : ""}">🍃 Feed <strong>${leafCount}/10</strong></span>
+        <span class="${this._bennyRewards?.toy ? "complete" : ""}">🧸 Toy <strong>${toyCount}/5</strong></span>
+        <span class="${this._adventure.shinyTag ? "complete" : ""}">💎 Tag <strong>${crystalCount}/6</strong></span>
+      `;
+    }
+
     const timeButton = this._root.querySelector("[data-mc-time]");
     if (timeButton) {
       const next = this._skyMode === "day" ? "sunset" : this._skyMode === "sunset" ? "night" : "day";
@@ -3957,8 +4063,8 @@ document.addEventListener("keydown", (event) => {
   const audio = document.querySelector("#site-audio");
   const songButtons = [...document.querySelectorAll(".soundtrack-song")];
 
-  const heroStart = document.querySelector("#hero-soundtrack-start");
   const heroNote = document.querySelector("#hero-audio-note");
+  const heroAutoplayState = document.querySelector("#hero-autoplay-state");
   const playButton = document.querySelector("#local-play");
   const previousButton = document.querySelector("#local-previous");
   const nextButton = document.querySelector("#local-next");
@@ -4020,11 +4126,12 @@ document.addEventListener("keydown", (event) => {
     playButton.textContent = playing ? "❚❚" : "▶";
     playButton.setAttribute("aria-label", playing ? "Pause" : "Play");
 
-    if (heroStart) {
-      heroStart.classList.toggle("playing", playing);
-      heroStart.innerHTML = playing
-        ? '<span aria-hidden="true">❚❚</span> Pause soundtrack'
-        : '<span aria-hidden="true">▶</span> Play soundtrack';
+    if (heroAutoplayState) {
+      heroAutoplayState.classList.toggle("playing", playing);
+      heroAutoplayState.classList.toggle("blocked", !playing && hasStarted);
+      heroAutoplayState.innerHTML = playing
+        ? '<i aria-hidden="true"></i> Playing'
+        : '<i aria-hidden="true"></i> Ready';
     }
   }
 
@@ -4093,17 +4200,55 @@ document.addEventListener("keydown", (event) => {
     savePreferences();
   }
 
-  function playAudio() {
+  function playAudio({ autoplayAttempt = false } = {}) {
     hasStarted = true;
 
     const result = audio.play();
-    if (result && typeof result.catch === "function") {
-      result.catch(() => {
-        status.textContent = "Tap Play once more to start the song.";
-        if (heroNote) heroNote.textContent = "Your browser blocked the first attempt—tap Play soundtrack once more.";
-        updatePlayVisuals();
-      });
+    if (!result || typeof result.then !== "function") {
+      return Promise.resolve(true);
     }
+
+    return result
+      .then(() => {
+        audio.muted = false;
+        if (heroNote) heroNote.textContent = "Valentine is playing from our lyric moment ♥";
+        if (heroAutoplayState) {
+          heroAutoplayState.classList.remove("blocked");
+          heroAutoplayState.classList.add("playing");
+          heroAutoplayState.innerHTML = '<i aria-hidden="true"></i> Playing';
+        }
+        return true;
+      })
+      .catch(async () => {
+        if (!autoplayAttempt) {
+          status.textContent = "Tap anywhere once to let the browser play the song.";
+          if (heroNote) heroNote.textContent = "The browser paused the song. Any tap on the page will resume it.";
+          updatePlayVisuals();
+          return false;
+        }
+
+        // Audible autoplay is commonly blocked. Keep the song loaded at the
+        // correct timestamp, then resume on the first ordinary interaction.
+        audio.muted = true;
+        try {
+          await audio.play();
+          window.setTimeout(() => {
+            audio.muted = false;
+          }, 650);
+        } catch (_error) {}
+
+        status.textContent = "Autoplay is waiting for browser permission.";
+        if (heroNote) {
+          heroNote.textContent = "Safari blocked audible autoplay. Enable Allow All Auto-Play for this site to hear it immediately.";
+        }
+        if (heroAutoplayState) {
+          heroAutoplayState.classList.remove("playing");
+          heroAutoplayState.classList.add("blocked");
+          heroAutoplayState.innerHTML = '<i aria-hidden="true"></i> Browser blocked audio';
+        }
+        updatePlayVisuals();
+        return false;
+      });
   }
 
   function startValentine() {
@@ -4158,11 +4303,6 @@ document.addEventListener("keydown", (event) => {
   });
 
   closeButton?.addEventListener("click", () => setOpen(false));
-
-  heroStart?.addEventListener("click", (event) => {
-    event.stopPropagation();
-    startValentine();
-  });
 
   restartButton?.addEventListener("click", () => {
     audio.currentTime = 0;
@@ -4255,22 +4395,23 @@ document.addEventListener("keydown", (event) => {
     }
   });
 
-  // The page is visible immediately. The first ordinary dashboard tap starts
-  // Valentine because browsers require one user interaction before audible audio.
-  function startOnFirstDashboardInteraction(event) {
-    if (event.target.closest("#floating-soundtrack, #hero-soundtrack-start, input, select, textarea")) {
-      return;
-    }
-
-    if (!hasStarted && audio.paused) {
-      seekWhenReady(VALENTINE_MOMENT_SECONDS);
+  // Fallback only: browsers may block audible autoplay. Any ordinary click,
+  // tap, or key press then resumes Valentine without requiring a special button.
+  function resumeAfterBrowserBlock() {
+    if (audio.paused || audio.muted) {
+      audio.muted = false;
+      seekWhenReady(
+        audio.currentTime > 2 ? audio.currentTime : VALENTINE_MOMENT_SECONDS
+      );
       playAudio();
     }
 
-    document.removeEventListener("pointerdown", startOnFirstDashboardInteraction, true);
+    document.removeEventListener("pointerdown", resumeAfterBrowserBlock, true);
+    document.removeEventListener("keydown", resumeAfterBrowserBlock, true);
   }
 
-  document.addEventListener("pointerdown", startOnFirstDashboardInteraction, true);
+  document.addEventListener("pointerdown", resumeAfterBrowserBlock, true);
+  document.addEventListener("keydown", resumeAfterBrowserBlock, true);
 
   try {
     const saved = JSON.parse(safeStorage.getItem(STATE_KEY));
@@ -4296,6 +4437,22 @@ document.addEventListener("keydown", (event) => {
     startAt: VALENTINE_MOMENT_SECONDS,
     announce: false
   });
+
+  audio.autoplay = true;
+  audio.muted = false;
+
+  const attemptAutoplay = () => {
+    seekWhenReady(VALENTINE_MOMENT_SECONDS);
+    playAudio({ autoplayAttempt: true });
+  };
+
+  if (audio.readyState >= 2) {
+    attemptAutoplay();
+  } else {
+    audio.addEventListener("canplay", attemptAutoplay, { once: true });
+    window.setTimeout(attemptAutoplay, 900);
+  }
+
   updatePlayVisuals();
 })();
 
