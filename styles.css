@@ -1225,3 +1225,21 @@ h1 {
 @media (max-width: 1080px) { .watched-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 620px) { .watched-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; } }
 @media (max-width: 410px) { .watched-grid { grid-template-columns: 1fr; } }
+
+
+.screen-diary-error {
+  max-width: 640px;
+  padding: 34px;
+  text-align: center;
+}
+.screen-diary-error h3 {
+  margin: 0 0 10px;
+  color: var(--wine-900);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 2rem;
+}
+.screen-diary-error p {
+  margin: 0 auto 20px;
+  max-width: 480px;
+  color: var(--muted);
+}

@@ -3242,6 +3242,15 @@ const screenDiary = (() => {
     return `${clean || "watch"}-${Date.now().toString(36)}`;
   }
 
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
   function loadState() {
     const fallback = {
       favorites: [],
@@ -3271,7 +3280,25 @@ const screenDiary = (() => {
     mount(root) {
       this._root = root;
       this._state = loadState();
-      this._render();
+
+      try {
+        this._render();
+      } catch (error) {
+        console.error("Screen diary could not render:", error);
+        root.innerHTML = `
+          <section class="game-panel screen-diary-error">
+            <h3>Our Cozy Screen Diary</h3>
+            <p>The diary had trouble loading. Resetting its saved list will repair it without affecting the other games.</p>
+            <button class="btn" type="button" data-reset-screen-diary>Reset and reload diary</button>
+          </section>
+        `;
+
+        root.querySelector("[data-reset-screen-diary]")?.addEventListener("click", () => {
+          safeStorage.removeItem(STORAGE_KEY);
+          this._state = loadState();
+          this._render();
+        });
+      }
     },
 
     unmount() {
