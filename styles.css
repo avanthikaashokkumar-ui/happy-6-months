@@ -345,13 +345,53 @@ h1 {
 
 /* Block Blast */
 .blockblast-layout { display: flex; flex-direction: column; align-items: center; gap: 20px; }
-.blockblast-board { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; width: min(390px, 100%); padding: 9px; border-radius: 18px; background: #241018; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 16px 34px rgba(36,16,24,.25); }
-.bb-cell { aspect-ratio: 1; border-radius: 7px; background: #4b2530; transition: transform .13s ease, background .13s ease; }
+.blockblast-board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  width: min(390px, 100%);
+  padding: 9px;
+  border-radius: 18px;
+  background: #241018;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 16px 34px rgba(36,16,24,.25);
+  user-select: none;
+  touch-action: manipulation;
+}
+.bb-cell {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: #4b2530;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform .1s ease, background .13s ease, box-shadow .13s ease;
+}
+.bb-cell:hover,
+.bb-cell:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.32);
+}
+.bb-cell:active {
+  transform: scale(.92);
+}
 .bb-cell.filled { background: linear-gradient(145deg, var(--bb-color, #ef6b83), color-mix(in srgb, var(--bb-color, #ef6b83), #000 18%)); box-shadow: inset 0 2px 0 rgba(255,255,255,.25), 0 3px 7px rgba(0,0,0,.18); }
 .bb-cell.preview-ok { background: #6aab77; }
 .bb-cell.preview-bad { background: #d4505f; }
 .blockblast-tray { min-height: 104px; display: flex; justify-content: center; align-items: center; gap: 22px; flex-wrap: wrap; }
-.bb-piece { display: grid; gap: 3px; padding: 10px; border: 2px solid transparent; border-radius: 13px; background: #f8edef; cursor: grab; transition: transform .14s ease, border-color .14s ease; }
+.bb-piece {
+  display: grid;
+  gap: 3px;
+  padding: 10px;
+  border: 2px solid transparent;
+  border-radius: 13px;
+  background: #f8edef;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform .14s ease, border-color .14s ease;
+}
 .bb-piece:hover { transform: translateY(-3px); }
 .bb-piece.selected { border-color: var(--wine-600); box-shadow: 0 7px 16px rgba(116,20,38,.16); }
 .bb-piece.used { visibility: hidden; }
@@ -387,11 +427,50 @@ h1 {
 }
 .minecraft-shell { position: relative; min-height: 720px; background: #141014; }
 .minecraft-stage { position: relative; width: 100%; height: min(72vh, 720px); min-height: 520px; overflow: hidden; background: #8fcff3; }
-.minecraft-canvas { width: 100%; height: 100%; display: block; cursor: crosshair; image-rendering: auto; }
+.minecraft-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+  image-rendering: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
 .minecraft-overlay { position: absolute; inset: 0; pointer-events: none; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,.65); }
 .mc-topbar { position: absolute; top: 14px; left: 14px; right: 14px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-.mc-stat, .mc-help { padding: 8px 11px; border: 1px solid rgba(255,255,255,.18); border-radius: 10px; background: rgba(16,11,14,.64); backdrop-filter: blur(8px); font-size: .78rem; font-weight: 700; }
+.mc-stat, .mc-help {
+  padding: 8px 11px;
+  border: 2px solid rgba(255,255,255,.2);
+  border-radius: 3px;
+  background: rgba(24,24,24,.76);
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,.28), 0 3px 0 rgba(0,0,0,.45);
+  backdrop-filter: blur(5px);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: .76rem;
+  font-weight: 800;
+}
 .mc-help { max-width: 390px; text-align: right; }
+.mc-quest {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 7px;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: .68rem;
+  text-shadow: 0 2px 2px rgba(0,0,0,.8);
+}
+.mc-quest span {
+  padding: 5px 7px;
+  border: 2px solid rgba(255,255,255,.2);
+  border-radius: 2px;
+  background: rgba(35,35,35,.76);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.4);
+}
+.mc-quest span.complete {
+  border-color: rgba(137,211,90,.78);
+  background: rgba(44,91,36,.84);
+}
 .mc-crosshair { position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; transform: translate(-50%,-50%); }
 .mc-crosshair::before, .mc-crosshair::after { content: ""; position: absolute; background: #fff; box-shadow: 0 0 2px #000; }
 .mc-crosshair::before { width: 2px; height: 20px; left: 9px; }
@@ -410,12 +489,84 @@ h1 {
 .mc-lock-card h3 { margin: 0 0 8px; font-size: 1.6rem; }
 .mc-lock-card p { margin: 0 0 17px; color: rgba(255,255,255,.72); font-size: .9rem; }
 .mc-start { border: 0; border-radius: 999px; padding: 11px 22px; color: #fff; background: var(--wine-500); font-weight: 900; cursor: pointer; }
-.mc-mobile-controls { display: none; position: absolute; inset: 0; pointer-events: none; }
-.mc-pad { position: absolute; left: 18px; bottom: 94px; width: 132px; height: 132px; pointer-events: auto; }
-.mc-mobile-btn { position: absolute; width: 44px; height: 44px; border: 1px solid rgba(255,255,255,.2); border-radius: 12px; color: #fff; background: rgba(20,12,15,.62); font-weight: 900; }
-.mc-up { top: 0; left: 44px; } .mc-left { top: 44px; left: 0; } .mc-right { top: 44px; right: 0; } .mc-down { bottom: 0; left: 44px; }
-.mc-action-stack { position: absolute; right: 18px; bottom: 94px; display: grid; gap: 8px; pointer-events: auto; }
-.mc-action-stack button { width: 62px; height: 44px; border: 1px solid rgba(255,255,255,.2); border-radius: 12px; color: #fff; background: rgba(20,12,15,.66); font-size: .68rem; font-weight: 900; }
+.mc-mobile-controls {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  touch-action: none;
+}
+.mc-pad {
+  position: absolute;
+  left: 16px;
+  bottom: 86px;
+  width: 150px;
+  height: 150px;
+  pointer-events: auto;
+  touch-action: none;
+}
+.mc-mobile-btn,
+.mc-action-stack button {
+  border: 3px solid #252525;
+  border-top-color: #a7a7a7;
+  border-left-color: #8d8d8d;
+  border-radius: 3px;
+  color: #fff;
+  background: linear-gradient(#737373, #4c4c4c);
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.09),
+    inset 0 -5px 0 rgba(0,0,0,.3),
+    0 4px 0 rgba(0,0,0,.55);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-weight: 900;
+  text-shadow: 0 2px 1px #111;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.mc-mobile-btn:active,
+.mc-action-stack button:active {
+  transform: translateY(3px);
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.06),
+    inset 0 -2px 0 rgba(0,0,0,.32),
+    0 1px 0 rgba(0,0,0,.55);
+}
+.mc-mobile-btn {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+.mc-mobile-btn strong { font-size: 1rem; }
+.mc-mobile-btn small { font-size: .55rem; opacity: .82; }
+.mc-up { top: 0; left: 50px; }
+.mc-left { top: 50px; left: 0; }
+.mc-right { top: 50px; right: 0; }
+.mc-down { bottom: 0; left: 50px; }
+.mc-action-stack {
+  position: absolute;
+  right: 14px;
+  bottom: 84px;
+  display: grid;
+  grid-template-columns: repeat(2, 62px);
+  gap: 9px;
+  pointer-events: auto;
+  touch-action: none;
+}
+.mc-action-stack button {
+  width: 62px;
+  height: 58px;
+  padding: 4px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1px;
+}
+.mc-action-stack button span { font-size: 1.15rem; line-height: 1; }
+.mc-action-stack button small { font-size: .58rem; letter-spacing: .04em; text-transform: uppercase; }
 .mc-benny-panel { display: grid; grid-template-columns: 150px 1fr; gap: 20px; padding: 20px; color: #f8e9ec; background: linear-gradient(135deg, #2b0710, #480b17); }
 .mc-benny-photo { width: 150px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; border: 2px solid rgba(255,255,255,.16); }
 .mc-benny-copy h3 { margin: 0 0 5px; font-size: 1.25rem; }
@@ -451,4 +602,14 @@ h1 {
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+}
+
+@media (max-width: 520px) {
+  .mc-topbar { top: 9px; left: 9px; right: 9px; }
+  .mc-stat { font-size: .65rem; }
+  .mc-quest { max-width: 220px; font-size: .58rem; }
+  .mc-quest span { padding: 4px 5px; }
+  .mc-pad { left: 10px; bottom: 78px; transform: scale(.9); transform-origin: left bottom; }
+  .mc-action-stack { right: 9px; bottom: 80px; transform: scale(.9); transform-origin: right bottom; }
+  .mc-interact { bottom: 142px; font-size: .72rem; }
 }

@@ -1012,13 +1012,46 @@ return {
     this._score = 0;
     this._combo = 0;
     this._hoverCell = null;
-    this._render("Choose a piece, then place it on the board.");
+    this._render("Tap a piece below, then tap where you want it on the board.");
   },
 
   _selectPiece(id) {
     this._selectedPieceId = this._selectedPieceId === id ? null : id;
     this._hoverCell = null;
-    this._render("");
+    this._render(this._selectedPieceId ? "Now tap a square on the board." : "Choose a piece to continue.");
+  },
+
+  _previewPlacement(row, col) {
+    if (!this._root) return;
+
+    const piece = this._tray.find((item) => item.id === this._selectedPieceId && !item.used);
+    const cells = this._root.querySelectorAll(".bb-cell");
+
+    cells.forEach((cell) => {
+      cell.classList.remove("preview-ok", "preview-bad");
+    });
+
+    this._hoverCell = piece ? { row, col } : null;
+    if (!piece) return;
+
+    const valid = fits(this._grid, piece.shape, row, col);
+    piece.shape.forEach(([dr, dc]) => {
+      const targetRow = row + dr;
+      const targetCol = col + dc;
+      if (targetRow < 0 || targetRow >= GRID || targetCol < 0 || targetCol >= GRID) return;
+
+      const target = this._root.querySelector(
+        `.bb-cell[data-row="${targetRow}"][data-col="${targetCol}"]`
+      );
+      target?.classList.add(valid ? "preview-ok" : "preview-bad");
+    });
+  },
+
+  _clearPreview() {
+    this._hoverCell = null;
+    this._root?.querySelectorAll(".bb-cell").forEach((cell) => {
+      cell.classList.remove("preview-ok", "preview-bad");
+    });
   },
 
   _placeAt(row, col) {
@@ -1084,27 +1117,44 @@ return {
 
     for (let r = 0; r < GRID; r++) {
       for (let c = 0; c < GRID; c++) {
-        const cell = document.createElement("div");
+        const cell = document.createElement("button");
+        cell.type = "button";
         cell.className = "bb-cell";
+        cell.dataset.row = String(r);
+        cell.dataset.col = String(c);
+        cell.setAttribute("aria-label", `Board row ${r + 1}, column ${c + 1}`);
+
         if (this._grid[r][c]) {
           cell.classList.add("filled");
           cell.style.setProperty("--bb-color", this._grid[r][c]);
         }
-        if (selected && this._hoverCell) {
-          const { row: hr, col: hc } = this._hoverCell;
-          if (selected.shape.some(([dr,dc]) => hr + dr === r && hc + dc === c)) {
-            cell.classList.add(fits(this._grid, selected.shape, hr, hc) ? "preview-ok" : "preview-bad");
-          }
-        }
+
         cell.addEventListener("pointerenter", () => {
-          if (!selected) return;
-          this._hoverCell = { row: r, col: c };
-          this._render(message);
+          this._previewPlacement(r, c);
         });
-        cell.addEventListener("click", () => this._placeAt(r,c));
+
+        cell.addEventListener("focus", () => {
+          this._previewPlacement(r, c);
+        });
+
+        // Place on pointer-down instead of waiting for click. This works
+        // reliably on Safari, phones, tablets, mice, and trackpads.
+        cell.addEventListener("pointerdown", (event) => {
+          event.preventDefault();
+          this._placeAt(r, c);
+        });
+
+        cell.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          this._placeAt(r, c);
+        });
+
         board.appendChild(cell);
       }
     }
+
+    board.addEventListener("pointerleave", () => this._clearPreview());
 
     const tray = document.createElement("div");
     tray.className = "blockblast-tray";
@@ -1281,12 +1331,18 @@ return {
   _messageTimer: null,
   _target: null,
   _mobileLook: null,
+  _lookTargetYaw: 0,
+  _lookTargetPitch: 0,
+  _bennyRewards: null,
 
   mount(root) {
     this._root = root;
     this._world = this._loadWorld() || createWorld();
     this._player = { x: 0.5, y: highestSolid(this._world, 0, -2), z: -2.5, yaw: 0, pitch: -0.08, vy: 0, grounded: true };
     this._benny = { x: 1.5, z: 1.5, y: highestSolid(this._world, 1, 1), yaw: Math.PI, tamed: this._loadTamed(), phase: 0, petBoost: 0 };
+    this._bennyRewards = this._loadRewards();
+    this._lookTargetYaw = this._player.yaw;
+    this._lookTargetPitch = this._player.pitch;
     this._selected = 0;
     this._keys = new Set();
     this._buildUI();
@@ -1318,7 +1374,13 @@ return {
           <canvas class="minecraft-canvas" aria-label="Benny's 3D block world"></canvas>
           <div class="minecraft-overlay">
             <div class="mc-topbar">
-              <div class="mc-stat" data-mc-stat>Creative mode · Benny is nearby</div>
+              <div>
+                <div class="mc-stat" data-mc-stat>Creative mode · Benny is nearby</div>
+                <div class="mc-quest" data-mc-quest>
+                  <span>🍃 Leaves <strong>0/10</strong></span>
+                  <span>🪵 Wood <strong>0/5</strong></span>
+                </div>
+              </div>
               <div class="mc-help">WASD move · mouse look · Space jump · left-click mine · right-click build · E tame/pet · 1–6 blocks</div>
             </div>
             <div class="mc-crosshair"></div>
@@ -1332,18 +1394,18 @@ return {
                 <button class="mc-start" type="button">Start exploring</button>
               </div>
             </div>
-            <div class="mc-mobile-controls">
-              <div class="mc-pad">
-                <button class="mc-mobile-btn mc-up" data-move="KeyW">▲</button>
-                <button class="mc-mobile-btn mc-left" data-move="KeyA">◀</button>
-                <button class="mc-mobile-btn mc-right" data-move="KeyD">▶</button>
-                <button class="mc-mobile-btn mc-down" data-move="KeyS">▼</button>
+            <div class="mc-mobile-controls" aria-label="Touch controls">
+              <div class="mc-pad" aria-label="Movement controls">
+                <button class="mc-mobile-btn mc-up" data-move="KeyW" aria-label="Move forward"><strong>W</strong><small>▲</small></button>
+                <button class="mc-mobile-btn mc-left" data-move="KeyA" aria-label="Move left"><strong>A</strong><small>◀</small></button>
+                <button class="mc-mobile-btn mc-right" data-move="KeyD" aria-label="Move right"><strong>D</strong><small>▶</small></button>
+                <button class="mc-mobile-btn mc-down" data-move="KeyS" aria-label="Move backward"><strong>S</strong><small>▼</small></button>
               </div>
-              <div class="mc-action-stack">
-                <button data-action="jump">Jump</button>
-                <button data-action="mine">Mine</button>
-                <button data-action="build">Build</button>
-                <button data-action="tame">Tame / Pet</button>
+              <div class="mc-action-stack" aria-label="Action controls">
+                <button data-action="mine"><span>⛏</span><small>Mine</small></button>
+                <button data-action="build"><span>▣</span><small>Place</small></button>
+                <button data-action="jump"><span>↑</span><small>Jump</small></button>
+                <button data-action="tame"><span>🐾</span><small>Benny</small></button>
               </div>
             </div>
           </div>
@@ -1352,7 +1414,7 @@ return {
           <img class="mc-benny-photo" src="benny-standing.jpeg" alt="Benny standing happily on his back legs" />
           <div class="mc-benny-copy">
             <h3>Meet Benny 🐕</h3>
-            <p>The animated block dog inside the world is based on Benny. Walk close and press <strong>E</strong> to tame him. After that, he follows you while you mine and build your house.</p>
+            <p>The animated block dog inside the world is based on Benny. Tame him, then mine <strong>10 leaves</strong> to feed him and <strong>5 wood blocks</strong> to make him a toy.</p>
             <div class="game-controls" style="justify-content:flex-start;margin:12px 0 0">
               <button class="btn secondary" data-mc-save type="button">Save world</button>
               <button class="btn secondary" data-mc-reset type="button">Reset world</button>
@@ -1415,8 +1477,8 @@ return {
     this._on(document, "keyup", (event) => this._keys.delete(event.code));
     this._on(document, "mousemove", (event) => {
       if (document.pointerLockElement !== this._canvas) return;
-      this._player.yaw -= event.movementX * .00235;
-      this._player.pitch = clamp(this._player.pitch - event.movementY * .0022, -1.25, 1.25);
+      this._lookTargetYaw -= event.movementX * .00215;
+      this._lookTargetPitch = clamp(this._lookTargetPitch - event.movementY * .002, -1.25, 1.25);
     });
     this._on(this._canvas, "contextmenu", (event) => event.preventDefault());
     this._on(this._canvas, "mousedown", (event) => {
@@ -1425,25 +1487,39 @@ return {
       if (event.button === 2) this._build();
     });
 
-    // Touch drag controls camera direction.
+    // Touch drag controls camera direction. Dragging left now turns left.
+    // Camera targets are eased in the animation loop to prevent jerky movement.
     this._on(this._canvas, "pointerdown", (event) => {
-      if (event.pointerType === "touch") this._mobileLook = { x: event.clientX, y: event.clientY };
-    });
+      if (event.pointerType !== "touch") return;
+      event.preventDefault();
+      this._canvas.setPointerCapture?.(event.pointerId);
+      this._mobileLook = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    }, { passive: false });
     this._on(this._canvas, "pointermove", (event) => {
-      if (event.pointerType !== "touch" || !this._mobileLook) return;
-      const dx = event.clientX - this._mobileLook.x;
-      const dy = event.clientY - this._mobileLook.y;
-      this._player.yaw -= dx * .008;
-      this._player.pitch = clamp(this._player.pitch - dy * .006, -1.2, 1.2);
-      this._mobileLook = { x: event.clientX, y: event.clientY };
-    });
-    this._on(this._canvas, "pointerup", () => { this._mobileLook = null; });
+      if (event.pointerType !== "touch" || !this._mobileLook || event.pointerId !== this._mobileLook.id) return;
+      event.preventDefault();
+      const dx = clamp(event.clientX - this._mobileLook.x, -36, 36);
+      const dy = clamp(event.clientY - this._mobileLook.y, -30, 30);
+      this._lookTargetYaw += dx * .0046;
+      this._lookTargetPitch = clamp(this._lookTargetPitch - dy * .0039, -1.2, 1.2);
+      this._mobileLook.x = event.clientX;
+      this._mobileLook.y = event.clientY;
+    }, { passive: false });
+    const finishTouchLook = (event) => {
+      if (!this._mobileLook || (event.pointerId != null && event.pointerId !== this._mobileLook.id)) return;
+      this._mobileLook = null;
+    };
+    this._on(this._canvas, "pointerup", finishTouchLook);
+    this._on(this._canvas, "pointercancel", finishTouchLook);
 
     this._root.querySelectorAll("[data-move]").forEach((button) => {
       const code = button.dataset.move;
       this._on(button, "pointerdown", (event) => { event.preventDefault(); this._keys.add(code); });
       this._on(button, "pointerup", () => this._keys.delete(code));
       this._on(button, "pointercancel", () => this._keys.delete(code));
+      this._on(button, "pointerleave", (event) => {
+        if (event.pointerType === "touch") this._keys.delete(code);
+      });
     });
     this._root.querySelectorAll("[data-action]").forEach((button) => {
       this._on(button, "click", () => {
@@ -1459,10 +1535,14 @@ return {
       if (!confirm("Reset the block world and Benny's tame status?")) return;
       safeStorage.removeItem(SAVE_KEY);
       safeStorage.removeItem(`${SAVE_KEY}:tamed`);
+      safeStorage.removeItem(`${SAVE_KEY}:rewards`);
       this._world = createWorld();
       this._benny = { x: 1.5, z: 1.5, y: highestSolid(this._world, 1, 1), yaw: Math.PI, tamed: false, phase: 0, petBoost: 0 };
+      this._bennyRewards = { leaves: 0, wood: 0, fed: false, toy: false };
       this._player.x = .5; this._player.z = -2.5; this._player.y = highestSolid(this._world, 0, -2);
-      this._showMessage("The world has been reset.");
+      this._lookTargetYaw = this._player.yaw;
+      this._lookTargetPitch = this._player.pitch;
+      this._showMessage("The world and Benny's gifts have been reset.");
     });
   },
 
@@ -1493,6 +1573,10 @@ return {
 
   _update(dt) {
     const p = this._player;
+    const lookEase = 1 - Math.exp(-15 * dt);
+    p.yaw += (this._lookTargetYaw - p.yaw) * lookEase;
+    p.pitch += (this._lookTargetPitch - p.pitch) * lookEase;
+
     let forward = 0, strafe = 0;
     if (this._keys.has("KeyW")) forward += 1;
     if (this._keys.has("KeyS")) forward -= 1;
@@ -1528,6 +1612,16 @@ return {
     prompt.classList.toggle("show", near);
     const stat = this._root.querySelector("[data-mc-stat]");
     stat.textContent = `${this._benny.tamed ? "Benny tamed ♥" : "Find and tame Benny"} · ${BLOCKS[HOTBAR[this._selected]].label} selected`;
+
+    const quest = this._root.querySelector("[data-mc-quest]");
+    if (quest && this._bennyRewards) {
+      const leaves = Math.min(10, this._bennyRewards.leaves);
+      const wood = Math.min(5, this._bennyRewards.wood);
+      quest.innerHTML = `
+        <span class="${this._bennyRewards.fed ? "complete" : ""}">🍃 Leaves <strong>${leaves}/10</strong>${this._bennyRewards.fed ? " ✓ Fed Benny" : ""}</span>
+        <span class="${this._bennyRewards.toy ? "complete" : ""}">🪵 Wood <strong>${wood}/5</strong>${this._bennyRewards.toy ? " ✓ Toy made" : ""}</span>
+      `;
+    }
   },
 
   _moveHorizontal(dx, dz) {
@@ -1641,7 +1735,44 @@ return {
     if (!target) return this._showMessage("No block within reach.");
     if (target.hit.y === 0 || target.type === "bedrock") return this._showMessage("Bedrock cannot be mined.");
     this._world.delete(key(target.hit.x,target.hit.y,target.hit.z));
+
+    if (target.type === "leaves" || target.type === "wood") {
+      this._collectForBenny(target.type);
+      return;
+    }
+
     this._showMessage(`${BLOCKS[target.type]?.label || target.type} mined.`);
+  },
+
+  _collectForBenny(type) {
+    const rewards = this._bennyRewards;
+    if (!rewards) return;
+
+    if (type === "leaves" && !rewards.fed) {
+      rewards.leaves += 1;
+      if (rewards.leaves >= 10) {
+        rewards.leaves = 10;
+        rewards.fed = true;
+        this._benny.petBoost = 4;
+        this._showMessage("You mined 10 leaves and fed Benny! He is very happy. 🍃🐕");
+      } else {
+        this._showMessage(`Leaf collected for Benny · ${rewards.leaves}/10`);
+      }
+    } else if (type === "wood" && !rewards.toy) {
+      rewards.wood += 1;
+      if (rewards.wood >= 5) {
+        rewards.wood = 5;
+        rewards.toy = true;
+        this._benny.petBoost = 4;
+        this._showMessage("You mined 5 wood blocks and made Benny a toy! 🪵🧸");
+      } else {
+        this._showMessage(`Wood collected for Benny's toy · ${rewards.wood}/5`);
+      }
+    } else {
+      this._showMessage(`${BLOCKS[type]?.label || type} mined · Benny's reward is already complete!`);
+    }
+
+    this._saveRewards();
   },
 
   _build() {
@@ -1804,12 +1935,24 @@ return {
     this._modelBox(faces,local(.2,.91,.67),[.17,.3,.16],tan,b.yaw+.12,width,height);
     const wag=Math.sin(time*(b.petBoost>0?15:7))*.22;
     this._modelBox(faces,local(wag,.66,-.68),[.14,.16,.52],tan,b.yaw+wag,width,height);
+
+    if (this._bennyRewards?.toy) {
+      const toyBounce = Math.abs(Math.sin(time * 4)) * .04;
+      this._modelBox(faces,local(.46,.08 + toyBounce,.72),[.24,.22,.24],"#d7a52e",b.yaw + time * .7,width,height);
+      this._modelBox(faces,local(.46,.27 + toyBounce,.72),[.1,.12,.1],"#8f1730",b.yaw,width,height);
+    }
   },
 
   _drawBennyName(ctx,width,height) {
     const point=this._project({x:this._benny.x,y:this._benny.y+1.45,z:this._benny.z},width,height);
     if(!point||point.z>24)return;
-    const label=this._benny.tamed?"Benny ♥  Tamed":"Benny";
+    const rewardWords = [
+      this._bennyRewards?.fed ? "Fed" : "",
+      this._bennyRewards?.toy ? "Toy" : ""
+    ].filter(Boolean);
+    const label = this._benny.tamed
+      ? `Benny ♥ Tamed${rewardWords.length ? ` · ${rewardWords.join(" · ")}` : ""}`
+      : `Benny${rewardWords.length ? ` · ${rewardWords.join(" · ")}` : ""}`;
     ctx.save();
     ctx.font="700 13px DM Sans, sans-serif";
     const w=ctx.measureText(label).width+20;
@@ -1846,7 +1989,8 @@ return {
       for(const[id,type]of this._world) custom.push([id,type]);
       safeStorage.setItem(SAVE_KEY,JSON.stringify(custom));
       safeStorage.setItem(`${SAVE_KEY}:tamed`,String(this._benny?.tamed||false));
-      if(showMessage)this._showMessage("World saved in this browser.");
+      this._saveRewards();
+      if(showMessage)this._showMessage("World and Benny's gifts saved in this browser.");
     } catch(error) {
       if(showMessage)this._showMessage("The browser could not save this world.");
     }
@@ -1858,6 +2002,29 @@ return {
       if(!Array.isArray(saved)||!saved.length)return null;
       return new Map(saved);
     } catch { return null; }
+  },
+
+  _saveRewards() {
+    try {
+      safeStorage.setItem(`${SAVE_KEY}:rewards`, JSON.stringify(this._bennyRewards || {
+        leaves: 0, wood: 0, fed: false, toy: false
+      }));
+    } catch (_error) {}
+  },
+
+  _loadRewards() {
+    try {
+      const saved = JSON.parse(safeStorage.getItem(`${SAVE_KEY}:rewards`));
+      if (!saved || typeof saved !== "object") throw new Error("No reward state");
+      return {
+        leaves: clamp(Number(saved.leaves) || 0, 0, 10),
+        wood: clamp(Number(saved.wood) || 0, 0, 5),
+        fed: Boolean(saved.fed),
+        toy: Boolean(saved.toy)
+      };
+    } catch {
+      return { leaves: 0, wood: 0, fed: false, toy: false };
+    }
   },
 
   _loadTamed() { return safeStorage.getItem(`${SAVE_KEY}:tamed`) === "true"; }
