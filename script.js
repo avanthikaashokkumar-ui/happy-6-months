@@ -3646,6 +3646,7 @@ const screenDiary = (() => {
 
     _filteredWatched() {
       const filter = this._state.watchedFilter;
+      if (filter === "needtowatch") return [];
       return this._watched().filter((item) => {
         if (filter === "movies") return item.type === "Movie";
         if (filter === "shows") return item.type === "Series";
@@ -3930,7 +3931,16 @@ const screenDiary = (() => {
 
       const heading = document.createElement("div");
       heading.className = "clean-section-heading";
-      heading.innerHTML = `
+      const showingNeedToWatch = this._state.watchedFilter === "needtowatch";
+
+      heading.innerHTML = showingNeedToWatch
+        ? `
+        <div>
+          <p class="screen-section-kicker">Saved for our next couch night</p>
+          <h4>Need to Watch ♥</h4>
+        </div>
+      `
+        : `
         <div>
           <p class="screen-section-kicker">Already part of our story</p>
           <h4>Watched With You ♥</h4>
@@ -3943,7 +3953,8 @@ const screenDiary = (() => {
         ["all", "All"],
         ["movies", "Movies"],
         ["shows", "Shows"],
-        ["halfway", "Halfway"]
+        ["halfway", "Halfway"],
+        ["needtowatch", "Need to watch"]
       ].forEach(([value, label]) => {
         const button = document.createElement("button");
         button.type = "button";
@@ -3960,10 +3971,23 @@ const screenDiary = (() => {
       heading.appendChild(filters);
 
       const watchedGrid = document.createElement("div");
-      watchedGrid.className = "clean-watched-grid";
-      filteredWatched.forEach((item, index) => {
-        watchedGrid.appendChild(this._renderWatchedCard(item, index));
-      });
+
+      if (showingNeedToWatch) {
+        watchedGrid.className = "clean-need-grid";
+
+        if (!this._state.queue.length) {
+          watchedGrid.innerHTML = `<p class="clean-empty-queue clean-empty-main">Nothing saved yet. Use the AI picker on the right and save a movie or show for later ♥</p>`;
+        } else {
+          this._state.queue.forEach((item) => {
+            watchedGrid.appendChild(this._renderQueueItem(item));
+          });
+        }
+      } else {
+        watchedGrid.className = "clean-watched-grid";
+        filteredWatched.forEach((item, index) => {
+          watchedGrid.appendChild(this._renderWatchedCard(item, index));
+        });
+      }
 
       main.append(heading, watchedGrid);
 
