@@ -4161,3 +4161,59 @@ body.screen-diary-open .soundtrack-panel {
     justify-content: flex-start;
   }
 }
+
+
+/* Online movie/show search */
+.clean-online-search-controls {
+  grid-template-columns: minmax(0,1fr) 150px auto;
+}
+.clean-online-search-button {
+  min-height: 42px;
+  padding: 9px 14px;
+  white-space: nowrap;
+}
+.clean-online-search-button:disabled {
+  cursor: wait;
+  opacity: .66;
+}
+.clean-search-copy em {
+  width: fit-content;
+  margin-top: 3px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  color: #5b3a69;
+  background: #eee2f4;
+  font-size: .52rem;
+  font-style: normal;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.clean-search-actions a {
+  border-radius: 999px;
+  padding: 6px 9px;
+  color: #5e3b69;
+  background: #eee4f3;
+  font-size: .57rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+.clean-search-actions a:hover {
+  background: #e5d4ed;
+}
+@media (max-width: 820px) {
+  .clean-online-search-controls {
+    grid-template-columns: 1fr 130px;
+  }
+  .clean-online-search-button {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 560px) {
+  .clean-online-search-controls {
+    grid-template-columns: 1fr;
+  }
+  .clean-online-search-button {
+    grid-column: auto;
+    width: 100%;
+  }
+}

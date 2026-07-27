@@ -3713,6 +3713,207 @@ const screenDiary = (() => {
         .slice(0, 8);
     },
 
+    async _searchOnline(query, type = "all") {
+      const cleanQuery = String(query || "").trim();
+      if (!cleanQuery) return [];
+
+      const typeHint =
+        type === "Series"
+          ? "television series"
+          : type === "Movie"
+            ? "film"
+            : "film OR television series";
+
+      const params = new URLSearchParams({
+        action: "query",
+        generator: "search",
+        gsrsearch: `${cleanQuery} ${typeHint}`,
+        gsrnamespace: "0",
+        gsrlimit: "10",
+        prop: "pageimages|extracts|pageprops",
+        piprop: "thumbnail|original",
+        pithumbsize: "700",
+        exintro: "1",
+        explaintext: "1",
+        exsentences: "4",
+        format: "json",
+        origin: "*"
+      });
+
+      const response = await fetch(`https://en.wikipedia.org/w/api.php?${params.toString()}`);
+      if (!response.ok) throw new Error("Online search failed.");
+
+      const payload = await response.json();
+      const pages = Object.values(payload?.query?.pages || {})
+        .sort((a, b) => (a.index || 999) - (b.index || 999));
+
+      const mediaPages = pages.filter((page) => {
+        const text = `${page.title || ""} ${page.extract || ""}`.toLowerCase();
+        const looksLikeMedia =
+          text.includes("film") ||
+          text.includes("movie") ||
+          text.includes("television series") ||
+          text.includes("tv series") ||
+          text.includes("web series") ||
+          text.includes("drama series") ||
+          text.includes("sitcom");
+
+        if (!looksLikeMedia) return false;
+        if (type === "Movie") return text.includes("film") || text.includes("movie");
+        if (type === "Series") {
+          return (
+            text.includes("television series") ||
+            text.includes("tv series") ||
+            text.includes("web series") ||
+            text.includes("drama series") ||
+            text.includes("sitcom")
+          );
+        }
+        return true;
+      });
+
+      const qids = mediaPages
+        .map((page) => page?.pageprops?.wikibase_item)
+        .filter(Boolean);
+
+      let entityMap = {};
+      if (qids.length) {
+        const entityParams = new URLSearchParams({
+          action: "wbgetentities",
+          ids: qids.join("|"),
+          props: "claims|labels",
+          languages: "en",
+          format: "json",
+          origin: "*"
+        });
+
+        const entityResponse = await fetch(
+          `https://www.wikidata.org/w/api.php?${entityParams.toString()}`
+        );
+
+        if (entityResponse.ok) {
+          const entityPayload = await entityResponse.json();
+          entityMap = entityPayload.entities || {};
+        }
+      }
+
+      const actorIds = new Set();
+      Object.values(entityMap).forEach((entity) => {
+        (entity?.claims?.P161 || []).slice(0, 6).forEach((claim) => {
+          const actorId = claim?.mainsnak?.datavalue?.value?.id;
+          if (actorId) actorIds.add(actorId);
+        });
+      });
+
+      let actorLabels = {};
+      if (actorIds.size) {
+        const actorParams = new URLSearchParams({
+          action: "wbgetentities",
+          ids: [...actorIds].join("|"),
+          props: "labels",
+          languages: "en",
+          format: "json",
+          origin: "*"
+        });
+
+        const actorResponse = await fetch(
+          `https://www.wikidata.org/w/api.php?${actorParams.toString()}`
+        );
+
+        if (actorResponse.ok) {
+          const actorPayload = await actorResponse.json();
+          Object.entries(actorPayload.entities || {}).forEach(([id, entity]) => {
+            actorLabels[id] = entity?.labels?.en?.value || "";
+          });
+        }
+      }
+
+      const readClaim = (entity, property) =>
+        entity?.claims?.[property]?.[0]?.mainsnak?.datavalue?.value;
+
+      const readDate = (entity) => {
+        const value = readClaim(entity, "P577");
+        const raw = value?.time;
+        if (!raw) return "Not listed";
+
+        const match = raw.match(/[+-](\d{4})-(\d{2})-(\d{2})/);
+        if (!match) return "Not listed";
+
+        const [, year, month, day] = match;
+        const date = new Date(`${year}-${month}-${day}T00:00:00Z`);
+        if (Number.isNaN(date.getTime())) return year;
+
+        return new Intl.DateTimeFormat("en-US", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+          timeZone: "UTC"
+        }).format(date);
+      };
+
+      const readDuration = (entity, inferredType) => {
+        const value = readClaim(entity, "P2047");
+        const amount = Number(value?.amount);
+        if (!Number.isFinite(amount) || amount <= 0) {
+          return inferredType === "Series" ? "Episode duration not listed" : "Not listed";
+        }
+
+        const minutes = Math.round(amount);
+        if (minutes < 60) return `${minutes}m`;
+        return `${Math.floor(minutes / 60)}h ${String(minutes % 60).padStart(2, "0")}m`;
+      };
+
+      return mediaPages.slice(0, 8).map((page) => {
+        const qid = page?.pageprops?.wikibase_item || "";
+        const entity = entityMap[qid];
+        const combinedText = `${page.title || ""} ${page.extract || ""}`.toLowerCase();
+        const inferredType =
+          type === "Movie" || type === "Series"
+            ? type
+            : (
+              combinedText.includes("television series") ||
+              combinedText.includes("tv series") ||
+              combinedText.includes("web series") ||
+              combinedText.includes("sitcom")
+                ? "Series"
+                : "Movie"
+            );
+
+        const cast = (entity?.claims?.P161 || [])
+          .slice(0, 6)
+          .map((claim) => claim?.mainsnak?.datavalue?.value?.id)
+          .map((id) => actorLabels[id])
+          .filter(Boolean);
+
+        const commonsFilename = readClaim(entity, "P18");
+        const commonsPoster = commonsFilename
+          ? `https://commons.wikimedia.org/wiki/Special:Redirect/file/${encodeURIComponent(commonsFilename)}?width=700`
+          : "";
+
+        const poster =
+          commonsPoster ||
+          page?.thumbnail?.source ||
+          page?.original?.source ||
+          makeCustomPoster(page.title, inferredType);
+
+        return {
+          id: `online-${qid || page.pageid}`,
+          title: String(page.title || cleanQuery).replace(/\s+\((film|TV series|television series)\)$/i, ""),
+          type: inferredType,
+          language: "Not listed",
+          releaseDate: readDate(entity),
+          duration: readDuration(entity, inferredType),
+          actors: cast,
+          synopsis: page.extract || "No synopsis was returned for this title.",
+          poster,
+          sourceUrl: `https://en.wikipedia.org/?curid=${page.pageid}`,
+          googleUrl: `https://www.google.com/search?q=${encodeURIComponent(
+            `${page.title} ${inferredType === "Series" ? "TV series" : "movie"}`
+          )}`
+        };
+      });
+    },
+
     _addSearchResult(item, destination) {
       const watchedTitles = new Set(this._watched().map((entry) => entry.title.toLowerCase()));
       const queueTitles = new Set(this._state.queue.map((entry) => entry.title.toLowerCase()));
@@ -4140,16 +4341,16 @@ const screenDiary = (() => {
       searchBox.innerHTML = `
         <div class="clean-search-heading">
           <div>
-            <p class="screen-section-kicker">Add something to our diary</p>
-            <h4>Search movies & shows</h4>
+            <p class="screen-section-kicker">Add anything to our diary</p>
+            <h4>Search movies & shows online</h4>
           </div>
-          <span>Search, then choose where it belongs</span>
+          <span>Search the built-in list or look up a completely different title online</span>
         </div>
 
-        <div class="clean-search-controls">
+        <div class="clean-search-controls clean-online-search-controls">
           <label class="clean-search-field">
             <span class="sr-only">Search movies and shows</span>
-            <input type="search" placeholder="Search by title, actor, or language…" data-library-search autocomplete="off" />
+            <input type="search" placeholder="Type any movie or show title…" data-library-search autocomplete="off" />
           </label>
 
           <select data-library-type aria-label="Filter search by movie or show">
@@ -4157,23 +4358,67 @@ const screenDiary = (() => {
             <option value="Movie">Movies only</option>
             <option value="Series">Shows only</option>
           </select>
+
+          <button type="button" class="btn clean-online-search-button" data-search-online>
+            Search online
+          </button>
         </div>
 
         <div class="clean-search-results" data-library-results aria-live="polite">
-          <p class="clean-search-empty">Start typing to find a title.</p>
+          <p class="clean-search-empty">Start typing to search the built-in list, or press Search online for any title.</p>
         </div>
       `;
 
       const searchInput = searchBox.querySelector("[data-library-search]");
       const searchType = searchBox.querySelector("[data-library-type]");
+      const searchOnlineButton = searchBox.querySelector("[data-search-online]");
       const searchResults = searchBox.querySelector("[data-library-results]");
 
-      const renderSearchResults = () => {
+      const createSearchResult = (item, online = false) => {
+        const result = document.createElement("article");
+        result.className = "clean-search-result";
+        result.innerHTML = `
+          <div class="clean-search-poster">
+            <div class="clean-poster-fallback"><strong>${escapeHtml(item.title)}</strong></div>
+            <img src="${escapeHtml(item.poster)}" alt="${escapeHtml(item.title)} poster" loading="lazy" referrerpolicy="no-referrer" />
+          </div>
+
+          <div class="clean-search-copy">
+            <span>${escapeHtml(item.type === "Series" ? "Show" : "Movie")}${item.language ? ` · ${escapeHtml(item.language)}` : ""}</span>
+            <strong>${escapeHtml(item.title)}</strong>
+            <small>${escapeHtml(item.releaseDate || "")}${item.duration ? ` · ${escapeHtml(item.duration)}` : ""}</small>
+            ${online ? `<em>Online result</em>` : ""}
+          </div>
+
+          <div class="clean-search-actions">
+            ${online && item.googleUrl ? `<a href="${escapeHtml(item.googleUrl)}" target="_blank" rel="noopener noreferrer">Open Google</a>` : ""}
+            <button type="button" data-add-watched>Add to watched</button>
+            <button type="button" data-add-need>Add to need to watch</button>
+          </div>
+        `;
+
+        attachPosterFallback(
+          result.querySelector("img"),
+          item,
+          result.querySelector(".clean-poster-fallback")
+        );
+
+        result.querySelector("[data-add-watched]")?.addEventListener("click", () => {
+          this._addSearchResult(item, "watched");
+        });
+        result.querySelector("[data-add-need]")?.addEventListener("click", () => {
+          this._addSearchResult(item, "need");
+        });
+
+        return result;
+      };
+
+      const renderLocalResults = () => {
         const query = searchInput.value.trim();
         const matches = this._searchCatalog(query, searchType.value);
 
         if (!query) {
-          searchResults.innerHTML = `<p class="clean-search-empty">Start typing to find a title.</p>`;
+          searchResults.innerHTML = `<p class="clean-search-empty">Start typing to search the built-in list, or press Search online for any title.</p>`;
           return;
         }
 
@@ -4181,12 +4426,12 @@ const screenDiary = (() => {
           searchResults.innerHTML = `
             <article class="clean-search-custom">
               <div>
-                <strong>No saved match for “${escapeHtml(query)}”</strong>
-                <small>Add it as a custom ${searchType.value === "Series" ? "show" : "movie"}.</small>
+                <strong>No built-in match for “${escapeHtml(query)}”</strong>
+                <small>Press Search online to look it up, or add a simple custom card now.</small>
               </div>
               <div class="clean-search-actions">
-                <button type="button" data-custom-watch>Add to watched</button>
-                <button type="button" data-custom-need>Add to need to watch</button>
+                <button type="button" data-custom-watch>Add custom to watched</button>
+                <button type="button" data-custom-need>Add custom to need to watch</button>
               </div>
             </article>
           `;
@@ -4203,43 +4448,81 @@ const screenDiary = (() => {
 
         searchResults.innerHTML = "";
         matches.forEach((item) => {
-          const result = document.createElement("article");
-          result.className = "clean-search-result";
-          result.innerHTML = `
-            <div class="clean-search-poster">
-              <div class="clean-poster-fallback"><strong>${escapeHtml(item.title)}</strong></div>
-              <img src="${escapeHtml(item.poster)}" alt="${escapeHtml(item.title)} poster" loading="lazy" referrerpolicy="no-referrer" />
-            </div>
-            <div class="clean-search-copy">
-              <span>${escapeHtml(item.type === "Series" ? "Show" : "Movie")} · ${escapeHtml(item.language)}</span>
-              <strong>${escapeHtml(item.title)}</strong>
-              <small>${escapeHtml(item.releaseDate || "")}${item.duration ? ` · ${escapeHtml(item.duration)}` : ""}</small>
-            </div>
-            <div class="clean-search-actions">
-              <button type="button" data-add-watched>Add to watched</button>
-              <button type="button" data-add-need>Add to need to watch</button>
-            </div>
-          `;
-
-          attachPosterFallback(
-            result.querySelector("img"),
-            item,
-            result.querySelector(".clean-poster-fallback")
-          );
-
-          result.querySelector("[data-add-watched]")?.addEventListener("click", () => {
-            this._addSearchResult(item, "watched");
-          });
-          result.querySelector("[data-add-need]")?.addEventListener("click", () => {
-            this._addSearchResult(item, "need");
-          });
-
-          searchResults.appendChild(result);
+          searchResults.appendChild(createSearchResult(item, false));
         });
       };
 
-      searchInput.addEventListener("input", renderSearchResults);
-      searchType.addEventListener("change", renderSearchResults);
+      const renderOnlineResults = async () => {
+        const query = searchInput.value.trim();
+        if (!query) {
+          searchResults.innerHTML = `<p class="clean-search-empty">Type a movie or show title first.</p>`;
+          searchInput.focus();
+          return;
+        }
+
+        searchOnlineButton.disabled = true;
+        searchOnlineButton.textContent = "Searching…";
+        searchResults.innerHTML = `<p class="clean-search-empty">Searching online for “${escapeHtml(query)}”…</p>`;
+
+        try {
+          const matches = await this._searchOnline(query, searchType.value);
+
+          if (!matches.length) {
+            searchResults.innerHTML = `
+              <article class="clean-search-custom">
+                <div>
+                  <strong>No online movie/show match was found for “${escapeHtml(query)}”</strong>
+                  <small>You can still add it as a custom title.</small>
+                </div>
+                <div class="clean-search-actions">
+                  <a href="https://www.google.com/search?q=${encodeURIComponent(query + " movie or TV show")}" target="_blank" rel="noopener noreferrer">Search Google</a>
+                  <button type="button" data-custom-watch>Add custom to watched</button>
+                  <button type="button" data-custom-need>Add custom to need to watch</button>
+                </div>
+              </article>
+            `;
+
+            const customType = searchType.value === "Series" ? "Series" : "Movie";
+            searchResults.querySelector("[data-custom-watch]")?.addEventListener("click", () => {
+              this._addCustomSearchTitle(query, customType, "watched");
+            });
+            searchResults.querySelector("[data-custom-need]")?.addEventListener("click", () => {
+              this._addCustomSearchTitle(query, customType, "need");
+            });
+            return;
+          }
+
+          searchResults.innerHTML = "";
+          matches.forEach((item) => {
+            searchResults.appendChild(createSearchResult(item, true));
+          });
+        } catch (error) {
+          console.error("Online movie search failed:", error);
+          searchResults.innerHTML = `
+            <article class="clean-search-custom">
+              <div>
+                <strong>The online search could not load.</strong>
+                <small>Open Google directly or add the title as a custom card.</small>
+              </div>
+              <div class="clean-search-actions">
+                <a href="https://www.google.com/search?q=${encodeURIComponent(query + " movie or TV show")}" target="_blank" rel="noopener noreferrer">Search Google</a>
+              </div>
+            </article>
+          `;
+        } finally {
+          searchOnlineButton.disabled = false;
+          searchOnlineButton.textContent = "Search online";
+        }
+      };
+
+      searchInput.addEventListener("input", renderLocalResults);
+      searchInput.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter") return;
+        event.preventDefault();
+        renderOnlineResults();
+      });
+      searchType.addEventListener("change", renderLocalResults);
+      searchOnlineButton.addEventListener("click", renderOnlineResults);
 
       const heading = document.createElement("div");
       heading.className = "clean-section-heading";
