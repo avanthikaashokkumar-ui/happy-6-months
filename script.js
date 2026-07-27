@@ -3324,510 +3324,105 @@ return {
 })();
 
 const screenDiary = (() => {
-  const STORAGE_KEY = "happy6:cozy-screen-diary:v1";
+  const STORAGE_KEY = "happy6:cozy-screen-diary:v3";
+  const LEGACY_STORAGE_KEY = "happy6:cozy-screen-diary:v1";
 
-  const STARTER_WATCHED = [
-    { id: "anand", title: "Anand", note: "Watched together", status: "watched", poster: "https://play-lh.googleusercontent.com/proxy/VujXcineAs2bBiwz7OeBbGn3bbkuT7aSQGotjV0KCIx2faddcYOR8iYmwoWx_9DkzudFRiB8YdnVc7lPwxR1eaGv10O8mMuSnzUIo5mA-MH8ql5bmxqdYOxUCwNSvAnx261ZAonQ5h_BHMSn-vgj7I5f3jgx5sFjFSAvKw=w480-h960" },
-    { id: "ye-maaya-chesave", title: "Ye Maaya Chesave", note: "Watched together", status: "watched", poster: "https://play-lh.googleusercontent.com/dRqoM-6maw4enTL-g1RU2iek4erAPukRdg5k7U4bdUz1CT5cZEQtrUC-P9tCcvXWJ5w=w480-h960" },
-    { id: "with-love", title: "With Love", note: "Watched together", status: "watched", poster: "https://images.fandango.com/ImageRenderer/400/0/redesign/static/img/default_poster--dark-mode.png/0/images/masterrepository/Fandango/244298/withlove.jpg" },
-    { id: "anaganaga-oka-raju", title: "Anaganaga Oka Raju", note: "Watched together", status: "watched", poster: "https://images.fandango.com/ImageRenderer/400/0/redesign/static/img/default_poster--dark-mode.png/0/images/masterrepository/Fandango/243701/1290220-anaganaga-oka-raju-0-230-0-345-crop.jpg" },
-        { id: "mike-and-molly", title: "Mike & Molly", note: "Watched together", status: "watched", poster: "https://upload.wikimedia.org/wikipedia/commons/9/95/Mike-and-molly-13.jpg" },
-    { id: "tamizh-padam-2", title: "Tamizh Padam 2", note: "Halfway… lmao", status: "halfway", poster: "https://play-lh.googleusercontent.com/vnGWrt5NYKGGLYUJ5kEJFugzOXhRjr_1E5LFiuzaOINF9K_iBiFZMcxH31xfIuYSyWLHrmRmcEzBt7d2sV8=w480-h960" },
-    { id: "little-things", title: "Little Things", note: "Watched together", status: "watched", poster: "https://resizing.flixster.com/8edPB5rPK5_2cyFuICY5bNT6LJc%3D/342x513/v2/https%3A//resizing.flixster.com/uKRM5V-4Sdx-eXjCYhkC7ecmzew%3D/ems.cHJkLWVtcy1hc3NldHMvdHZzZXJpZXMvNDQ0ZDk4MGMtN2FmNy00MDJjLTgwNTAtZTExMmFiMGMzODJiLmpwZw%3D%3D" },
-    { id: "attarintiki-daredi", title: "Attarintiki Daredi", note: "Watched together", status: "watched", poster: "https://play-lh.googleusercontent.com/RTPgLMluBxCFjmM-crWQS_38zUuboxajlLWRvFx3KSvBpOocVzWRAfA16u-8vgWd_Nez=w480-h960" },
-    { id: "seethamma-vakitlo-sirimalle-chettu", title: "Seethamma Vakitlo Sirimalle Chettu", note: "Watched together", status: "watched", poster: "https://play-lh.googleusercontent.com/ztyP5jIJ9pRuz-gxXAlGC7DTfFEQNNt78RdYZRh-Ufr1YRZdvWW8yoilmvxvjevjmr5O=w480-h960" }
-  ];
-
-
-  function slugifyTitle(value) {
-    return String(value || "")
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
-  }
-
-  const SCREEN_PALETTES = {
-    rose: { top: "#f7cad4", bottom: "#7a1731", accent: "#fff2f5", text: "#fffaf7" },
-    gold: { top: "#ffd58b", bottom: "#7a3115", accent: "#fff1d6", text: "#fffaf7" },
-    peach: { top: "#ffc8b6", bottom: "#8d3050", accent: "#fff1ea", text: "#fffaf7" },
-    green: { top: "#cde4ad", bottom: "#224837", accent: "#eff8e0", text: "#fffaf7" },
-    lavender: { top: "#ddc8f2", bottom: "#4e2f67", accent: "#f3ebff", text: "#fffaf7" },
-    blue: { top: "#b6d2e6", bottom: "#22465c", accent: "#eaf5fd", text: "#fffaf7" },
-    rain: { top: "#cfd8df", bottom: "#334557", accent: "#edf3f7", text: "#fffaf7" },
-    sky: { top: "#d6efff", bottom: "#355c7d", accent: "#edf7ff", text: "#fffaf7" },
-    plum: { top: "#e7c5df", bottom: "#5e294f", accent: "#fdf0fb", text: "#fffaf7" },
-    cocoa: { top: "#e5c7b1", bottom: "#6a3f35", accent: "#fff1e9", text: "#fffaf7" }
-  };
-
-  function makePosterData(title, kicker = "OUR NEXT WATCH", palette = "rose") {
-    const chosen = SCREEN_PALETTES[palette] || SCREEN_PALETTES.rose;
-    const safeTitle = escapeHtml(title);
-    const safeKicker = escapeHtml(kicker);
-
-    const svg = `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1200">
-        <defs>
-          <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0%" stop-color="${chosen.top}"/>
-            <stop offset="100%" stop-color="${chosen.bottom}"/>
-          </linearGradient>
-          <radialGradient id="glow" cx="70%" cy="18%" r="38%">
-            <stop offset="0%" stop-color="${chosen.accent}" stop-opacity=".8"/>
-            <stop offset="100%" stop-color="${chosen.accent}" stop-opacity="0"/>
-          </radialGradient>
-        </defs>
-        <rect width="800" height="1200" fill="url(#bg)"/>
-        <rect width="800" height="1200" fill="url(#glow)"/>
-        <rect x="44" y="44" width="712" height="1112" rx="28" fill="none" stroke="rgba(255,255,255,.30)" stroke-width="4"/>
-        <text x="72" y="114" fill="${chosen.text}" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" letter-spacing="5">${safeKicker}</text>
-        <text x="72" y="925" fill="${chosen.text}" font-family="Georgia, serif" font-size="84" font-weight="700">${safeTitle}</text>
-        <text x="72" y="995" fill="${chosen.text}" font-family="Arial, Helvetica, sans-serif" font-size="30" opacity=".86">Movie night pick for us ♥</text>
-        <circle cx="660" cy="175" r="78" fill="rgba(255,255,255,.13)"/>
-        <text x="660" y="196" text-anchor="middle" fill="${chosen.text}" font-family="Georgia, serif" font-size="70">♥</text>
-      </svg>
-    `.trim();
-
-    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-  }
-
-  function enrichWatchItem(item, fallbackKicker = "OUR WATCHLIST") {
-    if (!item || !item.title) return item;
-    const found = [...STARTER_WATCHED, ...AI_MOVIE_CATALOG].find(
-      (entry) => entry.title.toLowerCase() === String(item.title).toLowerCase()
-    );
-
-    const palette = item.palette || found?.palette || "rose";
-    const status = item.status || found?.status || "towatch";
-    const note = item.note || found?.note || (status === "watched" ? "Watched together" : "Need to watch together");
-
-    return {
-      ...item,
-      id: item.id || slugifyTitle(item.title),
-      palette,
-      note,
-      year: item.year || found?.year || "",
-      type: item.type || found?.type || "",
-      poster: item.poster || found?.poster || makePosterData(item.title, fallbackKicker, palette)
-    };
-  }
-
-  const DEFAULT_TO_WATCH = [
+  const WATCHED = [
     {
-      id: "queen-of-tears",
-      title: "Queen of Tears",
-      note: "Need to watch together",
-      status: "towatch",
+      id: "anand",
+      title: "Anand",
+      type: "Movie",
+      note: "Watched together",
+      status: "watched",
+      palette: "green",
+      poster: "https://play-lh.googleusercontent.com/proxy/VujXcineAs2bBiwz7OeBbGn3bbkuT7aSQGotjV0KCIx2faddcYOR8iYmwoWx_9DkzudFRiB8YdnVc7lPwxR1eaGv10O8mMuSnzUIo5mA-MH8ql5bmxqdYOxUCwNSvAnx261ZAonQ5h_BHMSn-vgj7I5f3jgx5sFjFSAvKw=w480-h960"
+    },
+    {
+      id: "ye-maaya-chesave",
+      title: "Ye Maaya Chesave",
+      type: "Movie",
+      note: "Watched together",
+      status: "watched",
+      palette: "rose",
+      poster: "https://play-lh.googleusercontent.com/dRqoM-6maw4enTL-g1RU2iek4erAPukRdg5k7U4bdUz1CT5cZEQtrUC-P9tCcvXWJ5w=w480-h960"
+    },
+    {
+      id: "with-love",
+      title: "With Love",
       type: "Series",
-      year: 2024,
+      note: "Watched together",
+      status: "watched",
+      palette: "peach",
+      poster: "https://images.fandango.com/ImageRenderer/400/0/redesign/static/img/default_poster--dark-mode.png/0/images/masterrepository/Fandango/244298/withlove.jpg"
+    },
+    {
+      id: "anaganaga-oka-raju",
+      title: "Anaganaga Oka Raju",
+      type: "Movie",
+      note: "Watched together",
+      status: "watched",
+      palette: "gold",
+      poster: "https://images.fandango.com/ImageRenderer/400/0/redesign/static/img/default_poster--dark-mode.png/0/images/masterrepository/Fandango/243701/1290220-anaganaga-oka-raju-0-230-0-345-crop.jpg"
+    },
+    {
+      id: "mike-and-molly",
+      title: "Mike & Molly",
+      type: "Series",
+      note: "Watched together",
+      status: "watched",
+      palette: "sky",
+      poster: "https://upload.wikimedia.org/wikipedia/commons/9/95/Mike-and-molly-13.jpg"
+    },
+    {
+      id: "tamizh-padam-2",
+      title: "Tamizh Padam 2",
+      type: "Movie",
+      note: "Halfway… lmao",
+      status: "halfway",
+      palette: "gold",
+      poster: "https://play-lh.googleusercontent.com/vnGWrt5NYKGGLYUJ5kEJFugzOXhRjr_1E5LFiuzaOINF9K_iBiFZMcxH31xfIuYSyWLHrmRmcEzBt7d2sV8=w480-h960"
+    },
+    {
+      id: "little-things",
+      title: "Little Things",
+      type: "Series",
+      note: "Watched together",
+      status: "watched",
       palette: "plum",
-      poster: "https://upload.wikimedia.org/wikipedia/commons/6/69/Queen_of_Tears_20240307_1.png"
-    }
-  ];
-
-
-  const AI_MOVIE_CATALOG = [
+      poster: "https://resizing.flixster.com/8edPB5rPK5_2cyFuICY5bNT6LJc%3D/342x513/v2/https%3A//resizing.flixster.com/uKRM5V-4Sdx-eXjCYhkC7ecmzew%3D/ems.cHJkLWVtcy1hc3NldHMvdHZzZXJpZXMvNDQ0ZDk4MGMtN2FmNy00MDJjLTgwNTAtZTExMmFiMGMzODJiLmpwZw%3D%3D"
+    },
     {
-      id: "hi-nanna",
-      title: "Hi Nanna",
-      year: 2023,
+      id: "attarintiki-daredi",
+      title: "Attarintiki Daredi",
       type: "Movie",
-      duration: "2h 35m",
-      minutes: 155,
-      language: "Telugu",
-      genre: "Romantic family drama",
-      actors: ["Nani", "Mrunal Thakur", "Kiara Khanna"],
-      synopsis: "A devoted single father and his daughter meet a mysterious woman whose connection to their past slowly changes all of their lives.",
-      moods: ["emotional", "romantic", "cozy"],
-      why: "Heartfelt, soft, and emotional in a way that matches your shared taste beautifully.",
-      icon: "🐕",
-      palette: "rose",
-      poster: makePosterData("Hi Nanna", "AI MATCH", "rose")
-    },
-    {
-      id: "sita-ramam",
-      title: "Sita Ramam",
-      year: 2022,
-      type: "Movie",
-      duration: "2h 43m",
-      minutes: 163,
-      language: "Telugu",
-      genre: "Period romantic drama",
-      actors: ["Dulquer Salmaan", "Mrunal Thakur", "Rashmika Mandanna"],
-      synopsis: "An army officer begins receiving letters from a woman calling herself his wife, leading to a sweeping love story.",
-      moods: ["emotional", "romantic", "epic"],
-      why: "Big emotions and grand romance—perfect for a special movie night.",
-      icon: "💌",
-      palette: "gold",
-      poster: makePosterData("Sita Ramam", "AI MATCH", "gold")
-    },
-    {
-      id: "premalu",
-      title: "Premalu",
-      year: 2024,
-      type: "Movie",
-      duration: "2h 36m",
-      minutes: 156,
-      language: "Malayalam",
-      genre: "Romantic comedy",
-      actors: ["Naslen", "Mamitha Baiju", "Sangeeth Prathap"],
-      synopsis: "A confused graduate in Hyderabad falls for a confident young professional in a sweet and funny modern romance.",
-      moods: ["funny", "romantic", "light"],
-      why: "Playful and easy to enjoy together when you want something fun.",
-      icon: "💘",
-      palette: "peach",
-      poster: makePosterData("Premalu", "AI MATCH", "peach")
-    },
-    {
-      id: "pelli-choopulu",
-      title: "Pelli Choopulu",
-      year: 2016,
-      type: "Movie",
-      duration: "1h 58m",
-      minutes: 118,
-      language: "Telugu",
-      genre: "Romantic comedy",
-      actors: ["Vijay Deverakonda", "Ritu Varma"],
-      synopsis: "A laid-back aspiring chef and an ambitious entrepreneur discover chemistry after a matchmaking visit.",
-      moods: ["funny", "romantic", "light"],
-      why: "Warm, charming, and short enough for a cozy evening.",
-      icon: "🍲",
-      palette: "green",
-      poster: makePosterData("Pelli Choopulu", "AI MATCH", "green")
-    },
-    {
-      id: "oohalu-gusagusalade",
-      title: "Oohalu Gusagusalade",
-      year: 2014,
-      type: "Movie",
-      duration: "2h 08m",
-      minutes: 128,
-      language: "Telugu",
-      genre: "Romantic comedy",
-      actors: ["Naga Shaurya", "Raashii Khanna", "Srinivas Avasarala"],
-      synopsis: "A television presenter helps his boss woo a woman, only to fall for her himself.",
-      moods: ["funny", "romantic", "cozy"],
-      why: "Gentle and comforting, with exactly the kind of cute energy your list likes.",
-      icon: "☕",
-      palette: "lavender",
-      poster: makePosterData("Oohalu Gusagusalade", "AI MATCH", "lavender")
-    },
-    {
-      id: "96",
-      title: "'96",
-      year: 2018,
-      type: "Movie",
-      duration: "2h 38m",
-      minutes: 158,
-      language: "Tamil",
-      genre: "Nostalgic romantic drama",
-      actors: ["Vijay Sethupathi", "Trisha Krishnan", "Gouri G. Kishan"],
-      synopsis: "Former school sweethearts reunite years later and revisit the love and memories that never really left them.",
-      moods: ["emotional", "romantic", "nostalgic"],
-      why: "Best for a deeply emotional and memory-filled night.",
-      icon: "📷",
-      palette: "blue",
-      poster: makePosterData("'96", "AI MATCH", "blue")
-    },
-    {
-      id: "about-time",
-      title: "About Time",
-      year: 2013,
-      type: "Movie",
-      duration: "2h 03m",
-      minutes: 123,
-      language: "English",
-      genre: "Romantic fantasy comedy-drama",
-      actors: ["Domhnall Gleeson", "Rachel McAdams", "Bill Nighy"],
-      synopsis: "A man who can travel through time learns that love is really about appreciating ordinary moments.",
-      moods: ["emotional", "romantic", "cozy", "fantasy"],
-      why: "A perfect anniversary-style pick because it makes everyday love feel magical.",
-      icon: "⏳",
-      palette: "rain",
-      poster: makePosterData("About Time", "AI MATCH", "rain")
-    },
-    {
-      id: "business-proposal",
-      title: "Business Proposal",
-      year: 2022,
-      type: "Series",
-      duration: "12 episodes",
-      minutes: 720,
-      language: "Korean",
-      genre: "Romantic comedy series",
-      actors: ["Ahn Hyo-seop", "Kim Se-jeong", "Kim Min-kyu", "Seol In-ah"],
-      synopsis: "A fake blind date turns into a workplace romance with big chemistry and lots of chaos.",
-      moods: ["funny", "romantic", "light", "series"],
-      why: "A lighter K-drama mood if you want the excitement of a series.",
-      icon: "💼",
-      palette: "sky",
-      poster: makePosterData("Business Proposal", "AI MATCH", "sky")
-    },
-    {
-      id: "our-beloved-summer",
-      title: "Our Beloved Summer",
-      year: 2021,
-      type: "Series",
-      duration: "16 episodes",
-      minutes: 960,
-      language: "Korean",
-      genre: "Romantic coming-of-age series",
-      actors: ["Choi Woo-shik", "Kim Da-mi", "Kim Sung-cheol"],
-      synopsis: "Former high school sweethearts are forced back into each other’s lives when their old documentary goes viral.",
-      moods: ["romantic", "cozy", "series", "nostalgic"],
-      why: "Tender, soft, and full of the kind of lingering feelings that make a series addictive.",
-      icon: "🌿",
-      palette: "green",
-      poster: makePosterData("Our Beloved Summer", "AI MATCH", "green")
-    },
-    {
-      id: "hometown-cha-cha-cha",
-      title: "Hometown Cha-Cha-Cha",
-      year: 2021,
-      type: "Series",
-      duration: "16 episodes",
-      minutes: 960,
-      language: "Korean",
-      genre: "Healing romantic comedy series",
-      actors: ["Shin Min-a", "Kim Seon-ho", "Lee Sang-yi"],
-      synopsis: "A city dentist moves to a seaside village and clashes, then slowly falls, for its beloved handyman.",
-      moods: ["cozy", "romantic", "funny", "series"],
-      why: "One of the coziest shows you could watch together.",
-      icon: "🌊",
-      palette: "sky",
-      poster: makePosterData("Hometown Cha-Cha-Cha", "AI MATCH", "sky")
-    },
-    {
-      id: "twenty-five-twenty-one",
-      title: "Twenty-Five Twenty-One",
-      year: 2022,
-      type: "Series",
-      duration: "16 episodes",
-      minutes: 960,
-      language: "Korean",
-      genre: "Youth romance series",
-      actors: ["Kim Tae-ri", "Nam Joo-hyuk", "Bona"],
-      synopsis: "A teenage fencer and a young man in crisis grow up together during turbulent years.",
-      moods: ["emotional", "romantic", "series", "nostalgic"],
-      why: "When you want romance with a lot of feeling and youthfulness.",
-      icon: "🏅",
-      palette: "gold",
-      poster: makePosterData("Twenty-Five Twenty-One", "AI MATCH", "gold")
-    },
-    {
-      id: "lovely-runner",
-      title: "Lovely Runner",
-      year: 2024,
-      type: "Series",
-      duration: "16 episodes",
-      minutes: 960,
-      language: "Korean",
-      genre: "Romantic fantasy series",
-      actors: ["Byeon Woo-seok", "Kim Hye-yoon"],
-      synopsis: "A devoted fan is thrown back in time and tries to save the artist who means everything to her.",
-      moods: ["romantic", "emotional", "series", "fantasy"],
-      why: "Sweet, dramatic, and very bingeable.",
-      icon: "✨",
-      palette: "lavender",
-      poster: makePosterData("Lovely Runner", "AI MATCH", "lavender")
-    },
-    {
-      id: "hidden-love",
-      title: "Hidden Love",
-      year: 2023,
-      type: "Series",
-      duration: "25 episodes",
-      minutes: 1100,
-      language: "Chinese",
-      genre: "Romantic coming-of-age series",
-      actors: ["Zhao Lusi", "Chen Zheyuan"],
-      synopsis: "A long-held crush slowly turns into something real as a younger girl grows up and reconnects with her brother’s friend.",
-      moods: ["romantic", "cozy", "series"],
-      why: "Soft, blushy, and made for people who love tender romance.",
-      icon: "🩷",
-      palette: "rose",
-      poster: makePosterData("Hidden Love", "AI MATCH", "rose")
-    },
-    {
-      id: "when-i-fly-towards-you",
-      title: "When I Fly Towards You",
-      year: 2023,
-      type: "Series",
-      duration: "24 episodes",
-      minutes: 960,
-      language: "Chinese",
-      genre: "Youth romance series",
-      actors: ["Zhou Yiran", "Zhang Miaoyi"],
-      synopsis: "A bright and fearless girl falls for the quiet boy in her class, leading to a sweet school-age romance.",
-      moods: ["cozy", "romantic", "series", "light"],
-      why: "Cute, easy, and very comforting.",
-      icon: "☁️",
-      palette: "sky",
-      poster: makePosterData("When I Fly Towards You", "AI MATCH", "sky")
-    },
-    {
-      id: "little-forest",
-      title: "Little Forest",
-      year: 2018,
-      type: "Movie",
-      duration: "1h 43m",
-      minutes: 103,
-      language: "Korean",
-      genre: "Healing slice-of-life drama",
-      actors: ["Kim Tae-ri", "Ryu Jun-yeol", "Jin Ki-joo"],
-      synopsis: "A young woman returns to her village and reconnects with food, seasons, friendship, and herself.",
-      moods: ["cozy", "emotional", "short"],
-      why: "A perfect comfort pick when you want peace more than drama.",
-      icon: "🍃",
-      palette: "green",
-      poster: makePosterData("Little Forest", "AI MATCH", "green")
-    },
-    {
-      id: "tune-in-for-love",
-      title: "Tune in for Love",
-      year: 2019,
-      type: "Movie",
-      duration: "2h 02m",
-      minutes: 122,
-      language: "Korean",
-      genre: "Romantic drama",
-      actors: ["Kim Go-eun", "Jung Hae-in"],
-      synopsis: "Two people keep finding and losing each other over the years, bound by radio broadcasts and timing.",
-      moods: ["romantic", "emotional", "cozy"],
-      why: "Soft and yearning with a lovely slow-burn feel.",
-      icon: "📻",
-      palette: "blue",
-      poster: makePosterData("Tune in for Love", "AI MATCH", "blue")
-    },
-    {
-      id: "love-reset",
-      title: "Love Reset",
-      year: 2023,
-      type: "Movie",
-      duration: "1h 59m",
-      minutes: 119,
-      language: "Korean",
-      genre: "Romantic comedy",
-      actors: ["Kang Ha-neul", "Jung So-min"],
-      synopsis: "A divorcing couple loses their memories in an accident and falls for each other all over again.",
-      moods: ["funny", "romantic", "light"],
-      why: "A chaotic and funny reset-button romance.",
-      icon: "🔁",
-      palette: "peach",
-      poster: makePosterData("Love Reset", "AI MATCH", "peach")
-    },
-    {
-      id: "miss-shetty-mr-polishetty",
-      title: "Miss Shetty Mr Polishetty",
-      year: 2023,
-      type: "Movie",
-      duration: "2h 29m",
-      minutes: 149,
-      language: "Telugu",
-      genre: "Romantic drama",
-      actors: ["Anushka Shetty", "Naveen Polishetty"],
-      synopsis: "A stand-up comic and a successful chef navigate an unusual relationship on very different terms.",
-      moods: ["romantic", "funny", "cozy"],
-      why: "Modern, warm, and a fun Telugu pick with a little emotional depth too.",
-      icon: "🍰",
+      note: "Watched together",
+      status: "watched",
       palette: "cocoa",
-      poster: makePosterData("Miss Shetty Mr Polishetty", "AI MATCH", "cocoa")
+      poster: "https://play-lh.googleusercontent.com/RTPgLMluBxCFjmM-crWQS_38zUuboxajlLWRvFx3KSvBpOocVzWRAfA16u-8vgWd_Nez=w480-h960"
     },
     {
-      id: "ante-sundaraniki",
-      title: "Ante Sundaraniki",
-      year: 2022,
+      id: "seethamma-vakitlo-sirimalle-chettu",
+      title: "Seethamma Vakitlo Sirimalle Chettu",
       type: "Movie",
-      duration: "2h 53m",
-      minutes: 173,
-      language: "Telugu",
-      genre: "Romantic comedy-drama",
-      actors: ["Nani", "Nazriya Nazim"],
-      synopsis: "A Hindu man and a Christian woman fall in love and pile up elaborate lies while trying to convince their families.",
-      moods: ["funny", "romantic", "long"],
-      why: "A longer Telugu watch when you want something big and entertaining.",
-      icon: "🎭",
-      palette: "gold",
-      poster: makePosterData("Ante Sundaraniki", "AI MATCH", "gold")
-    },
-    {
-      id: "fidaa",
-      title: "Fidaa",
-      year: 2017,
-      type: "Movie",
-      duration: "2h 24m",
-      minutes: 144,
-      language: "Telugu",
-      genre: "Romantic drama",
-      actors: ["Varun Tej", "Sai Pallavi"],
-      synopsis: "An NRI medical student and a spirited village girl fall in love across very different worlds.",
-      moods: ["romantic", "cozy", "emotional"],
-      why: "Warm-hearted and rooted in emotion, exactly the kind of movie that stays with you.",
-      icon: "🌸",
-      palette: "rose",
-      poster: makePosterData("Fidaa", "AI MATCH", "rose")
-    },
-    {
-      id: "kumbalangi-nights",
-      title: "Kumbalangi Nights",
-      year: 2019,
-      type: "Movie",
-      duration: "2h 15m",
-      minutes: 135,
-      language: "Malayalam",
-      genre: "Family drama",
-      actors: ["Shane Nigam", "Soubin Shahir", "Fahadh Faasil", "Anna Ben"],
-      synopsis: "Four brothers try to piece together their messy family while love enters their lives in unexpected ways.",
-      moods: ["cozy", "emotional", "funny"],
-      why: "Rich characters, warmth, and a beautifully lived-in world.",
-      icon: "🏡",
+      note: "Watched together",
+      status: "watched",
       palette: "green",
-      poster: makePosterData("Kumbalangi Nights", "AI MATCH", "green")
-    },
-    {
-      id: "queen-of-tears",
-      title: "Queen of Tears",
-      year: 2024,
-      type: "Series",
-      duration: "16 episodes",
-      minutes: 960,
-      language: "Korean",
-      genre: "Romantic melodrama series",
-      actors: ["Kim Soo-hyun", "Kim Ji-won", "Park Sung-hoon"],
-      synopsis: "A married couple on the brink of separation rediscover love amid family chaos and emotional upheaval.",
-      moods: ["emotional", "romantic", "series"],
-      why: "You already wanted this in your queue, so it stays here too in case the AI confirms it for the next watch.",
-      icon: "👑",
-      palette: "plum",
-      poster: "https://upload.wikimedia.org/wikipedia/commons/6/69/Queen_of_Tears_20240307_1.png"
-    },
-    {
-      id: "crash-landing-on-you",
-      title: "Crash Landing on You",
-      year: 2019,
-      type: "Series",
-      duration: "16 episodes",
-      minutes: 960,
-      language: "Korean",
-      genre: "Romantic drama series",
-      actors: ["Hyun Bin", "Son Ye-jin", "Seo Ji-hye", "Kim Jung-hyun"],
-      synopsis: "A South Korean heiress accidentally lands in North Korea and falls for the officer protecting her.",
-      moods: ["romantic", "emotional", "series", "epic"],
-      why: "Big feelings, sweeping romance, and very binge-worthy.",
-      icon: "🪂",
-      palette: "sky",
-      poster: makePosterData("Crash Landing on You", "AI MATCH", "sky")
+      poster: "https://play-lh.googleusercontent.com/ztyP5jIJ9pRuz-gxXAlGC7DTfFEQNNt78RdYZRh-Ufr1YRZdvWW8yoilmvxvjevjmr5O=w480-h960"
     }
   ];
 
-  function makeId(value) {
-    const clean = String(value || "")
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
-    return `${clean || "watch"}-${Date.now().toString(36)}`;
-  }
+  const PALETTES = {
+    rose: ["#f7c8d4", "#7b1732", "#fff0f4"],
+    plum: ["#dcc7ee", "#542a68", "#f7efff"],
+    peach: ["#ffd0bd", "#9b4157", "#fff0e8"],
+    gold: ["#ffd88d", "#7f3e18", "#fff2d7"],
+    green: ["#cde7b4", "#28513d", "#eff9e2"],
+    sky: ["#d0ecff", "#315d7d", "#edf8ff"],
+    blue: ["#bad4e7", "#27495f", "#eef7fd"],
+    cocoa: ["#e6c6b2", "#6d4237", "#fff1e8"],
+    rain: ["#d6dde4", "#394b5c", "#f1f5f8"],
+    lavender: ["#dfcef2", "#53376d", "#f7f0ff"]
+  };
 
   function escapeHtml(value) {
     return String(value ?? "")
@@ -3838,46 +3433,295 @@ const screenDiary = (() => {
       .replaceAll("'", "&#039;");
   }
 
+  function escapeXml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&apos;");
+  }
+
+  function slugify(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+  }
+
+  function makeId(value) {
+    return `${slugify(value) || "watch"}-${Date.now().toString(36)}`;
+  }
+
+  function titleLines(title) {
+    const words = String(title).split(/\s+/);
+    const lines = [];
+    let current = "";
+
+    words.forEach((word) => {
+      const candidate = current ? `${current} ${word}` : word;
+      if (candidate.length > 17 && current) {
+        lines.push(current);
+        current = word;
+      } else {
+        current = candidate;
+      }
+    });
+
+    if (current) lines.push(current);
+    return lines.slice(0, 4);
+  }
+
+  function posterData(title, label = "OUR WATCHLIST", palette = "rose") {
+    const [top, bottom, accent] = PALETTES[palette] || PALETTES.rose;
+    const lines = titleLines(title);
+    const titleMarkup = lines.map((line, index) =>
+      `<tspan x="64" dy="${index === 0 ? 0 : 78}">${escapeXml(line)}</tspan>`
+    ).join("");
+
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 1050">
+        <defs>
+          <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="${top}"/>
+            <stop offset="100%" stop-color="${bottom}"/>
+          </linearGradient>
+          <radialGradient id="glow" cx="74%" cy="15%" r="42%">
+            <stop offset="0%" stop-color="${accent}" stop-opacity=".86"/>
+            <stop offset="100%" stop-color="${accent}" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect width="700" height="1050" fill="url(#background)"/>
+        <rect width="700" height="1050" fill="url(#glow)"/>
+        <circle cx="560" cy="176" r="102" fill="rgba(255,255,255,.13)"/>
+        <circle cx="560" cy="176" r="65" fill="none" stroke="rgba(255,255,255,.24)" stroke-width="3"/>
+        <text x="560" y="199" text-anchor="middle" fill="#fffaf7" font-family="Georgia,serif" font-size="72">♥</text>
+        <rect x="34" y="34" width="632" height="982" rx="28" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="3"/>
+        <text x="64" y="105" fill="#fffaf7" font-family="Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="4">${escapeXml(label)}</text>
+        <text x="64" y="760" fill="#fffaf7" font-family="Georgia,serif" font-size="66" font-weight="700">${titleMarkup}</text>
+        <text x="64" y="973" fill="#fffaf7" opacity=".78" font-family="Arial,sans-serif" font-size="25">for our next couch night</text>
+      </svg>
+    `.trim();
+
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  }
+
+  const AI_CATALOG = [
+    { id: "hi-nanna", title: "Hi Nanna", type: "Movie", year: 2023, language: "Telugu", mood: ["romantic", "emotional", "cozy"], length: "long", palette: "rose", summary: "A tender family story about love, memory, and the bond between a father and daughter.", why: "Soft, emotional, and exactly the kind of heartfelt movie that fits your list." },
+    { id: "sita-ramam", title: "Sita Ramam", type: "Movie", year: 2022, language: "Telugu", mood: ["romantic", "emotional"], length: "long", palette: "gold", summary: "A sweeping love story carried through letters, distance, duty, and memory.", why: "A special-night pick when you both want a grand romance." },
+    { id: "premalu", title: "Premalu", type: "Movie", year: 2024, language: "Malayalam", mood: ["funny", "romantic", "light"], length: "long", palette: "peach", summary: "A funny modern romance set around awkward feelings, friendship, and young adulthood.", why: "Light, cute, and easy to laugh through together." },
+    { id: "pelli-choopulu", title: "Pelli Choopulu", type: "Movie", year: 2016, language: "Telugu", mood: ["funny", "romantic", "light"], length: "short", palette: "green", summary: "A laid-back chef and an ambitious entrepreneur unexpectedly make a great team.", why: "Warm rom-com energy for an easy couch night." },
+    { id: "about-time", title: "About Time", type: "Movie", year: 2013, language: "English", mood: ["romantic", "emotional", "cozy"], length: "short", palette: "rain", summary: "A time-travel romance that turns ordinary days and small moments into the heart of the story.", why: "It feels especially right for an anniversary watch." },
+    { id: "fidaa", title: "Fidaa", type: "Movie", year: 2017, language: "Telugu", mood: ["romantic", "emotional", "cozy"], length: "long", palette: "rose", summary: "A spirited village girl and an NRI doctor fall in love across different worlds.", why: "Warm, emotional, and easy to remember after the credits." },
+    { id: "miss-shetty-mr-polishetty", title: "Miss Shetty Mr Polishetty", type: "Movie", year: 2023, language: "Telugu", mood: ["funny", "romantic", "cozy"], length: "long", palette: "cocoa", summary: "A chef and a stand-up comedian navigate an unusual relationship with humor and heart.", why: "Modern, funny, and still emotionally grounded." },
+    { id: "ante-sundaraniki", title: "Ante Sundaraniki", type: "Movie", year: 2022, language: "Telugu", mood: ["funny", "romantic"], length: "long", palette: "gold", summary: "A couple creates an increasingly complicated web of lies while trying to win over their families.", why: "Pick this when you want a longer, chaotic, entertaining date night." },
+    { id: "96", title: "'96", type: "Movie", year: 2018, language: "Tamil", mood: ["romantic", "emotional", "nostalgic"], length: "long", palette: "blue", summary: "Former school sweethearts reunite and revisit the love and memories that never left them.", why: "For a deeply emotional and memory-filled night." },
+    { id: "love-reset", title: "Love Reset", type: "Movie", year: 2023, language: "Korean", mood: ["funny", "romantic", "light"], length: "short", palette: "peach", summary: "A divorcing couple loses their memories and gets the strangest possible second chance.", why: "A chaotic, funny reset-button romance." },
+    { id: "tune-in-for-love", title: "Tune in for Love", type: "Movie", year: 2019, language: "Korean", mood: ["romantic", "emotional", "cozy"], length: "short", palette: "blue", summary: "Two people keep finding and losing each other over time, connected by timing and radio.", why: "Soft, yearning, and made for a quiet night." },
+    { id: "little-forest", title: "Little Forest", type: "Movie", year: 2018, language: "Korean", mood: ["cozy", "emotional"], length: "short", palette: "green", summary: "A young woman returns home and reconnects with food, seasons, friendship, and herself.", why: "The calmest comfort-watch option in the picker." },
+    { id: "kumbalangi-nights", title: "Kumbalangi Nights", type: "Movie", year: 2019, language: "Malayalam", mood: ["cozy", "emotional", "funny"], length: "long", palette: "green", summary: "Four brothers slowly piece their family together as love changes their home.", why: "Rich characters, warmth, and a beautifully lived-in world." },
+    { id: "oohalu-gusagusalade", title: "Oohalu Gusagusalade", type: "Movie", year: 2014, language: "Telugu", mood: ["funny", "romantic", "cozy"], length: "short", palette: "lavender", summary: "A charming romantic triangle built around witty conversations and mixed-up feelings.", why: "Gentle, familiar, and sweet without being too heavy." },
+
+    { id: "queen-of-tears", title: "Queen of Tears", type: "Series", year: 2024, language: "Korean", mood: ["romantic", "emotional"], length: "series", palette: "plum", summary: "A married couple near separation is pulled back toward each other through family chaos and emotional upheaval.", why: "This is already the most important show waiting in your queue." },
+    { id: "business-proposal", title: "Business Proposal", type: "Series", year: 2022, language: "Korean", mood: ["funny", "romantic", "light"], length: "series", palette: "sky", summary: "A fake blind date turns into a fast, chaotic workplace romance.", why: "A lighter K-drama with big chemistry and easy binge energy." },
+    { id: "our-beloved-summer", title: "Our Beloved Summer", type: "Series", year: 2021, language: "Korean", mood: ["romantic", "cozy", "nostalgic"], length: "series", palette: "green", summary: "Former high-school sweethearts are forced together again when their old documentary becomes popular.", why: "Tender, soft, and full of lingering feelings." },
+    { id: "hometown-cha-cha-cha", title: "Hometown Cha-Cha-Cha", type: "Series", year: 2021, language: "Korean", mood: ["cozy", "romantic", "funny"], length: "series", palette: "sky", summary: "A city dentist moves to a seaside village and slowly falls for its beloved handyman.", why: "One of the coziest series you could start together." },
+    { id: "lovely-runner", title: "Lovely Runner", type: "Series", year: 2024, language: "Korean", mood: ["romantic", "emotional"], length: "series", palette: "lavender", summary: "A devoted fan travels back in time and tries to save the artist who changed her life.", why: "Sweet, dramatic, and extremely bingeable." },
+    { id: "hidden-love", title: "Hidden Love", type: "Series", year: 2023, language: "Chinese", mood: ["romantic", "cozy"], length: "series", palette: "rose", summary: "A long-held crush slowly grows into a tender relationship.", why: "Soft, blushy, and perfect for a romance-heavy queue." },
+    { id: "when-i-fly-towards-you", title: "When I Fly Towards You", type: "Series", year: 2023, language: "Chinese", mood: ["romantic", "cozy", "light"], length: "series", palette: "sky", summary: "A bright girl falls for the quiet boy in her class in a sweet youth romance.", why: "Cute, comforting, and easy to keep watching." },
+    { id: "crash-landing-on-you", title: "Crash Landing on You", type: "Series", year: 2019, language: "Korean", mood: ["romantic", "emotional"], length: "series", palette: "blue", summary: "An heiress accidentally lands across the border and falls for the officer protecting her.", why: "Big feelings and a sweeping romance for a serious binge." },
+    { id: "twenty-five-twenty-one", title: "Twenty-Five Twenty-One", type: "Series", year: 2022, language: "Korean", mood: ["romantic", "emotional", "nostalgic"], length: "series", palette: "gold", summary: "A teenage fencer and a young man in crisis grow up alongside each other.", why: "Youthful, emotional, and full of unforgettable moments." },
+    { id: "weightlifting-fairy", title: "Weightlifting Fairy Kim Bok-joo", type: "Series", year: 2016, language: "Korean", mood: ["funny", "romantic", "cozy"], length: "series", palette: "peach", summary: "College athletes grow through friendship, first love, and finding confidence.", why: "A sweet comfort-series with playful chemistry." },
+    { id: "reply-1988", title: "Reply 1988", type: "Series", year: 2015, language: "Korean", mood: ["cozy", "emotional", "nostalgic"], length: "series", palette: "cocoa", summary: "Five families and their children grow up together in one close-knit neighborhood.", why: "A warm, lived-in show that makes the characters feel like family." },
+    { id: "because-this-is-my-first-life", title: "Because This Is My First Life", type: "Series", year: 2017, language: "Korean", mood: ["romantic", "cozy", "funny"], length: "series", palette: "plum", summary: "A practical housing arrangement slowly turns into an unexpectedly thoughtful romance.", why: "Quietly funny, mature, and very relationship-focused." },
+
+    { id: "heartstopper", title: "Heartstopper", type: "Series", year: 2022, language: "English", mood: ["romantic", "cozy", "light"], length: "series", palette: "green", summary: "Two classmates grow from friendship into a gentle first love while their wider friend group finds its own way forward.", why: "Warm, soft, and one of the sweetest choices for a comforting binge." },
+    { id: "the-good-place", title: "The Good Place", type: "Series", year: 2016, language: "English", mood: ["funny", "cozy", "light"], length: "series", palette: "sky", summary: "A woman wakes up in an unusual afterlife and slowly learns what it means to become a better person.", why: "Funny, clever, and easy to keep watching together." },
+    { id: "new-girl", title: "New Girl", type: "Series", year: 2011, language: "English", mood: ["funny", "romantic", "cozy"], length: "series", palette: "peach", summary: "A cheerful teacher moves into a loft with three men and becomes part of their chaotic found family.", why: "Comfort comedy, friendship, and slow-burn romance all in one." },
+    { id: "modern-family", title: "Modern Family", type: "Series", year: 2009, language: "English", mood: ["funny", "cozy", "light"], length: "series", palette: "gold", summary: "Three connected households move through family life, relationships, and everyday chaos.", why: "An easy long-running comfort show for casual couch nights." },
+    { id: "schitts-creek", title: "Schitt's Creek", type: "Series", year: 2015, language: "English", mood: ["funny", "cozy", "romantic"], length: "series", palette: "lavender", summary: "A formerly wealthy family loses everything and slowly builds a new life in a tiny town.", why: "Starts chaotic and grows into something genuinely warm and lovable." },
+    { id: "never-have-i-ever", title: "Never Have I Ever", type: "Series", year: 2020, language: "English", mood: ["funny", "romantic", "light"], length: "series", palette: "rose", summary: "An ambitious teenager navigates grief, family expectations, friendship, and messy first love.", why: "Fast, funny, emotional, and very easy to binge." },
+    { id: "one-day-series", title: "One Day", type: "Series", year: 2024, language: "English", mood: ["romantic", "emotional", "nostalgic"], length: "series", palette: "blue", summary: "Two people reconnect on the same date across many years as their lives and relationship keep changing.", why: "A beautiful choice when you want something deeply romantic and emotional." },
+    { id: "nobody-wants-this", title: "Nobody Wants This", type: "Series", year: 2024, language: "English", mood: ["funny", "romantic", "light"], length: "series", palette: "plum", summary: "An outspoken podcaster and an unconventional rabbi begin a relationship that challenges both of their worlds.", why: "Modern chemistry, sharp banter, and an easy date-night pace." },
+    { id: "brooklyn-nine-nine", title: "Brooklyn Nine-Nine", type: "Series", year: 2013, language: "English", mood: ["funny", "cozy", "light"], length: "series", palette: "sky", summary: "A talented but immature detective and his precinct become a deeply lovable workplace family.", why: "Perfect when you want fast episodes and dependable laughs." },
+    { id: "gilmore-girls", title: "Gilmore Girls", type: "Series", year: 2000, language: "English", mood: ["cozy", "funny", "romantic"], length: "series", palette: "cocoa", summary: "A close mother and daughter move through love, school, family, and life in a small town.", why: "Peak cozy-town energy for a long comfort watch." },
+    { id: "derry-girls", title: "Derry Girls", type: "Series", year: 2018, language: "English", mood: ["funny", "light", "cozy"], length: "series", palette: "green", summary: "A group of teenagers creates chaos while growing up in Northern Ireland during the 1990s.", why: "Short episodes, huge personality, and genuinely hilarious friendship energy." },
+    { id: "normal-people", title: "Normal People", type: "Series", year: 2020, language: "English", mood: ["romantic", "emotional", "nostalgic"], length: "series", palette: "rain", summary: "Two young people move in and out of each other's lives through school, college, and adulthood.", why: "Intimate, emotional, and best for a serious romantic drama night." }
+  ].map((item) => ({
+    ...item,
+    poster: posterData(item.title, item.type === "Movie" ? "MOVIE NIGHT" : "NEXT SERIES", item.palette)
+  }));
+
+  const DEFAULT_MOVIE_IDS = [
+    "hi-nanna",
+    "sita-ramam",
+    "premalu",
+    "pelli-choopulu",
+    "about-time",
+    "fidaa",
+    "love-reset",
+    "tune-in-for-love"
+  ];
+
+  const DEFAULT_SHOW_IDS = [
+    "queen-of-tears",
+    "business-proposal",
+    "our-beloved-summer",
+    "hometown-cha-cha-cha",
+    "heartstopper",
+    "the-good-place",
+    "new-girl",
+    "modern-family",
+    "never-have-i-ever",
+    "nobody-wants-this",
+    "brooklyn-nine-nine",
+    "gilmore-girls"
+  ];
+
+  function catalogItem(id) {
+    return AI_CATALOG.find((item) => item.id === id);
+  }
+
+  function toQueueItem(item) {
+    return {
+      id: item.id,
+      title: item.title,
+      type: item.type,
+      year: item.year,
+      language: item.language,
+      note: item.type === "Movie" ? "Movie we need to watch together" : "Show we need to watch together",
+      status: "towatch",
+      palette: item.palette,
+      poster: item.poster
+    };
+  }
+
+  function defaultQueue() {
+    return [...DEFAULT_MOVIE_IDS, ...DEFAULT_SHOW_IDS]
+      .map(catalogItem)
+      .filter(Boolean)
+      .map(toQueueItem);
+  }
+
+  function enrichItem(item, label = "OUR WATCHLIST") {
+    if (!item?.title) return item;
+
+    const match = AI_CATALOG.find(
+      (entry) => entry.title.toLowerCase() === String(item.title).toLowerCase()
+    );
+
+    const type = item.type || match?.type || "Movie";
+    const palette = item.palette || match?.palette || (type === "Series" ? "plum" : "rose");
+
+    return {
+      ...item,
+      id: item.id || match?.id || makeId(item.title),
+      type,
+      year: item.year || match?.year || "",
+      language: item.language || match?.language || "",
+      palette,
+      poster: item.poster || match?.poster || posterData(item.title, label, palette),
+      note: item.note || (item.status === "watched" ? "Watched together" : `${type} we need to watch together`)
+    };
+  }
+
+  function dedupe(items) {
+    const seen = new Set();
+    return items.filter((item) => {
+      const key = String(item.title || "").trim().toLowerCase();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
   function loadState() {
-    const fallback = {
+    const fresh = {
       favorites: [],
-      toWatch: [...DEFAULT_TO_WATCH],
+      toWatch: defaultQueue(),
       extraWatched: [],
-      pickerMessage: "",
       aiMood: "surprise",
-      aiLength: "any",
-      aiPickId: ""
+      aiFormat: "any",
+      aiPickId: "about-time",
+      pickerMessage: "Queen of Tears is waiting under Shows We Need to Watch ♥"
     };
 
     try {
-      const stored = JSON.parse(safeStorage.getItem(STORAGE_KEY));
-      if (!stored || typeof stored !== "object") return fallback;
+      const current = JSON.parse(safeStorage.getItem(STORAGE_KEY));
+      if (current && typeof current === "object") {
+        return {
+          favorites: Array.isArray(current.favorites) ? current.favorites : [],
+          toWatch: Array.isArray(current.toWatch)
+            ? current.toWatch.map((item) => enrichItem(item, "NEXT ON OUR COUCH"))
+            : fresh.toWatch,
+          extraWatched: Array.isArray(current.extraWatched)
+            ? current.extraWatched.map((item) => enrichItem(item, "WATCHED WITH YOU"))
+            : [],
+          aiMood: typeof current.aiMood === "string" ? current.aiMood : "surprise",
+          aiFormat: typeof current.aiFormat === "string" ? current.aiFormat : "any",
+          aiPickId: typeof current.aiPickId === "string" ? current.aiPickId : "about-time",
+          pickerMessage: ""
+        };
+      }
 
-      const toWatch = Array.isArray(stored.toWatch) ? stored.toWatch.map((item) =>
-        enrichWatchItem(item, "NEXT ON OUR COUCH")
-      ) : [];
+      const legacy = JSON.parse(safeStorage.getItem(LEGACY_STORAGE_KEY));
+      if (!legacy || typeof legacy !== "object") return fresh;
 
-      const hasQueen = toWatch.some((item) => item.title.toLowerCase() === "queen of tears");
-      if (!hasQueen) toWatch.unshift(...DEFAULT_TO_WATCH);
-
-      const extraWatched = Array.isArray(stored.extraWatched)
-        ? stored.extraWatched
+      const legacyWatched = Array.isArray(legacy.extraWatched)
+        ? legacy.extraWatched
             .filter((item) => String(item.title || "").toLowerCase() !== "queen of tears")
-            .map((item) => enrichWatchItem(item, "WATCHED WITH YOU"))
+            .map((item) => enrichItem(item, "WATCHED WITH YOU"))
         : [];
 
+      const watchedTitles = new Set(
+        [...WATCHED, ...legacyWatched].map((item) => item.title.toLowerCase())
+      );
+
+      const migratedQueue = dedupe([
+        ...defaultQueue().filter((item) => !watchedTitles.has(item.title.toLowerCase())),
+        ...(Array.isArray(legacy.toWatch)
+          ? legacy.toWatch
+              .filter((item) => String(item.title || "").toLowerCase() !== "queen of tears")
+              .map((item) => enrichItem(item, "NEXT ON OUR COUCH"))
+          : [])
+      ]);
+
+      const queen = toQueueItem(catalogItem("queen-of-tears"));
+      const withoutQueen = migratedQueue.filter(
+        (item) => item.title.toLowerCase() !== "queen of tears"
+      );
+
       return {
-        favorites: Array.isArray(stored.favorites) ? stored.favorites : [],
-        toWatch,
-        extraWatched,
-        pickerMessage: "",
-        aiMood: typeof stored.aiMood === "string" ? stored.aiMood : "surprise",
-        aiLength: typeof stored.aiLength === "string" ? stored.aiLength : "any",
-        aiPickId: typeof stored.aiPickId === "string" ? stored.aiPickId : ""
+        favorites: Array.isArray(legacy.favorites) ? legacy.favorites : [],
+        toWatch: [queen, ...withoutQueen],
+        extraWatched: legacyWatched,
+        aiMood: typeof legacy.aiMood === "string" ? legacy.aiMood : "surprise",
+        aiFormat: "any",
+        aiPickId: typeof legacy.aiPickId === "string" ? legacy.aiPickId : "about-time",
+        pickerMessage: "Your old diary was upgraded with separate movie and show lists."
       };
     } catch (_error) {
-      return fallback;
+      return fresh;
     }
+  }
+
+  function makePosterElement(item, statusLabel, number) {
+    const poster = document.createElement("div");
+    poster.className = "screen-poster";
+    poster.innerHTML = `
+      <img src="${escapeHtml(item.poster)}" alt="${escapeHtml(item.title)} poster" loading="lazy" referrerpolicy="no-referrer" />
+      <div class="screen-poster-shade"></div>
+      ${number ? `<span class="screen-card-number">${number}</span>` : ""}
+      <span class="screen-status-tag ${escapeHtml(item.status || "towatch")}">${escapeHtml(statusLabel)}</span>
+    `;
+
+    const image = poster.querySelector("img");
+    image?.addEventListener("error", () => {
+      image.src = posterData(item.title, statusLabel.toUpperCase(), item.palette || "rose");
+    }, { once: true });
+
+    return poster;
   }
 
   return {
@@ -3887,94 +3731,40 @@ const screenDiary = (() => {
     mount(root) {
       this._root = root;
       this._state = loadState();
-
-      try {
-        this._render();
-      } catch (error) {
-        console.error("Screen diary could not render:", error);
-        root.innerHTML = `
-          <section class="game-panel screen-diary-error">
-            <h3>Our Cozy Screen Diary</h3>
-            <p>The diary had trouble loading. Resetting its saved list will repair it without affecting the other games.</p>
-            <button class="btn" type="button" data-reset-screen-diary>Reset and reload diary</button>
-          </section>
-        `;
-
-        root.querySelector("[data-reset-screen-diary]")?.addEventListener("click", () => {
-          safeStorage.removeItem(STORAGE_KEY);
-          this._state = loadState();
-          this._render();
-        });
-      }
+      document.body.classList.add("screen-diary-open");
+      this._save();
+      this._render();
     },
 
     unmount() {
+      document.body.classList.remove("screen-diary-open");
       this._root = null;
       this._state = null;
     },
 
     _save() {
       if (!this._state) return;
-      safeStorage.setItem(STORAGE_KEY, JSON.stringify({
-        favorites: this._state.favorites,
-        toWatch: this._state.toWatch,
-        extraWatched: this._state.extraWatched,
-        aiMood: this._state.aiMood,
-        aiLength: this._state.aiLength,
-        aiPickId: this._state.aiPickId
-      }));
+      safeStorage.setItem(STORAGE_KEY, JSON.stringify(this._state));
     },
 
-    _allWatched() {
-      return [...STARTER_WATCHED, ...(this._state?.extraWatched || [])];
+    _watched() {
+      return dedupe([
+        ...WATCHED.map((item) => enrichItem(item, "WATCHED WITH YOU")),
+        ...(this._state?.extraWatched || []).map((item) => enrichItem(item, "WATCHED WITH YOU"))
+      ]);
     },
 
     _toggleFavorite(id) {
       const favorites = new Set(this._state.favorites);
-      if (favorites.has(id)) favorites.delete(id);
-      else favorites.add(id);
+      favorites.has(id) ? favorites.delete(id) : favorites.add(id);
       this._state.favorites = [...favorites];
-      this._save();
-      this._render();
-    },
-
-    _addToWatch(input) {
-      const seed = typeof input === "string" ? { title: input } : (input || {});
-      const cleanTitle = String(seed.title || "").trim();
-      if (!cleanTitle) return;
-
-      const alreadyExists = [
-        ...this._allWatched(),
-        ...this._state.toWatch
-      ].some((item) => item.title.toLowerCase() === cleanTitle.toLowerCase());
-
-      if (alreadyExists) {
-        this._state.pickerMessage = "That one is already in our diary ♥";
-        this._render();
-        return;
-      }
-
-      const match = AI_MOVIE_CATALOG.find((item) => item.title.toLowerCase() === cleanTitle.toLowerCase());
-      const entry = enrichWatchItem({
-        id: seed.id || makeId(cleanTitle),
-        title: cleanTitle,
-        note: seed.note || "Need to watch together",
-        status: "towatch",
-        type: seed.type || match?.type || "",
-        year: seed.year || match?.year || "",
-        palette: seed.palette || match?.palette || "rose",
-        poster: seed.poster || match?.poster
-      }, "NEXT ON OUR COUCH");
-
-      this._state.toWatch.push(entry);
-      this._state.pickerMessage = `${cleanTitle} was added to our couch queue.`;
       this._save();
       this._render();
     },
 
     _removeToWatch(id) {
       this._state.toWatch = this._state.toWatch.filter((item) => item.id !== id);
-      this._state.pickerMessage = "Removed from our couch queue.";
+      this._state.pickerMessage = "Removed from our watchlist.";
       this._save();
       this._render();
     },
@@ -3984,361 +3774,398 @@ const screenDiary = (() => {
       if (!item) return;
 
       this._state.toWatch = this._state.toWatch.filter((entry) => entry.id !== id);
-      this._state.extraWatched.push(enrichWatchItem({
+      this._state.extraWatched.push(enrichItem({
         ...item,
-        note: "Watched together",
-        status: "watched"
+        status: "watched",
+        note: "Watched together"
       }, "WATCHED WITH YOU"));
-      this._state.pickerMessage = `${item.title} moved into our watched memories ♥`;
+
+      this._state.pickerMessage = `${item.title} moved into Watched With You ♥`;
       this._save();
       this._render();
     },
 
-    _pickNext() {
-      const watchedTitles = new Set(
-        [...this._allWatched(), ...this._state.toWatch]
-          .map((item) => item.title.toLowerCase())
+    _addToWatch(seed) {
+      const raw = typeof seed === "string" ? { title: seed } : (seed || {});
+      const title = String(raw.title || "").trim();
+      if (!title) return;
+
+      const watchedTitles = new Set(this._watched().map((item) => item.title.toLowerCase()));
+      const queueTitles = new Set(this._state.toWatch.map((item) => item.title.toLowerCase()));
+      if (watchedTitles.has(title.toLowerCase()) || queueTitles.has(title.toLowerCase())) {
+        this._state.pickerMessage = "That one is already in our diary ♥";
+        this._render();
+        return;
+      }
+
+      const match = AI_CATALOG.find(
+        (item) => item.title.toLowerCase() === title.toLowerCase()
       );
+      const type = raw.type || match?.type || "Movie";
+      const palette = raw.palette || match?.palette || (type === "Series" ? "plum" : "rose");
 
-      let candidates = AI_MOVIE_CATALOG.filter(
-        (item) => !watchedTitles.has(item.title.toLowerCase())
-      );
-      if (!candidates.length) candidates = [...AI_MOVIE_CATALOG];
+      this._state.toWatch.push(enrichItem({
+        id: raw.id || match?.id || makeId(title),
+        title,
+        type,
+        year: raw.year || match?.year || "",
+        language: raw.language || match?.language || "",
+        palette,
+        poster: raw.poster || match?.poster || posterData(title, type === "Movie" ? "MOVIE NIGHT" : "NEXT SERIES", palette),
+        status: "towatch",
+        note: type === "Movie" ? "Movie we need to watch together" : "Show we need to watch together"
+      }, "NEXT ON OUR COUCH"));
 
-      const mood = this._state.aiMood || "surprise";
-      const length = this._state.aiLength || "any";
-      const previousPick = this._state.aiPickId;
+      this._state.pickerMessage = `${title} was added under ${type === "Movie" ? "Movies" : "Shows"} We Need to Watch.`;
+      this._save();
+      this._render();
+    },
 
-      const scored = candidates.map((item) => {
-        let score = Math.random() * 1.4;
+    _filteredAi() {
+      return AI_CATALOG.filter((item) => {
+        const moodMatch = this._state.aiMood === "surprise" || item.mood.includes(this._state.aiMood);
+        const formatMatch =
+          this._state.aiFormat === "any" ||
+          item.type === this._state.aiFormat ||
+          (this._state.aiFormat === "EnglishSeries" && item.type === "Series" && item.language === "English");
+        return moodMatch && formatMatch;
+      });
+    },
 
-        if (["Telugu", "Tamil", "Malayalam"].includes(item.language)) score += 2.2;
-        if (item.language === "Korean") score += 1.25;
-        if (item.moods.includes("romantic")) score += 1.8;
-        if (item.moods.includes("cozy") || item.moods.includes("funny")) score += .8;
+    _pickNext(id = "") {
+      const candidates = this._filteredAi();
+      if (!candidates.length) return;
 
-        if (mood !== "surprise" && item.moods.includes(mood)) score += 5;
-        if (mood !== "surprise" && !item.moods.includes(mood)) score -= .9;
-
-        if (length === "short") score += item.type === "Movie" && item.minutes <= 130 ? 4 : -1.5;
-        if (length === "long") score += item.type === "Movie" && item.minutes > 130 ? 3.5 : -1;
-        if (length === "series") score += item.type === "Series" ? 6 : -2;
-        if (previousPick && item.id === previousPick && candidates.length > 1) score -= 5;
-
-        return { item, score };
-      }).sort((a, b) => b.score - a.score);
-
-      const choicePool = scored.slice(0, Math.min(3, scored.length));
-      const choice = choicePool[Math.floor(Math.random() * choicePool.length)].item;
+      let choice = id ? candidates.find((item) => item.id === id) : null;
+      if (!choice) {
+        const otherChoices = candidates.filter((item) => item.id !== this._state.aiPickId);
+        const pool = otherChoices.length ? otherChoices : candidates;
+        choice = pool[Math.floor(Math.random() * pool.length)];
+      }
 
       this._state.aiPickId = choice.id;
-      this._state.pickerMessage = `AI-style match: ${choice.title} looks right for this movie night ✨`;
+      this._state.pickerMessage = `${choice.title} is the AI date-night pick ✨`;
       this._save();
       this._render();
     },
 
-    _setAiPreference(key, value) {
-      if (key === "mood") this._state.aiMood = value;
-      if (key === "length") this._state.aiLength = value;
-      this._save();
+    _renderLibraryCard(item, index, mode) {
+      const card = document.createElement("article");
+      card.className = `screen-library-card ${mode}`;
+
+      const statusLabel = mode === "watched"
+        ? (item.status === "halfway" ? "Still watching" : "Watched")
+        : (item.type === "Series" ? "Show to watch" : "Movie to watch");
+
+      card.appendChild(makePosterElement(item, statusLabel, String(index + 1).padStart(2, "0")));
+
+      const copy = document.createElement("div");
+      copy.className = "screen-library-copy";
+      copy.innerHTML = `
+        <div class="screen-title-line">
+          <h5>${escapeHtml(item.title)}</h5>
+          ${item.year ? `<span>${escapeHtml(String(item.year))}</span>` : ""}
+        </div>
+        <p>${escapeHtml(item.note)}</p>
+        <div class="screen-card-meta">
+          <span>${escapeHtml(item.type || "Movie")}</span>
+          ${item.language ? `<span>${escapeHtml(item.language)}</span>` : ""}
+        </div>
+      `;
+
+      if (mode === "watched") {
+        const favorite = document.createElement("button");
+        const active = this._state.favorites.includes(item.id);
+        favorite.type = "button";
+        favorite.className = `screen-heart ${active ? "active" : ""}`;
+        favorite.textContent = active ? "♥" : "♡";
+        favorite.setAttribute("aria-label", `${active ? "Remove" : "Add"} ${item.title} ${active ? "from" : "to"} favorites`);
+        favorite.addEventListener("click", () => this._toggleFavorite(item.id));
+        copy.appendChild(favorite);
+      } else {
+        const actions = document.createElement("div");
+        actions.className = "screen-card-actions";
+
+        const watchedButton = document.createElement("button");
+        watchedButton.type = "button";
+        watchedButton.className = "screen-action watched-action";
+        watchedButton.textContent = "✓ We watched it";
+        watchedButton.addEventListener("click", () => this._markWatched(item.id));
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.className = "screen-action remove-action";
+        removeButton.textContent = "Remove";
+        removeButton.addEventListener("click", () => this._removeToWatch(item.id));
+
+        actions.append(watchedButton, removeButton);
+        copy.appendChild(actions);
+      }
+
+      card.appendChild(copy);
+      return card;
+    },
+
+    _renderAiSidebar() {
+      const sidebar = document.createElement("aside");
+      sidebar.className = "ai-watch-sidebar";
+
+      const filtered = this._filteredAi();
+      let current = filtered.find((item) => item.id === this._state.aiPickId);
+      if (!current) current = filtered[0] || AI_CATALOG[0];
+
+      const alternatives = filtered
+        .filter((item) => item.id !== current.id)
+        .slice(0, 6);
+
+      sidebar.innerHTML = `
+        <div class="ai-sidebar-heading">
+          <p class="screen-section-kicker">Our smart date-night sidekick</p>
+          <h4>AI Movie & Show Picker ✨</h4>
+          <p>The full recommendation stays here on the side instead of being squeezed under the queue.</p>
+        </div>
+
+        <div class="ai-sidebar-controls">
+          <label>
+            <span>Mood</span>
+            <select data-ai-mood>
+              <option value="surprise">Surprise us</option>
+              <option value="funny">Cute & funny</option>
+              <option value="romantic">Romantic</option>
+              <option value="emotional">Emotional</option>
+              <option value="cozy">Cozy comfort</option>
+            </select>
+          </label>
+          <label>
+            <span>Pick from</span>
+            <select data-ai-format>
+              <option value="any">Movies + shows</option>
+              <option value="Movie">Movies only</option>
+              <option value="Series">Shows only</option>
+              <option value="EnglishSeries">English shows</option>
+            </select>
+          </label>
+        </div>
+
+        <button class="btn ai-main-pick-button" type="button" data-ai-pick>
+          ✨ Pick another for us
+        </button>
+
+        <article class="ai-full-card">
+          <div class="ai-full-poster">
+            <img src="${escapeHtml(current.poster)}" alt="${escapeHtml(current.title)} poster" />
+            <span class="ai-best-match">Best match</span>
+          </div>
+
+          <div class="ai-full-copy">
+            <div class="ai-full-title">
+              <div>
+                <small>${escapeHtml(current.type)} · ${escapeHtml(current.language)}</small>
+                <h5>${escapeHtml(current.title)}</h5>
+              </div>
+              <span>${escapeHtml(String(current.year))}</span>
+            </div>
+
+            <div class="ai-full-tags">
+              ${current.mood.slice(0, 3).map((mood) => `<span>${escapeHtml(mood)}</span>`).join("")}
+            </div>
+
+            <section>
+              <strong>What it is</strong>
+              <p>${escapeHtml(current.summary)}</p>
+            </section>
+
+            <section>
+              <strong>Why it fits us</strong>
+              <p>${escapeHtml(current.why)}</p>
+            </section>
+
+            <button class="btn ai-add-current" type="button" data-add-current>
+              Add to ${current.type === "Movie" ? "Movies" : "Shows"} We Need to Watch
+            </button>
+          </div>
+        </article>
+
+        <div class="ai-more-heading">
+          <strong>More AI ideas</strong>
+          <span>${filtered.length} matches in this filter</span>
+        </div>
+
+        <div class="ai-idea-list">
+          ${alternatives.map((item) => `
+            <button type="button" class="ai-idea-card" data-ai-choice="${escapeHtml(item.id)}">
+              <img src="${escapeHtml(item.poster)}" alt="" aria-hidden="true" />
+              <span>
+                <strong>${escapeHtml(item.title)}</strong>
+                <small>${escapeHtml(item.type)} · ${escapeHtml(String(item.year))}</small>
+              </span>
+            </button>
+          `).join("")}
+        </div>
+      `;
+
+      const moodSelect = sidebar.querySelector("[data-ai-mood]");
+      const formatSelect = sidebar.querySelector("[data-ai-format]");
+      moodSelect.value = this._state.aiMood;
+      formatSelect.value = this._state.aiFormat;
+
+      moodSelect.addEventListener("change", () => {
+        this._state.aiMood = moodSelect.value;
+        this._state.aiPickId = "";
+        this._save();
+        this._render();
+      });
+
+      formatSelect.addEventListener("change", () => {
+        this._state.aiFormat = formatSelect.value;
+        this._state.aiPickId = "";
+        this._save();
+        this._render();
+      });
+
+      sidebar.querySelector("[data-ai-pick]")?.addEventListener("click", () => this._pickNext());
+      sidebar.querySelector("[data-add-current]")?.addEventListener("click", () => this._addToWatch(current));
+      sidebar.querySelectorAll("[data-ai-choice]").forEach((button) => {
+        button.addEventListener("click", () => this._pickNext(button.dataset.aiChoice));
+      });
+
+      return sidebar;
     },
 
     _render() {
-      const root = this._root;
-      const state = this._state;
-      if (!root || !state) return;
+      if (!this._root || !this._state) return;
 
-      const watched = this._allWatched().map((item) => enrichWatchItem(item, "WATCHED WITH YOU"));
-      const favorites = new Set(state.favorites);
-      const finishedCount = watched.filter((item) => item.status === "watched").length;
-      const halfwayCount = watched.filter((item) => item.status === "halfway").length;
+      const watched = this._watched();
+      const movies = this._state.toWatch
+        .map((item) => enrichItem(item, "MOVIE NIGHT"))
+        .filter((item) => item.type !== "Series");
+      const shows = this._state.toWatch
+        .map((item) => enrichItem(item, "NEXT SERIES"))
+        .filter((item) => item.type === "Series");
 
       const panel = document.createElement("section");
-      panel.className = "game-panel wide screen-diary-panel";
+      panel.className = "game-panel wide screen-diary-panel screen-diary-v3";
 
-      const intro = document.createElement("div");
-      intro.className = "screen-diary-hero";
-      intro.innerHTML = `
+      const hero = document.createElement("header");
+      hero.className = "screen-diary-hero";
+      hero.innerHTML = `
         <div>
           <p class="screen-diary-kicker">Six months, one couch, many stories</p>
           <h3>Our Cozy Screen Diary</h3>
-          <p>A little home for everything we have watched, laughed through, cried over, paused halfway, and still want to see together.</p>
+          <p>Everything we watched—and separate little shelves for the movies and shows still waiting for us.</p>
         </div>
-        <div class="screen-diary-stats" aria-label="Watch statistics">
-          <span><strong>${finishedCount}</strong> finished</span>
-          <span><strong>${halfwayCount}</strong> halfway</span>
-          <span><strong>${state.toWatch.length}</strong> next up</span>
-        </div>
-      `;
-
-      const columns = document.createElement("div");
-      columns.className = "screen-diary-columns";
-
-      const watchedSection = document.createElement("section");
-      watchedSection.className = "screen-diary-section";
-      watchedSection.innerHTML = `
-        <div class="screen-section-heading">
-          <div>
-            <p class="screen-section-kicker">Already part of our story</p>
-            <h4>Watched With You ♥</h4>
-          </div>
-          <span class="screen-count">${watched.length}</span>
+        <div class="screen-diary-stats" aria-label="Screen diary statistics">
+          <span><strong>${watched.filter((item) => item.status === "watched").length}</strong> watched</span>
+          <span><strong>${movies.length}</strong> movies next</span>
+          <span><strong>${shows.length}</strong> shows next</span>
         </div>
       `;
 
-      const watchedGrid = document.createElement("div");
-      watchedGrid.className = "watched-grid";
+      const body = document.createElement("div");
+      body.className = "screen-diary-body";
 
-      watched.forEach((item, index) => {
-        const card = document.createElement("article");
-        card.className = `watch-card poster-card ${item.status === "halfway" ? "halfway" : ""}`;
-        const isFavorite = favorites.has(item.id);
+      const library = document.createElement("main");
+      library.className = "screen-main-library";
 
-        const cover = document.createElement("div");
-        cover.className = "watch-poster";
-        const initials = item.title.split(/\s+/).slice(0, 3).map((word) => word[0] || "").join("").toUpperCase();
-        cover.innerHTML = `
-          <div class="watch-poster-fallback" aria-hidden="true"><span>🎞️</span><strong>${escapeHtml(initials)}</strong></div>
-          <div class="watch-poster-shade"></div>
-          <div class="watch-card-number">${String(index + 1).padStart(2, "0")}</div>
-          <span class="watch-status ${item.status}">${item.status === "halfway" ? "Still watching" : "Watched"}</span>
-        `;
-        if (item.poster) {
-          const image = document.createElement("img");
-          image.src = item.poster;
-          image.alt = `${item.title} poster`;
-          image.loading = "lazy";
-          image.referrerPolicy = "no-referrer";
-          image.addEventListener("load", () => cover.classList.add("loaded"));
-          image.addEventListener("error", () => image.remove());
-          cover.prepend(image);
-        }
-
-        const copy = document.createElement("div");
-        copy.className = "watch-card-copy";
-        copy.innerHTML = `<h5>${escapeHtml(item.title)}</h5><p>${escapeHtml(item.note)}</p>`;
-
-        const heart = document.createElement("button");
-        heart.type = "button";
-        heart.className = `watch-heart ${isFavorite ? "active" : ""}`;
-        heart.setAttribute("aria-label", `${isFavorite ? "Remove" : "Add"} ${item.title} ${isFavorite ? "from" : "to"} favorites`);
-        heart.textContent = isFavorite ? "♥" : "♡";
-        heart.addEventListener("click", () => this._toggleFavorite(item.id));
-
-        card.append(cover, copy, heart);
-        watchedGrid.appendChild(card);
-      });
-
-      watchedSection.appendChild(watchedGrid);
-
-      const queueSection = document.createElement("section");
-      queueSection.className = "screen-diary-section queue-section";
-      queueSection.innerHTML = `
-        <div class="screen-section-heading">
-          <div>
-            <p class="screen-section-kicker">Blanket ready, snacks pending</p>
-            <h4>Next on Our Couch</h4>
-          </div>
-          <span class="screen-count">${state.toWatch.length}</span>
+      const addBar = document.createElement("section");
+      addBar.className = "screen-add-bar";
+      addBar.innerHTML = `
+        <div>
+          <p class="screen-section-kicker">Add another idea</p>
+          <strong>Put it on the right shelf</strong>
         </div>
-        <p class="queue-intro">Add your own ideas, or let the smart movie matcher suggest something with full details.</p>
+        <div class="screen-add-fields">
+          <input type="text" maxlength="90" placeholder="Movie or show title…" data-watch-title />
+          <select data-watch-type aria-label="Choose movie or show">
+            <option value="Movie">Movie</option>
+            <option value="Series">Show</option>
+          </select>
+          <button class="btn" type="button" data-add-watch>Add to our diary</button>
+        </div>
       `;
 
-      const addRow = document.createElement("div");
-      addRow.className = "watch-add-row";
-
-      const label = document.createElement("label");
-      label.htmlFor = "next-watch-input";
-      label.className = "sr-only";
-      label.textContent = "Movie or show title";
-
-      const input = document.createElement("input");
-      input.id = "next-watch-input";
-      input.type = "text";
-      input.maxLength = 90;
-      input.placeholder = "Add a movie or show…";
-      input.autocomplete = "off";
-
-      const addButton = document.createElement("button");
-      addButton.type = "button";
-      addButton.className = "btn";
-      addButton.textContent = "Add to our list";
-      addButton.addEventListener("click", () => this._addToWatch(input.value));
+      const input = addBar.querySelector("[data-watch-title]");
+      const typeSelect = addBar.querySelector("[data-watch-type]");
+      const add = () => {
+        this._addToWatch({ title: input.value, type: typeSelect.value });
+      };
+      addBar.querySelector("[data-add-watch]")?.addEventListener("click", add);
       input.addEventListener("keydown", (event) => {
         if (event.key !== "Enter") return;
         event.preventDefault();
-        this._addToWatch(input.value);
+        add();
       });
 
-      addRow.append(label, input, addButton);
+      const message = document.createElement("p");
+      message.className = "screen-picker-message";
+      message.setAttribute("aria-live", "polite");
+      message.textContent = this._state.pickerMessage || "Pick from the shelves—or let the AI sidekick decide.";
 
-      const aiControls = document.createElement("div");
-      aiControls.className = "ai-movie-controls";
-      aiControls.innerHTML = `
-        <label>
-          <span>Tonight’s mood</span>
-          <select data-ai-mood>
-            <option value="surprise">Surprise us</option>
-            <option value="funny">Cute & funny</option>
-            <option value="emotional">Emotional</option>
-            <option value="romantic">Romantic</option>
-            <option value="cozy">Cozy comfort</option>
-          </select>
-        </label>
-        <label>
-          <span>Time commitment</span>
-          <select data-ai-length>
-            <option value="any">Any length</option>
-            <option value="short">About 2 hours</option>
-            <option value="long">Long movie night</option>
-            <option value="series">Start a series</option>
-          </select>
-        </label>
-      `;
+      const makeShelf = (kicker, title, tagText, tagClass, items, mode, emptyText) => {
+        const section = document.createElement("section");
+        section.className = `screen-shelf ${mode}-shelf`;
+        section.innerHTML = `
+          <div class="screen-shelf-heading">
+            <div>
+              <p class="screen-section-kicker">${escapeHtml(kicker)}</p>
+              <h4>${escapeHtml(title)}</h4>
+            </div>
+            <span class="shelf-heading-tag ${escapeHtml(tagClass)}">${escapeHtml(tagText)} · ${items.length}</span>
+          </div>
+        `;
 
-      const moodSelect = aiControls.querySelector("[data-ai-mood]");
-      const lengthSelect = aiControls.querySelector("[data-ai-length]");
-      moodSelect.value = state.aiMood || "surprise";
-      lengthSelect.value = state.aiLength || "any";
-      moodSelect.addEventListener("change", () => this._setAiPreference("mood", moodSelect.value));
-      lengthSelect.addEventListener("change", () => this._setAiPreference("length", lengthSelect.value));
+        const grid = document.createElement("div");
+        grid.className = `screen-shelf-grid ${mode}-grid`;
 
-      const pickButton = document.createElement("button");
-      pickButton.type = "button";
-      pickButton.className = "btn ai-pick-button";
-      pickButton.textContent = state.aiPickId ? "✨ Pick another AI match" : "✨ AI suggest our next watch";
-      pickButton.addEventListener("click", () => this._pickNext());
+        if (!items.length) {
+          grid.innerHTML = `<div class="screen-shelf-empty">🍿 ${escapeHtml(emptyText)}</div>`;
+        } else {
+          items.forEach((item, index) => {
+            grid.appendChild(this._renderLibraryCard(item, index, mode));
+          });
+        }
 
-      const aiNote = document.createElement("p");
-      aiNote.className = "ai-picker-note";
-      aiNote.textContent = "Private smart matching based on our watched list, mood, and time—no account needed.";
+        section.appendChild(grid);
+        return section;
+      };
 
-      const pickerMessage = document.createElement("p");
-      pickerMessage.className = "screen-picker-message";
-      pickerMessage.setAttribute("aria-live", "polite");
-      pickerMessage.textContent = state.pickerMessage || (
-        state.toWatch.length
-          ? "When we cannot decide, let the diary choose."
-          : "Our queue already has one very important drama waiting for us."
+      library.append(
+        addBar,
+        message,
+        makeShelf(
+          "Already part of our story",
+          "Watched With You ♥",
+          "Watched",
+          "watched-tag",
+          watched,
+          "watched",
+          "No watched memories yet."
+        ),
+        makeShelf(
+          "Blanket ready, snacks pending",
+          "Movies We Need to Watch",
+          "Movies",
+          "movie-tag",
+          movies,
+          "movie",
+          "Our movie shelf is empty."
+        ),
+        makeShelf(
+          "Episodes waiting for us",
+          "Shows We Need to Watch",
+          "Shows",
+          "show-tag",
+          shows,
+          "show",
+          "Our show shelf is empty."
+        )
       );
 
-      const aiResult = document.createElement("div");
-      aiResult.className = "ai-movie-result";
+      body.append(library, this._renderAiSidebar());
+      panel.append(hero, body);
 
-      const aiChoice = AI_MOVIE_CATALOG.find((item) => item.id === state.aiPickId);
-      if (aiChoice) {
-        const aiPoster = aiChoice.poster || makePosterData(aiChoice.title, "AI MATCH", aiChoice.palette);
-        aiResult.innerHTML = `
-          <article class="ai-recommendation-card">
-            <div class="ai-poster-shell">
-              <div class="ai-poster ai-poster-${escapeHtml(aiChoice.palette)}">
-                <img src="${escapeHtml(aiPoster)}" alt="${escapeHtml(aiChoice.title)} poster" class="ai-poster-image" loading="lazy" referrerpolicy="no-referrer" />
-                <div class="ai-poster-overlay"></div>
-                <span class="ai-poster-icon">${escapeHtml(aiChoice.icon)}</span>
-                <small>OUR NEXT WATCH</small>
-                <strong>${escapeHtml(aiChoice.title)}</strong>
-                <em>${escapeHtml(String(aiChoice.year))}</em>
-              </div>
-            </div>
-            <div class="ai-recommendation-copy">
-              <div class="ai-title-row">
-                <div>
-                  <p class="screen-section-kicker">Smart movie match</p>
-                  <h5>${escapeHtml(aiChoice.title)}</h5>
-                </div>
-                <span class="ai-match-badge">Best match</span>
-              </div>
-              <div class="ai-meta" aria-label="Movie details">
-                <span>${escapeHtml(aiChoice.type)}</span>
-                <span>${escapeHtml(String(aiChoice.year))}</span>
-                <span>${escapeHtml(aiChoice.duration)}</span>
-                <span>${escapeHtml(aiChoice.language)}</span>
-                <span>${escapeHtml(aiChoice.genre)}</span>
-              </div>
-              <dl class="ai-details-list">
-                <div><dt>Actors</dt><dd>${escapeHtml(aiChoice.actors.join(", "))}</dd></div>
-                <div><dt>Synopsis</dt><dd>${escapeHtml(aiChoice.synopsis)}</dd></div>
-                <div><dt>Why this fits us</dt><dd>${escapeHtml(aiChoice.why)}</dd></div>
-              </dl>
-              <div class="ai-result-actions">
-                <button class="btn" type="button" data-add-ai-pick>Add to our list</button>
-                <button class="btn secondary" type="button" data-another-ai-pick>Pick another</button>
-              </div>
-            </div>
-          </article>
-        `;
-
-        aiResult.querySelector("[data-add-ai-pick]")?.addEventListener("click", () => {
-          this._addToWatch(aiChoice);
-        });
-        aiResult.querySelector("[data-another-ai-pick]")?.addEventListener("click", () => this._pickNext());
-      }
-
-      const queueList = document.createElement("div");
-      queueList.className = "watch-queue-list";
-
-      if (!state.toWatch.length) {
-        const empty = document.createElement("div");
-        empty.className = "watch-queue-empty";
-        empty.innerHTML = `
-          <span>🍿</span>
-          <p>Add our next comfort watch, dramatic series, or chaotic movie night.</p>
-        `;
-        queueList.appendChild(empty);
-      } else {
-        state.toWatch.forEach((item, index) => {
-          const enrichedItem = enrichWatchItem(item, "NEXT ON OUR COUCH");
-          const row = document.createElement("article");
-          row.className = "watch-queue-item poster-queue-item";
-
-          const poster = document.createElement("div");
-          poster.className = "queue-poster";
-          poster.innerHTML = `
-            <img src="${escapeHtml(enrichedItem.poster)}" alt="${escapeHtml(enrichedItem.title)} poster" loading="lazy" referrerpolicy="no-referrer" />
-            <div class="queue-poster-overlay"></div>
-            <span class="queue-number">${index + 1}</span>
-            <span class="queue-tag towatch">Need to watch</span>
-          `;
-
-          const body = document.createElement("div");
-          body.className = "queue-copy";
-          body.innerHTML = `
-            <strong>${escapeHtml(enrichedItem.title)}</strong>
-            <p>${escapeHtml(enrichedItem.note || "Need to watch together")}</p>
-            <div class="queue-meta">
-              ${enrichedItem.type ? `<span>${escapeHtml(enrichedItem.type)}</span>` : ""}
-              ${enrichedItem.year ? `<span>${escapeHtml(String(enrichedItem.year))}</span>` : ""}
-            </div>
-          `;
-
-          const actions = document.createElement("div");
-          actions.className = "queue-actions";
-
-          const watchedButton = document.createElement("button");
-          watchedButton.type = "button";
-          watchedButton.className = "queue-action watched";
-          watchedButton.textContent = "✓ Watched";
-          watchedButton.addEventListener("click", () => this._markWatched(enrichedItem.id));
-
-          const removeButton = document.createElement("button");
-          removeButton.type = "button";
-          removeButton.className = "queue-action remove";
-          removeButton.textContent = "Remove";
-          removeButton.addEventListener("click", () => this._removeToWatch(enrichedItem.id));
-
-          actions.append(watchedButton, removeButton);
-          body.appendChild(actions);
-          row.append(poster, body);
-          queueList.appendChild(row);
-        });
-      }
-
-      queueSection.append(addRow, aiControls, pickButton, aiNote, pickerMessage, aiResult, queueList);
-      columns.append(watchedSection, queueSection);
-      panel.append(intro, columns);
-
-      root.innerHTML = "";
-      root.appendChild(panel);
+      this._root.innerHTML = "";
+      this._root.appendChild(panel);
     }
   };
 })();
