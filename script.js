@@ -3413,7 +3413,7 @@ const screenDiary = (() => {
   }
 
   const DEFAULT_TO_WATCH = [
-    enrichWatchItem({
+    {
       id: "queen-of-tears",
       title: "Queen of Tears",
       note: "Need to watch together",
@@ -3422,7 +3422,7 @@ const screenDiary = (() => {
       year: 2024,
       palette: "plum",
       poster: "https://upload.wikimedia.org/wikipedia/commons/6/69/Queen_of_Tears_20240307_1.png"
-    }, "NEXT ON OUR COUCH")
+    }
   ];
 
 
@@ -4822,11 +4822,15 @@ document.addEventListener("keydown", (event) => {
     }
 
     document.removeEventListener("pointerdown", resumeAfterBrowserBlock, true);
+    document.removeEventListener("click", resumeAfterBrowserBlock, true);
     document.removeEventListener("keydown", resumeAfterBrowserBlock, true);
+    document.removeEventListener("touchstart", resumeAfterBrowserBlock, true);
   }
 
   document.addEventListener("pointerdown", resumeAfterBrowserBlock, true);
+  document.addEventListener("click", resumeAfterBrowserBlock, true);
   document.addEventListener("keydown", resumeAfterBrowserBlock, true);
+  document.addEventListener("touchstart", resumeAfterBrowserBlock, { capture: true, passive: true });
 
   try {
     const saved = JSON.parse(safeStorage.getItem(STATE_KEY));

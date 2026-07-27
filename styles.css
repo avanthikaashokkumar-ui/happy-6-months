@@ -2497,3 +2497,23 @@ body {
     min-height: 220px;
   }
 }
+
+
+/* Clickability safeguard */
+.game-card,
+.game-emoji,
+.back-button,
+.soundtrack-launcher,
+button {
+  pointer-events: auto;
+}
+.game-grid,
+.page-shell,
+.game-view {
+  position: relative;
+  z-index: 1;
+}
+
+
+.art-from-start { background: linear-gradient(145deg, #f0c7d0, #7e2942); }
+.art-night-remember { background: linear-gradient(145deg, #b8a1c8, #4f385f); }
