@@ -3828,3 +3828,58 @@ body.screen-diary-open .soundtrack-panel {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* =========================================================
+   Full-size Need to Watch poster cards
+   ========================================================= */
+.clean-need-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.clean-need-card {
+  display: flex;
+  flex-direction: column;
+}
+.clean-need-card .clean-watched-poster {
+  aspect-ratio: 2 / 3;
+}
+.clean-status.need.movie {
+  background: rgba(157,49,78,.94);
+}
+.clean-status.need.show {
+  background: rgba(100,52,121,.94);
+}
+.clean-need-copy {
+  min-height: 166px;
+  padding-right: 12px;
+}
+.clean-need-copy > div:first-child {
+  min-width: 0;
+}
+.clean-need-copy > div:first-child p {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.clean-need-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+.clean-need-card-actions .clean-neutral-action,
+.clean-need-card-actions .clean-remove-action {
+  min-height: 30px;
+}
+@media (max-width: 980px) {
+  .clean-need-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 520px) {
+  .clean-need-grid {
+    grid-template-columns: 1fr;
+  }
+}

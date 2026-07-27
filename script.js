@@ -3787,6 +3787,62 @@ const screenDiary = (() => {
       return card;
     },
 
+    _renderNeedCard(item, index) {
+      const card = document.createElement("article");
+      card.className = `clean-watched-card clean-need-card ${item.type === "Series" ? "show" : "movie"}`;
+
+      const poster = document.createElement("div");
+      poster.className = "clean-watched-poster";
+      poster.innerHTML = `
+        <div class="clean-poster-fallback">
+          <span>Poster unavailable</span>
+          <strong>${escapeHtml(item.title)}</strong>
+        </div>
+        <img src="${escapeHtml(item.poster)}" alt="${escapeHtml(item.title)} poster" loading="lazy" referrerpolicy="no-referrer" />
+        <span class="clean-card-number">${String(index + 1).padStart(2, "0")}</span>
+        <span class="clean-status need ${item.type === "Series" ? "show" : "movie"}">
+          ${item.type === "Series" ? "Show to watch" : "Movie to watch"}
+        </span>
+      `;
+
+      const image = poster.querySelector("img");
+      attachPosterFallback(image, item, poster.querySelector(".clean-poster-fallback"));
+
+      const copy = document.createElement("div");
+      copy.className = "clean-watched-copy clean-need-copy";
+      copy.innerHTML = `
+        <div>
+          <h5>${escapeHtml(item.title)}</h5>
+          <p>${escapeHtml(item.synopsis || "Saved for one of our next couch nights.")}</p>
+        </div>
+        <div class="clean-meta">
+          <span>${escapeHtml(item.type === "Series" ? "Show" : "Movie")}</span>
+          <span>${escapeHtml(item.language || "")}</span>
+          ${item.duration ? `<span>${escapeHtml(item.duration)}</span>` : ""}
+        </div>
+      `;
+
+      const actions = document.createElement("div");
+      actions.className = "clean-need-card-actions";
+
+      const watchedButton = document.createElement("button");
+      watchedButton.type = "button";
+      watchedButton.className = "clean-neutral-action";
+      watchedButton.textContent = "Move to watched";
+      watchedButton.addEventListener("click", () => this._moveQueueToWatched(item.queueId));
+
+      const removeButton = document.createElement("button");
+      removeButton.type = "button";
+      removeButton.className = "clean-remove-action";
+      removeButton.textContent = "Remove";
+      removeButton.addEventListener("click", () => this._removeQueue(item.queueId));
+
+      actions.append(watchedButton, removeButton);
+      copy.appendChild(actions);
+      card.append(poster, copy);
+      return card;
+    },
+
     _renderAiCard(item) {
       const card = document.createElement("article");
       card.className = "clean-ai-result";
@@ -3978,8 +4034,8 @@ const screenDiary = (() => {
         if (!this._state.queue.length) {
           watchedGrid.innerHTML = `<p class="clean-empty-queue clean-empty-main">Nothing saved yet. Use the AI picker on the right and save a movie or show for later ♥</p>`;
         } else {
-          this._state.queue.forEach((item) => {
-            watchedGrid.appendChild(this._renderQueueItem(item));
+          this._state.queue.forEach((item, index) => {
+            watchedGrid.appendChild(this._renderNeedCard(item, index));
           });
         }
       } else {
