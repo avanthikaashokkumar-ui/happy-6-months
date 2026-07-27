@@ -3560,6 +3560,37 @@ const screenDiary = (() => {
       .replaceAll("'", "&#039;");
   }
 
+  function makeCustomPoster(title, type = "Movie") {
+    const safeTitle = escapeHtml(title);
+    const label = type === "Series" ? "OUR NEXT SHOW" : "OUR MOVIE NIGHT";
+    const top = type === "Series" ? "#d9c4ef" : "#f1bdca";
+    const bottom = type === "Series" ? "#55326a" : "#771a35";
+
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 1050">
+        <defs>
+          <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="${top}"/>
+            <stop offset="100%" stop-color="${bottom}"/>
+          </linearGradient>
+        </defs>
+        <rect width="700" height="1050" fill="url(#bg)"/>
+        <circle cx="560" cy="170" r="92" fill="rgba(255,255,255,.14)"/>
+        <text x="560" y="195" text-anchor="middle" fill="#fffaf7" font-family="Georgia,serif" font-size="76">♥</text>
+        <rect x="34" y="34" width="632" height="982" rx="28" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="3"/>
+        <text x="58" y="105" fill="#fffaf7" font-family="Arial,sans-serif" font-size="26" font-weight="800" letter-spacing="4">${label}</text>
+        <foreignObject x="58" y="650" width="584" height="245">
+          <div xmlns="http://www.w3.org/1999/xhtml" style="color:#fffaf7;font-family:Georgia,serif;font-size:64px;font-weight:700;line-height:1.06;overflow-wrap:anywhere;">
+            ${safeTitle}
+          </div>
+        </foreignObject>
+        <text x="58" y="970" fill="#fffaf7" opacity=".78" font-family="Arial,sans-serif" font-size="24">saved for us ♥</text>
+      </svg>
+    `.trim();
+
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  }
+
   function uniqueByTitle(items) {
     const seen = new Set();
     return items.filter((item) => {
@@ -3661,6 +3692,89 @@ const screenDiary = (() => {
       this._state.favorites = [...favorites];
       this._save();
       this._render();
+    },
+
+    _searchCatalog(query, type = "all") {
+      const cleanQuery = String(query || "").trim().toLowerCase();
+      if (!cleanQuery) return [];
+
+      return AI_CATALOG
+        .filter((item) => {
+          const typeMatches = type === "all" || item.type === type;
+          const searchText = [
+            item.title,
+            item.language,
+            item.type,
+            ...(Array.isArray(item.actors) ? item.actors : [])
+          ].join(" ").toLowerCase();
+
+          return typeMatches && searchText.includes(cleanQuery);
+        })
+        .slice(0, 8);
+    },
+
+    _addSearchResult(item, destination) {
+      const watchedTitles = new Set(this._watched().map((entry) => entry.title.toLowerCase()));
+      const queueTitles = new Set(this._state.queue.map((entry) => entry.title.toLowerCase()));
+      const key = item.title.toLowerCase();
+
+      if (destination === "watched") {
+        if (watchedTitles.has(key)) {
+          this._state.message = `${item.title} is already in Watched With You ♥`;
+          this._render();
+          return;
+        }
+
+        this._state.queue = this._state.queue.filter((entry) => entry.title.toLowerCase() !== key);
+        this._state.extraWatched.unshift({
+          ...item,
+          id: `watched-${item.id || Date.now().toString(36)}-${Date.now().toString(36)}`,
+          status: "watched",
+          note: "Watched together"
+        });
+        this._state.watchedFilter = "all";
+        this._state.message = `${item.title} was added to Watched With You ♥`;
+      } else {
+        if (queueTitles.has(key)) {
+          this._state.message = `${item.title} is already under Need to Watch.`;
+          this._render();
+          return;
+        }
+        if (watchedTitles.has(key)) {
+          this._state.message = `${item.title} is already marked as watched.`;
+          this._render();
+          return;
+        }
+
+        this._state.queue.unshift({
+          ...item,
+          queueId: `queue-${item.id || Date.now().toString(36)}-${Date.now().toString(36)}`
+        });
+        this._state.watchedFilter = "needtowatch";
+        this._state.message = `${item.title} was added to Need to Watch.`;
+      }
+
+      this._save();
+      this._render();
+    },
+
+    _addCustomSearchTitle(title, type, destination) {
+      const cleanTitle = String(title || "").trim();
+      if (!cleanTitle) return;
+
+      const customItem = {
+        id: `custom-${Date.now().toString(36)}`,
+        title: cleanTitle,
+        type: type === "Series" ? "Series" : "Movie",
+        language: "Not listed",
+        releaseDate: "Not listed",
+        duration: "Not listed",
+        actors: [],
+        synopsis: "Add the details later—or keep it as a simple memory in our diary.",
+        poster: makeCustomPoster(cleanTitle, type)
+      };
+
+      this._addSearchResult(customItem, destination);
     },
 
     _aiCandidates() {
@@ -4021,6 +4135,112 @@ const screenDiary = (() => {
       const main = document.createElement("main");
       main.className = "clean-watched-main";
 
+      const searchBox = document.createElement("section");
+      searchBox.className = "clean-library-search";
+      searchBox.innerHTML = `
+        <div class="clean-search-heading">
+          <div>
+            <p class="screen-section-kicker">Add something to our diary</p>
+            <h4>Search movies & shows</h4>
+          </div>
+          <span>Search, then choose where it belongs</span>
+        </div>
+
+        <div class="clean-search-controls">
+          <label class="clean-search-field">
+            <span class="sr-only">Search movies and shows</span>
+            <input type="search" placeholder="Search by title, actor, or language…" data-library-search autocomplete="off" />
+          </label>
+
+          <select data-library-type aria-label="Filter search by movie or show">
+            <option value="all">Movies + shows</option>
+            <option value="Movie">Movies only</option>
+            <option value="Series">Shows only</option>
+          </select>
+        </div>
+
+        <div class="clean-search-results" data-library-results aria-live="polite">
+          <p class="clean-search-empty">Start typing to find a title.</p>
+        </div>
+      `;
+
+      const searchInput = searchBox.querySelector("[data-library-search]");
+      const searchType = searchBox.querySelector("[data-library-type]");
+      const searchResults = searchBox.querySelector("[data-library-results]");
+
+      const renderSearchResults = () => {
+        const query = searchInput.value.trim();
+        const matches = this._searchCatalog(query, searchType.value);
+
+        if (!query) {
+          searchResults.innerHTML = `<p class="clean-search-empty">Start typing to find a title.</p>`;
+          return;
+        }
+
+        if (!matches.length) {
+          searchResults.innerHTML = `
+            <article class="clean-search-custom">
+              <div>
+                <strong>No saved match for “${escapeHtml(query)}”</strong>
+                <small>Add it as a custom ${searchType.value === "Series" ? "show" : "movie"}.</small>
+              </div>
+              <div class="clean-search-actions">
+                <button type="button" data-custom-watch>Add to watched</button>
+                <button type="button" data-custom-need>Add to need to watch</button>
+              </div>
+            </article>
+          `;
+
+          const customType = searchType.value === "Series" ? "Series" : "Movie";
+          searchResults.querySelector("[data-custom-watch]")?.addEventListener("click", () => {
+            this._addCustomSearchTitle(query, customType, "watched");
+          });
+          searchResults.querySelector("[data-custom-need]")?.addEventListener("click", () => {
+            this._addCustomSearchTitle(query, customType, "need");
+          });
+          return;
+        }
+
+        searchResults.innerHTML = "";
+        matches.forEach((item) => {
+          const result = document.createElement("article");
+          result.className = "clean-search-result";
+          result.innerHTML = `
+            <div class="clean-search-poster">
+              <div class="clean-poster-fallback"><strong>${escapeHtml(item.title)}</strong></div>
+              <img src="${escapeHtml(item.poster)}" alt="${escapeHtml(item.title)} poster" loading="lazy" referrerpolicy="no-referrer" />
+            </div>
+            <div class="clean-search-copy">
+              <span>${escapeHtml(item.type === "Series" ? "Show" : "Movie")} · ${escapeHtml(item.language)}</span>
+              <strong>${escapeHtml(item.title)}</strong>
+              <small>${escapeHtml(item.releaseDate || "")}${item.duration ? ` · ${escapeHtml(item.duration)}` : ""}</small>
+            </div>
+            <div class="clean-search-actions">
+              <button type="button" data-add-watched>Add to watched</button>
+              <button type="button" data-add-need>Add to need to watch</button>
+            </div>
+          `;
+
+          attachPosterFallback(
+            result.querySelector("img"),
+            item,
+            result.querySelector(".clean-poster-fallback")
+          );
+
+          result.querySelector("[data-add-watched]")?.addEventListener("click", () => {
+            this._addSearchResult(item, "watched");
+          });
+          result.querySelector("[data-add-need]")?.addEventListener("click", () => {
+            this._addSearchResult(item, "need");
+          });
+
+          searchResults.appendChild(result);
+        });
+      };
+
+      searchInput.addEventListener("input", renderSearchResults);
+      searchType.addEventListener("change", renderSearchResults);
+
       const heading = document.createElement("div");
       heading.className = "clean-section-heading";
       const showingNeedToWatch = this._state.watchedFilter === "needtowatch";
@@ -4081,7 +4301,7 @@ const screenDiary = (() => {
         });
       }
 
-      main.append(heading, watchedGrid);
+      main.append(searchBox, heading, watchedGrid);
 
       const sidebar = document.createElement("aside");
       sidebar.className = "clean-ai-sidebar";
