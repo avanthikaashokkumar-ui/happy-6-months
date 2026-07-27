@@ -3713,6 +3713,55 @@ const screenDiary = (() => {
         .slice(0, 8);
     },
 
+    _posterFromFile(file) {
+      return new Promise((resolve, reject) => {
+        if (!file || !String(file.type || "").startsWith("image/")) {
+          reject(new Error("Choose an image file."));
+          return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onerror = () => reject(new Error("Could not read that image."));
+        reader.onload = () => {
+          const image = new Image();
+
+          image.onerror = () => reject(new Error("Could not open that image."));
+          image.onload = () => {
+            const maxWidth = 700;
+            const maxHeight = 1050;
+            const scale = Math.min(
+              1,
+              maxWidth / image.naturalWidth,
+              maxHeight / image.naturalHeight
+            );
+
+            const width = Math.max(1, Math.round(image.naturalWidth * scale));
+            const height = Math.max(1, Math.round(image.naturalHeight * scale));
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+
+            const context = canvas.getContext("2d");
+            if (!context) {
+              reject(new Error("Could not prepare that image."));
+              return;
+            }
+
+            context.fillStyle = "#fff";
+            context.fillRect(0, 0, width, height);
+            context.drawImage(image, 0, 0, width, height);
+
+            resolve(canvas.toDataURL("image/jpeg", 0.8));
+          };
+
+          image.src = String(reader.result || "");
+        };
+
+        reader.readAsDataURL(file);
+      });
+    },
+
     async _searchOnline(query, type = "all") {
       const cleanQuery = String(query || "").trim();
       if (!cleanQuery) return [];
@@ -4342,9 +4391,9 @@ const screenDiary = (() => {
         <div class="clean-search-heading">
           <div>
             <p class="screen-section-kicker">Add anything to our diary</p>
-            <h4>Search movies & shows online</h4>
+            <h4>Search or add any movie/show</h4>
           </div>
-          <span>Search the built-in list or look up a completely different title online</span>
+          <span>Use online search—or Google it and paste the details yourself</span>
         </div>
 
         <div class="clean-search-controls clean-online-search-controls">
@@ -4362,17 +4411,107 @@ const screenDiary = (() => {
           <button type="button" class="btn clean-online-search-button" data-search-online>
             Search online
           </button>
+
+          <button type="button" class="clean-google-search-button" data-search-google>
+            Search Google
+          </button>
         </div>
 
         <div class="clean-search-results" data-library-results aria-live="polite">
-          <p class="clean-search-empty">Start typing to search the built-in list, or press Search online for any title.</p>
+          <p class="clean-search-empty">Type a title, then search online or open it in Google.</p>
         </div>
+
+        <details class="clean-manual-import">
+          <summary>Add a title manually from Google</summary>
+
+          <div class="clean-manual-intro">
+            Google the title, then paste the poster and details here. This works for any random movie or show.
+          </div>
+
+          <div class="clean-manual-grid">
+            <label>
+              <span>Title *</span>
+              <input type="text" data-manual-title placeholder="Movie or show title" />
+            </label>
+
+            <label>
+              <span>Type</span>
+              <select data-manual-type>
+                <option value="Movie">Movie</option>
+                <option value="Series">Show</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Add it to</span>
+              <select data-manual-destination>
+                <option value="need">Need to Watch</option>
+                <option value="watched">Watched With You</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Language</span>
+              <input type="text" data-manual-language placeholder="English, Telugu, Tamil…" />
+            </label>
+
+            <label>
+              <span>Release date/year</span>
+              <input type="text" data-manual-date placeholder="2024 or 9 February 2024" />
+            </label>
+
+            <label>
+              <span>Duration</span>
+              <input type="text" data-manual-duration placeholder="2h 15m or 12 episodes" />
+            </label>
+
+            <label class="clean-manual-wide">
+              <span>Actors</span>
+              <input type="text" data-manual-actors placeholder="Actor 1, Actor 2, Actor 3" />
+            </label>
+
+            <label class="clean-manual-wide">
+              <span>Synopsis</span>
+              <textarea data-manual-synopsis rows="3" placeholder="Paste a short synopsis…"></textarea>
+            </label>
+
+            <label class="clean-manual-wide">
+              <span>Poster image URL</span>
+              <input type="url" data-manual-poster-url placeholder="Paste image address from Google Images" />
+            </label>
+
+            <label class="clean-manual-wide clean-file-field">
+              <span>Or upload a poster image</span>
+              <input type="file" accept="image/*" data-manual-poster-file />
+              <small>Uploading the image is more reliable than linking it.</small>
+            </label>
+          </div>
+
+          <div class="clean-manual-actions">
+            <button type="button" class="btn" data-add-manual>Add to our diary</button>
+            <p data-manual-status aria-live="polite"></p>
+          </div>
+        </details>
       `;
 
       const searchInput = searchBox.querySelector("[data-library-search]");
       const searchType = searchBox.querySelector("[data-library-type]");
       const searchOnlineButton = searchBox.querySelector("[data-search-online]");
+      const searchGoogleButton = searchBox.querySelector("[data-search-google]");
       const searchResults = searchBox.querySelector("[data-library-results]");
+
+      const manualTitle = searchBox.querySelector("[data-manual-title]");
+      const manualType = searchBox.querySelector("[data-manual-type]");
+      const manualDestination = searchBox.querySelector("[data-manual-destination]");
+      const manualLanguage = searchBox.querySelector("[data-manual-language]");
+      const manualDate = searchBox.querySelector("[data-manual-date]");
+      const manualDuration = searchBox.querySelector("[data-manual-duration]");
+      const manualActors = searchBox.querySelector("[data-manual-actors]");
+      const manualSynopsis = searchBox.querySelector("[data-manual-synopsis]");
+      const manualPosterUrl = searchBox.querySelector("[data-manual-poster-url]");
+      const manualPosterFile = searchBox.querySelector("[data-manual-poster-file]");
+      const manualStatus = searchBox.querySelector("[data-manual-status]");
+      const manualAddButton = searchBox.querySelector("[data-add-manual]");
 
       const createSearchResult = (item, online = false) => {
         const result = document.createElement("article");
@@ -4418,7 +4557,7 @@ const screenDiary = (() => {
         const matches = this._searchCatalog(query, searchType.value);
 
         if (!query) {
-          searchResults.innerHTML = `<p class="clean-search-empty">Start typing to search the built-in list, or press Search online for any title.</p>`;
+          searchResults.innerHTML = `<p class="clean-search-empty">Type a title, then search online or open it in Google.</p>`;
           return;
         }
 
@@ -4427,22 +4566,10 @@ const screenDiary = (() => {
             <article class="clean-search-custom">
               <div>
                 <strong>No built-in match for “${escapeHtml(query)}”</strong>
-                <small>Press Search online to look it up, or add a simple custom card now.</small>
-              </div>
-              <div class="clean-search-actions">
-                <button type="button" data-custom-watch>Add custom to watched</button>
-                <button type="button" data-custom-need>Add custom to need to watch</button>
+                <small>Press Search online, open Google, or add it manually below.</small>
               </div>
             </article>
           `;
-
-          const customType = searchType.value === "Series" ? "Series" : "Movie";
-          searchResults.querySelector("[data-custom-watch]")?.addEventListener("click", () => {
-            this._addCustomSearchTitle(query, customType, "watched");
-          });
-          searchResults.querySelector("[data-custom-need]")?.addEventListener("click", () => {
-            this._addCustomSearchTitle(query, customType, "need");
-          });
           return;
         }
 
@@ -4471,24 +4598,11 @@ const screenDiary = (() => {
             searchResults.innerHTML = `
               <article class="clean-search-custom">
                 <div>
-                  <strong>No online movie/show match was found for “${escapeHtml(query)}”</strong>
-                  <small>You can still add it as a custom title.</small>
-                </div>
-                <div class="clean-search-actions">
-                  <a href="https://www.google.com/search?q=${encodeURIComponent(query + " movie or TV show")}" target="_blank" rel="noopener noreferrer">Search Google</a>
-                  <button type="button" data-custom-watch>Add custom to watched</button>
-                  <button type="button" data-custom-need>Add custom to need to watch</button>
+                  <strong>No automatic result was found.</strong>
+                  <small>Use Search Google, then add the title manually below.</small>
                 </div>
               </article>
             `;
-
-            const customType = searchType.value === "Series" ? "Series" : "Movie";
-            searchResults.querySelector("[data-custom-watch]")?.addEventListener("click", () => {
-              this._addCustomSearchTitle(query, customType, "watched");
-            });
-            searchResults.querySelector("[data-custom-need]")?.addEventListener("click", () => {
-              this._addCustomSearchTitle(query, customType, "need");
-            });
             return;
           }
 
@@ -4501,11 +4615,8 @@ const screenDiary = (() => {
           searchResults.innerHTML = `
             <article class="clean-search-custom">
               <div>
-                <strong>The online search could not load.</strong>
-                <small>Open Google directly or add the title as a custom card.</small>
-              </div>
-              <div class="clean-search-actions">
-                <a href="https://www.google.com/search?q=${encodeURIComponent(query + " movie or TV show")}" target="_blank" rel="noopener noreferrer">Search Google</a>
+                <strong>The automatic search could not load.</strong>
+                <small>Use Search Google and the manual form below instead.</small>
               </div>
             </article>
           `;
@@ -4514,6 +4625,72 @@ const screenDiary = (() => {
           searchOnlineButton.textContent = "Search online";
         }
       };
+
+      searchGoogleButton.addEventListener("click", () => {
+        const query = searchInput.value.trim();
+        if (!query) {
+          searchResults.innerHTML = `<p class="clean-search-empty">Type a title before opening Google.</p>`;
+          searchInput.focus();
+          return;
+        }
+
+        manualTitle.value = query;
+        if (searchType.value === "Series" || searchType.value === "Movie") {
+          manualType.value = searchType.value;
+        }
+
+        const googleQuery = `${query} ${manualType.value === "Series" ? "TV show" : "movie"} poster cast duration release date synopsis`;
+        window.open(
+          `https://www.google.com/search?q=${encodeURIComponent(googleQuery)}`,
+          "_blank",
+          "noopener,noreferrer"
+        );
+      });
+
+      manualAddButton.addEventListener("click", async () => {
+        const title = manualTitle.value.trim();
+        if (!title) {
+          manualStatus.textContent = "Add the title first.";
+          manualTitle.focus();
+          return;
+        }
+
+        manualAddButton.disabled = true;
+        manualAddButton.textContent = "Adding…";
+        manualStatus.textContent = "";
+
+        try {
+          let poster = manualPosterUrl.value.trim();
+
+          if (manualPosterFile.files?.[0]) {
+            poster = await this._posterFromFile(manualPosterFile.files[0]);
+          }
+
+          if (!poster) poster = makeCustomPoster(title, manualType.value);
+
+          const item = {
+            id: `manual-${Date.now().toString(36)}`,
+            title,
+            type: manualType.value === "Series" ? "Series" : "Movie",
+            language: manualLanguage.value.trim() || "Not listed",
+            releaseDate: manualDate.value.trim() || "Not listed",
+            duration: manualDuration.value.trim() || "Not listed",
+            actors: manualActors.value
+              .split(",")
+              .map((actor) => actor.trim())
+              .filter(Boolean),
+            synopsis: manualSynopsis.value.trim() || "No synopsis added yet.",
+            poster
+          };
+
+          this._addSearchResult(item, manualDestination.value);
+        } catch (error) {
+          console.error("Could not add manual title:", error);
+          manualStatus.textContent = error?.message || "Could not add that title.";
+          manualAddButton.disabled = false;
+          manualAddButton.textContent = "Add to our diary";
+        }
+      });
 
       searchInput.addEventListener("input", renderLocalResults);
       searchInput.addEventListener("keydown", (event) => {

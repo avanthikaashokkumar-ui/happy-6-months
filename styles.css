@@ -4217,3 +4217,122 @@ body.screen-diary-open .soundtrack-panel {
     width: 100%;
   }
 }
+
+
+/* =========================================================
+   Google-assisted manual add form
+   ========================================================= */
+.clean-google-search-button {
+  min-height: 42px;
+  border: 1px solid rgba(116,20,38,.17);
+  border-radius: 13px;
+  padding: 9px 13px;
+  color: var(--wine-700);
+  background: #fff;
+  cursor: pointer;
+  font-size: .68rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.clean-google-search-button:hover {
+  background: #fff6f7;
+}
+.clean-online-search-controls {
+  grid-template-columns: minmax(0,1fr) 145px auto auto;
+}
+.clean-manual-import {
+  margin-top: 13px;
+  border: 1px solid rgba(116,20,38,.13);
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255,255,255,.76);
+}
+.clean-manual-import summary {
+  padding: 12px 14px;
+  color: var(--wine-800);
+  cursor: pointer;
+  font-size: .76rem;
+  font-weight: 900;
+}
+.clean-manual-import[open] summary {
+  border-bottom: 1px solid rgba(116,20,38,.1);
+}
+.clean-manual-intro {
+  padding: 12px 14px 0;
+  color: var(--muted);
+  font-size: .68rem;
+  line-height: 1.45;
+}
+.clean-manual-grid {
+  padding: 13px 14px;
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 10px;
+}
+.clean-manual-grid label {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+.clean-manual-grid label > span {
+  color: var(--wine-700);
+  font-size: .6rem;
+  font-weight: 900;
+}
+.clean-manual-grid input,
+.clean-manual-grid select,
+.clean-manual-grid textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(116,20,38,.15);
+  border-radius: 11px;
+  padding: 9px 10px;
+  color: var(--ink);
+  background: #fff;
+  font: inherit;
+  font-size: .7rem;
+}
+.clean-manual-grid textarea {
+  resize: vertical;
+}
+.clean-manual-wide {
+  grid-column: 1 / -1;
+}
+.clean-file-field small {
+  color: var(--muted);
+  font-size: .58rem;
+}
+.clean-manual-actions {
+  padding: 0 14px 14px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.clean-manual-actions p {
+  margin: 0;
+  color: var(--wine-600);
+  font-size: .65rem;
+  font-weight: 800;
+}
+@media (max-width: 980px) {
+  .clean-online-search-controls {
+    grid-template-columns: minmax(0,1fr) 135px;
+  }
+  .clean-online-search-button,
+  .clean-google-search-button {
+    width: 100%;
+  }
+}
+@media (max-width: 720px) {
+  .clean-manual-grid {
+    grid-template-columns: 1fr;
+  }
+  .clean-manual-wide {
+    grid-column: auto;
+  }
+}
+@media (max-width: 560px) {
+  .clean-online-search-controls {
+    grid-template-columns: 1fr;
+  }
+}
