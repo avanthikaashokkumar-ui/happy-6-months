@@ -3324,8 +3324,8 @@ return {
 })();
 
 const screenDiary = (() => {
-  const STORAGE_KEY = "happy6:cozy-screen-diary:v3";
-  const LEGACY_STORAGE_KEY = "happy6:cozy-screen-diary:v1";
+  const STORAGE_KEY = "happy6:cozy-screen-diary:v4";
+  const LEGACY_STORAGE_KEY = "happy6:cozy-screen-diary:v3";
 
   const WATCHED = [
     {
@@ -3335,7 +3335,8 @@ const screenDiary = (() => {
       note: "Watched together",
       status: "watched",
       palette: "green",
-      poster: "https://play-lh.googleusercontent.com/proxy/VujXcineAs2bBiwz7OeBbGn3bbkuT7aSQGotjV0KCIx2faddcYOR8iYmwoWx_9DkzudFRiB8YdnVc7lPwxR1eaGv10O8mMuSnzUIo5mA-MH8ql5bmxqdYOxUCwNSvAnx261ZAonQ5h_BHMSn-vgj7I5f3jgx5sFjFSAvKw=w480-h960"
+      poster: "https://play-lh.googleusercontent.com/proxy/VujXcineAs2bBiwz7OeBbGn3bbkuT7aSQGotjV0KCIx2faddcYOR8iYmwoWx_9DkzudFRiB8YdnVc7lPwxR1eaGv10O8mMuSnzUIo5mA-MH8ql5bmxqdYOxUCwNSvAnx261ZAonQ5h_BHMSn-vgj7I5f3jgx5sFjFSAvKw=w480-h960",
+      fallbackPoster: "poster-anand.png"
     },
     {
       id: "ye-maaya-chesave",
@@ -3344,7 +3345,8 @@ const screenDiary = (() => {
       note: "Watched together",
       status: "watched",
       palette: "rose",
-      poster: "https://play-lh.googleusercontent.com/dRqoM-6maw4enTL-g1RU2iek4erAPukRdg5k7U4bdUz1CT5cZEQtrUC-P9tCcvXWJ5w=w480-h960"
+      poster: "https://play-lh.googleusercontent.com/dRqoM-6maw4enTL-g1RU2iek4erAPukRdg5k7U4bdUz1CT5cZEQtrUC-P9tCcvXWJ5w=w480-h960",
+      fallbackPoster: "poster-ye-maaya-chesave.png"
     },
     {
       id: "with-love",
@@ -3353,7 +3355,8 @@ const screenDiary = (() => {
       note: "Watched together",
       status: "watched",
       palette: "peach",
-      poster: "https://images.fandango.com/ImageRenderer/400/0/redesign/static/img/default_poster--dark-mode.png/0/images/masterrepository/Fandango/244298/withlove.jpg"
+      poster: "https://images.fandango.com/ImageRenderer/400/0/redesign/static/img/default_poster--dark-mode.png/0/images/masterrepository/Fandango/244298/withlove.jpg",
+      fallbackPoster: "poster-with-love.png"
     },
     {
       id: "anaganaga-oka-raju",
@@ -3362,7 +3365,8 @@ const screenDiary = (() => {
       note: "Watched together",
       status: "watched",
       palette: "gold",
-      poster: "https://images.fandango.com/ImageRenderer/400/0/redesign/static/img/default_poster--dark-mode.png/0/images/masterrepository/Fandango/243701/1290220-anaganaga-oka-raju-0-230-0-345-crop.jpg"
+      poster: "https://images.fandango.com/ImageRenderer/400/0/redesign/static/img/default_poster--dark-mode.png/0/images/masterrepository/Fandango/243701/1290220-anaganaga-oka-raju-0-230-0-345-crop.jpg",
+      fallbackPoster: "poster-anaganaga-oka-raju.png"
     },
     {
       id: "mike-and-molly",
@@ -3371,7 +3375,8 @@ const screenDiary = (() => {
       note: "Watched together",
       status: "watched",
       palette: "sky",
-      poster: "https://upload.wikimedia.org/wikipedia/commons/9/95/Mike-and-molly-13.jpg"
+      poster: "https://upload.wikimedia.org/wikipedia/commons/9/95/Mike-and-molly-13.jpg",
+      fallbackPoster: "poster-mike-and-molly.png"
     },
     {
       id: "tamizh-padam-2",
@@ -3380,7 +3385,8 @@ const screenDiary = (() => {
       note: "Halfway… lmao",
       status: "halfway",
       palette: "gold",
-      poster: "https://play-lh.googleusercontent.com/vnGWrt5NYKGGLYUJ5kEJFugzOXhRjr_1E5LFiuzaOINF9K_iBiFZMcxH31xfIuYSyWLHrmRmcEzBt7d2sV8=w480-h960"
+      poster: "https://play-lh.googleusercontent.com/vnGWrt5NYKGGLYUJ5kEJFugzOXhRjr_1E5LFiuzaOINF9K_iBiFZMcxH31xfIuYSyWLHrmRmcEzBt7d2sV8=w480-h960",
+      fallbackPoster: "poster-tamizh-padam-2.png"
     },
     {
       id: "little-things",
@@ -3389,7 +3395,8 @@ const screenDiary = (() => {
       note: "Watched together",
       status: "watched",
       palette: "plum",
-      poster: "https://resizing.flixster.com/8edPB5rPK5_2cyFuICY5bNT6LJc%3D/342x513/v2/https%3A//resizing.flixster.com/uKRM5V-4Sdx-eXjCYhkC7ecmzew%3D/ems.cHJkLWVtcy1hc3NldHMvdHZzZXJpZXMvNDQ0ZDk4MGMtN2FmNy00MDJjLTgwNTAtZTExMmFiMGMzODJiLmpwZw%3D%3D"
+      poster: "https://resizing.flixster.com/8edPB5rPK5_2cyFuICY5bNT6LJc%3D/342x513/v2/https%3A//resizing.flixster.com/uKRM5V-4Sdx-eXjCYhkC7ecmzew%3D/ems.cHJkLWVtcy1hc3NldHMvdHZzZXJpZXMvNDQ0ZDk4MGMtN2FmNy00MDJjLTgwNTAtZTExMmFiMGMzODJiLmpwZw%3D%3D",
+      fallbackPoster: "poster-little-things.png"
     },
     {
       id: "attarintiki-daredi",
@@ -3398,7 +3405,8 @@ const screenDiary = (() => {
       note: "Watched together",
       status: "watched",
       palette: "cocoa",
-      poster: "https://play-lh.googleusercontent.com/RTPgLMluBxCFjmM-crWQS_38zUuboxajlLWRvFx3KSvBpOocVzWRAfA16u-8vgWd_Nez=w480-h960"
+      poster: "https://play-lh.googleusercontent.com/RTPgLMluBxCFjmM-crWQS_38zUuboxajlLWRvFx3KSvBpOocVzWRAfA16u-8vgWd_Nez=w480-h960",
+      fallbackPoster: "poster-attarintiki-daredi.png"
     },
     {
       id: "seethamma-vakitlo-sirimalle-chettu",
@@ -3407,7 +3415,8 @@ const screenDiary = (() => {
       note: "Watched together",
       status: "watched",
       palette: "green",
-      poster: "https://play-lh.googleusercontent.com/ztyP5jIJ9pRuz-gxXAlGC7DTfFEQNNt78RdYZRh-Ufr1YRZdvWW8yoilmvxvjevjmr5O=w480-h960"
+      poster: "https://play-lh.googleusercontent.com/ztyP5jIJ9pRuz-gxXAlGC7DTfFEQNNt78RdYZRh-Ufr1YRZdvWW8yoilmvxvjevjmr5O=w480-h960",
+      fallbackPoster: "poster-seethamma-vakitlo-sirimalle-chettu.png"
     }
   ];
 
@@ -3622,7 +3631,8 @@ const screenDiary = (() => {
       language: item.language || match?.language || "",
       palette,
       poster: item.poster || match?.poster || posterData(item.title, label, palette),
-      note: item.note || (item.status === "watched" ? "Watched together" : `${type} we need to watch together`)
+      note: item.note || (item.status === "watched" ? "Watched together" : `${type} we need to watch together`),
+      fallbackPoster: item.fallbackPoster || match?.fallbackPoster || ""
     };
   }
 
@@ -3653,7 +3663,7 @@ const screenDiary = (() => {
         return {
           favorites: Array.isArray(current.favorites) ? current.favorites : [],
           toWatch: Array.isArray(current.toWatch)
-            ? current.toWatch.map((item) => enrichItem(item, "NEXT ON OUR COUCH"))
+            ? current.toWatch.map((item) => enrichItem({ ...item, status: "towatch" }, "NEXT ON OUR COUCH"))
             : fresh.toWatch,
           extraWatched: Array.isArray(current.extraWatched)
             ? current.extraWatched.map((item) => enrichItem(item, "WATCHED WITH YOU"))
@@ -3683,7 +3693,7 @@ const screenDiary = (() => {
         ...(Array.isArray(legacy.toWatch)
           ? legacy.toWatch
               .filter((item) => String(item.title || "").toLowerCase() !== "queen of tears")
-              .map((item) => enrichItem(item, "NEXT ON OUR COUCH"))
+              .map((item) => enrichItem({ ...item, status: "towatch" }, "NEXT ON OUR COUCH"))
           : [])
       ]);
 
@@ -3706,20 +3716,30 @@ const screenDiary = (() => {
     }
   }
 
-  function makePosterElement(item, statusLabel, number) {
+  function makePosterElement(item, statusLabel, number, statusClass, interactive = false) {
     const poster = document.createElement("div");
     poster.className = "screen-poster";
+
+    const tagMarkup = interactive
+      ? `<button type="button" class="screen-status-tag ${escapeHtml(statusClass)}" title="Move this into Watched With You">${escapeHtml(statusLabel)}</button>`
+      : `<span class="screen-status-tag ${escapeHtml(statusClass)}">${escapeHtml(statusLabel)}</span>`;
+
     poster.innerHTML = `
       <img src="${escapeHtml(item.poster)}" alt="${escapeHtml(item.title)} poster" loading="lazy" referrerpolicy="no-referrer" />
       <div class="screen-poster-shade"></div>
       ${number ? `<span class="screen-card-number">${number}</span>` : ""}
-      <span class="screen-status-tag ${escapeHtml(item.status || "towatch")}">${escapeHtml(statusLabel)}</span>
+      ${tagMarkup}
     `;
 
     const image = poster.querySelector("img");
     image?.addEventListener("error", () => {
+      if (item.fallbackPoster && image.dataset.usedLocal !== "true") {
+        image.dataset.usedLocal = "true";
+        image.src = item.fallbackPoster;
+        return;
+      }
       image.src = posterData(item.title, statusLabel.toUpperCase(), item.palette || "rose");
-    }, { once: true });
+    });
 
     return poster;
   }
@@ -3857,7 +3877,25 @@ const screenDiary = (() => {
         ? (item.status === "halfway" ? "Still watching" : "Watched")
         : (item.type === "Series" ? "Show to watch" : "Movie to watch");
 
-      card.appendChild(makePosterElement(item, statusLabel, String(index + 1).padStart(2, "0")));
+      const statusClass = mode === "watched"
+        ? (item.status === "halfway" ? "halfway" : "watched")
+        : (mode === "show" ? "show-towatch" : "movie-towatch");
+
+      card.appendChild(
+        makePosterElement(
+          { ...item, status: mode === "watched" ? item.status : "towatch" },
+          statusLabel,
+          String(index + 1).padStart(2, "0"),
+          statusClass,
+          mode !== "watched"
+        )
+      );
+
+      if (mode !== "watched") {
+        card.querySelector(".screen-status-tag")?.addEventListener("click", () => {
+          this._markWatched(item.id);
+        });
+      }
 
       const copy = document.createElement("div");
       copy.className = "screen-library-copy";

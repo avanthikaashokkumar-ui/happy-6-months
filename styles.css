@@ -3129,3 +3129,43 @@ body.screen-diary-open .soundtrack-panel {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* =========================================================
+   Screen Diary status correction + reliable poster fallbacks
+   ========================================================= */
+.screen-status-tag {
+  border: 0;
+  font: inherit;
+}
+button.screen-status-tag {
+  cursor: pointer;
+  transition: transform .15s ease, filter .15s ease;
+}
+button.screen-status-tag:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+.screen-library-card.movie .screen-status-tag.movie-towatch,
+.screen-status-tag.movie-towatch {
+  color: #fff !important;
+  background: rgba(157,49,78,.94) !important;
+}
+.screen-library-card.show .screen-status-tag.show-towatch,
+.screen-status-tag.show-towatch {
+  color: #fff !important;
+  background: rgba(100,52,121,.94) !important;
+}
+.screen-library-card.movie .screen-status-tag.watched,
+.screen-library-card.show .screen-status-tag.watched {
+  background: rgba(157,49,78,.94) !important;
+}
+.screen-library-card.show .screen-status-tag.watched {
+  background: rgba(100,52,121,.94) !important;
+}
+.screen-library-card.watched .screen-status-tag.watched {
+  background: rgba(73,113,45,.93) !important;
+}
+.screen-library-card.watched .screen-status-tag.halfway {
+  background: rgba(166,103,33,.93) !important;
+}
