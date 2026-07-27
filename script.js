@@ -3791,8 +3791,14 @@ const screenDiary = (() => {
       const card = document.createElement("article");
       card.className = `clean-watched-card clean-need-card ${item.type === "Series" ? "show" : "movie"}`;
 
-      const poster = document.createElement("div");
-      poster.className = "clean-watched-poster";
+      const detailsId = `need-details-${String(item.queueId || item.id || index).replace(/[^a-z0-9_-]/gi, "-")}`;
+
+      const poster = document.createElement("button");
+      poster.type = "button";
+      poster.className = "clean-watched-poster clean-need-poster-button";
+      poster.setAttribute("aria-expanded", "false");
+      poster.setAttribute("aria-controls", detailsId);
+      poster.setAttribute("aria-label", `View details for ${item.title}`);
       poster.innerHTML = `
         <div class="clean-poster-fallback">
           <span>Poster unavailable</span>
@@ -3803,6 +3809,7 @@ const screenDiary = (() => {
         <span class="clean-status need ${item.type === "Series" ? "show" : "movie"}">
           ${item.type === "Series" ? "Show to watch" : "Movie to watch"}
         </span>
+        <span class="clean-poster-details-hint">Tap for details</span>
       `;
 
       const image = poster.querySelector("img");
@@ -3813,17 +3820,46 @@ const screenDiary = (() => {
       copy.innerHTML = `
         <div>
           <h5>${escapeHtml(item.title)}</h5>
-          <p>${escapeHtml(item.synopsis || "Saved for one of our next couch nights.")}</p>
+          <p>Saved for one of our next couch nights.</p>
         </div>
         <div class="clean-meta">
           <span>${escapeHtml(item.type === "Series" ? "Show" : "Movie")}</span>
-          <span>${escapeHtml(item.language || "")}</span>
-          ${item.duration ? `<span>${escapeHtml(item.duration)}</span>` : ""}
+          ${item.language ? `<span>${escapeHtml(item.language)}</span>` : ""}
         </div>
+      `;
+
+      const details = document.createElement("div");
+      details.className = "clean-need-details";
+      details.id = detailsId;
+      details.hidden = true;
+      details.innerHTML = `
+        <div><strong>Release date</strong><span>${escapeHtml(item.releaseDate || item.year || "Not listed")}</span></div>
+        <div><strong>Duration</strong><span>${escapeHtml(item.duration || "Not listed")}</span></div>
+        <div class="wide"><strong>Actors</strong><span>${escapeHtml(Array.isArray(item.actors) && item.actors.length ? item.actors.join(", ") : "Not listed")}</span></div>
+        <div class="wide"><strong>Synopsis</strong><span>${escapeHtml(item.synopsis || "Details have not been added for this title yet.")}</span></div>
       `;
 
       const actions = document.createElement("div");
       actions.className = "clean-need-card-actions";
+
+      const detailsButton = document.createElement("button");
+      detailsButton.type = "button";
+      detailsButton.className = "clean-details-action";
+      detailsButton.textContent = "View details";
+      detailsButton.setAttribute("aria-expanded", "false");
+      detailsButton.setAttribute("aria-controls", detailsId);
+
+      const toggleDetails = () => {
+        const opening = details.hidden;
+        details.hidden = !opening;
+        detailsButton.textContent = opening ? "Hide details" : "View details";
+        detailsButton.setAttribute("aria-expanded", String(opening));
+        poster.setAttribute("aria-expanded", String(opening));
+        card.classList.toggle("details-open", opening);
+      };
+
+      detailsButton.addEventListener("click", toggleDetails);
+      poster.addEventListener("click", toggleDetails);
 
       const watchedButton = document.createElement("button");
       watchedButton.type = "button";
@@ -3837,8 +3873,8 @@ const screenDiary = (() => {
       removeButton.textContent = "Remove";
       removeButton.addEventListener("click", () => this._removeQueue(item.queueId));
 
-      actions.append(watchedButton, removeButton);
-      copy.appendChild(actions);
+      actions.append(detailsButton, watchedButton, removeButton);
+      copy.append(details, actions);
       card.append(poster, copy);
       return card;
     },
@@ -4029,7 +4065,7 @@ const screenDiary = (() => {
       const watchedGrid = document.createElement("div");
 
       if (showingNeedToWatch) {
-        watchedGrid.className = "clean-need-grid";
+        watchedGrid.className = "clean-watched-grid clean-need-grid";
 
         if (!this._state.queue.length) {
           watchedGrid.innerHTML = `<p class="clean-empty-queue clean-empty-main">Nothing saved yet. Use the AI picker on the right and save a movie or show for later ♥</p>`;
@@ -4189,7 +4225,7 @@ const games = {
   solitaire: {
     title: "Solitaire",
     emoji: "🃏",
-    tagline: "A peaceful card game for the moments when one of us needs a cozy pause.",
+    tagline: "The only game I’ll let you kick my ass.",
     module: solitaire
   },
   screendiary: {
