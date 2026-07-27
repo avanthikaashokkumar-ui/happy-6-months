@@ -2134,7 +2134,7 @@ return {
     const peekDetail = this._root.querySelector("[data-mc-peek-detail]");
     const peekProgressBar = this._root.querySelector("[data-mc-peek-progress-bar]");
     const peekProgressLabel = this._root.querySelector("[data-mc-peek-progress-label]");
-    const housePercent = this._housePercent();
+    const housePercent = this._houseProgress();
 
     if (peekHeading) peekHeading.textContent = `Mission ${step} of 7`;
     if (peekTitle) peekTitle.textContent = missionCopy[step][0];
@@ -3331,13 +3331,100 @@ const screenDiary = (() => {
     { id: "ye-maaya-chesave", title: "Ye Maaya Chesave", note: "Watched together", status: "watched", poster: "https://play-lh.googleusercontent.com/dRqoM-6maw4enTL-g1RU2iek4erAPukRdg5k7U4bdUz1CT5cZEQtrUC-P9tCcvXWJ5w=w480-h960" },
     { id: "with-love", title: "With Love", note: "Watched together", status: "watched", poster: "https://images.fandango.com/ImageRenderer/400/0/redesign/static/img/default_poster--dark-mode.png/0/images/masterrepository/Fandango/244298/withlove.jpg" },
     { id: "anaganaga-oka-raju", title: "Anaganaga Oka Raju", note: "Watched together", status: "watched", poster: "https://images.fandango.com/ImageRenderer/400/0/redesign/static/img/default_poster--dark-mode.png/0/images/masterrepository/Fandango/243701/1290220-anaganaga-oka-raju-0-230-0-345-crop.jpg" },
-    { id: "queen-of-tears", title: "Queen of Tears", note: "Watched together", status: "watched", poster: "https://upload.wikimedia.org/wikipedia/commons/6/69/Queen_of_Tears_20240307_1.png" },
-    { id: "mike-and-molly", title: "Mike & Molly", note: "Watched together", status: "watched", poster: "https://upload.wikimedia.org/wikipedia/commons/9/95/Mike-and-molly-13.jpg" },
+        { id: "mike-and-molly", title: "Mike & Molly", note: "Watched together", status: "watched", poster: "https://upload.wikimedia.org/wikipedia/commons/9/95/Mike-and-molly-13.jpg" },
     { id: "tamizh-padam-2", title: "Tamizh Padam 2", note: "Halfway… lmao", status: "halfway", poster: "https://play-lh.googleusercontent.com/vnGWrt5NYKGGLYUJ5kEJFugzOXhRjr_1E5LFiuzaOINF9K_iBiFZMcxH31xfIuYSyWLHrmRmcEzBt7d2sV8=w480-h960" },
     { id: "little-things", title: "Little Things", note: "Watched together", status: "watched", poster: "https://resizing.flixster.com/8edPB5rPK5_2cyFuICY5bNT6LJc%3D/342x513/v2/https%3A//resizing.flixster.com/uKRM5V-4Sdx-eXjCYhkC7ecmzew%3D/ems.cHJkLWVtcy1hc3NldHMvdHZzZXJpZXMvNDQ0ZDk4MGMtN2FmNy00MDJjLTgwNTAtZTExMmFiMGMzODJiLmpwZw%3D%3D" },
     { id: "attarintiki-daredi", title: "Attarintiki Daredi", note: "Watched together", status: "watched", poster: "https://play-lh.googleusercontent.com/RTPgLMluBxCFjmM-crWQS_38zUuboxajlLWRvFx3KSvBpOocVzWRAfA16u-8vgWd_Nez=w480-h960" },
     { id: "seethamma-vakitlo-sirimalle-chettu", title: "Seethamma Vakitlo Sirimalle Chettu", note: "Watched together", status: "watched", poster: "https://play-lh.googleusercontent.com/ztyP5jIJ9pRuz-gxXAlGC7DTfFEQNNt78RdYZRh-Ufr1YRZdvWW8yoilmvxvjevjmr5O=w480-h960" }
   ];
+
+
+  function slugifyTitle(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+  }
+
+  const SCREEN_PALETTES = {
+    rose: { top: "#f7cad4", bottom: "#7a1731", accent: "#fff2f5", text: "#fffaf7" },
+    gold: { top: "#ffd58b", bottom: "#7a3115", accent: "#fff1d6", text: "#fffaf7" },
+    peach: { top: "#ffc8b6", bottom: "#8d3050", accent: "#fff1ea", text: "#fffaf7" },
+    green: { top: "#cde4ad", bottom: "#224837", accent: "#eff8e0", text: "#fffaf7" },
+    lavender: { top: "#ddc8f2", bottom: "#4e2f67", accent: "#f3ebff", text: "#fffaf7" },
+    blue: { top: "#b6d2e6", bottom: "#22465c", accent: "#eaf5fd", text: "#fffaf7" },
+    rain: { top: "#cfd8df", bottom: "#334557", accent: "#edf3f7", text: "#fffaf7" },
+    sky: { top: "#d6efff", bottom: "#355c7d", accent: "#edf7ff", text: "#fffaf7" },
+    plum: { top: "#e7c5df", bottom: "#5e294f", accent: "#fdf0fb", text: "#fffaf7" },
+    cocoa: { top: "#e5c7b1", bottom: "#6a3f35", accent: "#fff1e9", text: "#fffaf7" }
+  };
+
+  function makePosterData(title, kicker = "OUR NEXT WATCH", palette = "rose") {
+    const chosen = SCREEN_PALETTES[palette] || SCREEN_PALETTES.rose;
+    const safeTitle = escapeHtml(title);
+    const safeKicker = escapeHtml(kicker);
+
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1200">
+        <defs>
+          <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0%" stop-color="${chosen.top}"/>
+            <stop offset="100%" stop-color="${chosen.bottom}"/>
+          </linearGradient>
+          <radialGradient id="glow" cx="70%" cy="18%" r="38%">
+            <stop offset="0%" stop-color="${chosen.accent}" stop-opacity=".8"/>
+            <stop offset="100%" stop-color="${chosen.accent}" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect width="800" height="1200" fill="url(#bg)"/>
+        <rect width="800" height="1200" fill="url(#glow)"/>
+        <rect x="44" y="44" width="712" height="1112" rx="28" fill="none" stroke="rgba(255,255,255,.30)" stroke-width="4"/>
+        <text x="72" y="114" fill="${chosen.text}" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" letter-spacing="5">${safeKicker}</text>
+        <text x="72" y="925" fill="${chosen.text}" font-family="Georgia, serif" font-size="84" font-weight="700">${safeTitle}</text>
+        <text x="72" y="995" fill="${chosen.text}" font-family="Arial, Helvetica, sans-serif" font-size="30" opacity=".86">Movie night pick for us ♥</text>
+        <circle cx="660" cy="175" r="78" fill="rgba(255,255,255,.13)"/>
+        <text x="660" y="196" text-anchor="middle" fill="${chosen.text}" font-family="Georgia, serif" font-size="70">♥</text>
+      </svg>
+    `.trim();
+
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  }
+
+  function enrichWatchItem(item, fallbackKicker = "OUR WATCHLIST") {
+    if (!item || !item.title) return item;
+    const found = [...STARTER_WATCHED, ...AI_MOVIE_CATALOG].find(
+      (entry) => entry.title.toLowerCase() === String(item.title).toLowerCase()
+    );
+
+    const palette = item.palette || found?.palette || "rose";
+    const status = item.status || found?.status || "towatch";
+    const note = item.note || found?.note || (status === "watched" ? "Watched together" : "Need to watch together");
+
+    return {
+      ...item,
+      id: item.id || slugifyTitle(item.title),
+      palette,
+      note,
+      year: item.year || found?.year || "",
+      type: item.type || found?.type || "",
+      poster: item.poster || found?.poster || makePosterData(item.title, fallbackKicker, palette)
+    };
+  }
+
+  const DEFAULT_TO_WATCH = [
+    enrichWatchItem({
+      id: "queen-of-tears",
+      title: "Queen of Tears",
+      note: "Need to watch together",
+      status: "towatch",
+      type: "Series",
+      year: 2024,
+      palette: "plum",
+      poster: "https://upload.wikimedia.org/wikipedia/commons/6/69/Queen_of_Tears_20240307_1.png"
+    }, "NEXT ON OUR COUCH")
+  ];
+
 
   const AI_MOVIE_CATALOG = [
     {
@@ -3350,11 +3437,12 @@ const screenDiary = (() => {
       language: "Telugu",
       genre: "Romantic family drama",
       actors: ["Nani", "Mrunal Thakur", "Kiara Khanna"],
-      synopsis: "A devoted single father and his six-year-old daughter meet a mysterious woman whose connection to their past slowly turns their lives into a story of love, memory, and family.",
+      synopsis: "A devoted single father and his daughter meet a mysterious woman whose connection to their past slowly changes all of their lives.",
       moods: ["emotional", "romantic", "cozy"],
-      why: "Your diary already leans toward heartfelt Telugu stories, warm relationships, and emotional romance, so this is a very natural next watch.",
+      why: "Heartfelt, soft, and emotional in a way that matches your shared taste beautifully.",
       icon: "🐕",
-      palette: "rose"
+      palette: "rose",
+      poster: makePosterData("Hi Nanna", "AI MATCH", "rose")
     },
     {
       id: "sita-ramam",
@@ -3366,11 +3454,12 @@ const screenDiary = (() => {
       language: "Telugu",
       genre: "Period romantic drama",
       actors: ["Dulquer Salmaan", "Mrunal Thakur", "Rashmika Mandanna"],
-      synopsis: "In 1964, an orphaned army officer begins receiving letters from a woman calling herself his wife, sending him on a sweeping journey shaped by love, identity, duty, and sacrifice.",
+      synopsis: "An army officer begins receiving letters from a woman calling herself his wife, leading to a sweeping love story.",
       moods: ["emotional", "romantic", "epic"],
-      why: "This matches the sincere romance and family emotion already present in your watched list, but gives the next movie night a grander, more cinematic feel.",
+      why: "Big emotions and grand romance—perfect for a special movie night.",
       icon: "💌",
-      palette: "gold"
+      palette: "gold",
+      poster: makePosterData("Sita Ramam", "AI MATCH", "gold")
     },
     {
       id: "premalu",
@@ -3382,11 +3471,12 @@ const screenDiary = (() => {
       language: "Malayalam",
       genre: "Romantic comedy",
       actors: ["Naslen", "Mamitha Baiju", "Sangeeth Prathap"],
-      synopsis: "A directionless graduate moves to Hyderabad and falls for a confident young professional, while awkward friendships and one-sided feelings create a funny, modern romance.",
+      synopsis: "A confused graduate in Hyderabad falls for a confident young professional in a sweet and funny modern romance.",
       moods: ["funny", "romantic", "light"],
-      why: "You have a mix of romance and comedy in the diary, so this gives you something playful, current, and easy to laugh through together.",
+      why: "Playful and easy to enjoy together when you want something fun.",
       icon: "💘",
-      palette: "peach"
+      palette: "peach",
+      poster: makePosterData("Premalu", "AI MATCH", "peach")
     },
     {
       id: "pelli-choopulu",
@@ -3398,11 +3488,12 @@ const screenDiary = (() => {
       language: "Telugu",
       genre: "Romantic comedy",
       actors: ["Vijay Deverakonda", "Ritu Varma"],
-      synopsis: "A laid-back aspiring chef and an ambitious entrepreneur meet during a matchmaking visit, then discover that working together may change both their careers and their relationship.",
+      synopsis: "A laid-back aspiring chef and an ambitious entrepreneur discover chemistry after a matchmaking visit.",
       moods: ["funny", "romantic", "light"],
-      why: "It has the warm Telugu rom-com energy your list suggests, and it is also one of the shorter choices for an easy movie night.",
+      why: "Warm, charming, and short enough for a cozy evening.",
       icon: "🍲",
-      palette: "green"
+      palette: "green",
+      poster: makePosterData("Pelli Choopulu", "AI MATCH", "green")
     },
     {
       id: "oohalu-gusagusalade",
@@ -3414,11 +3505,12 @@ const screenDiary = (() => {
       language: "Telugu",
       genre: "Romantic comedy",
       actors: ["Naga Shaurya", "Raashii Khanna", "Srinivas Avasarala"],
-      synopsis: "A television presenter agrees to help his boss impress the woman he loves, only to realize that he has feelings for her too, leading to a charming romantic triangle.",
+      synopsis: "A television presenter helps his boss woo a woman, only to fall for her himself.",
       moods: ["funny", "romantic", "cozy"],
-      why: "This is a gentle, dialogue-driven romance that fits the comfortable and familiar side of your shared watch history.",
+      why: "Gentle and comforting, with exactly the kind of cute energy your list likes.",
       icon: "☕",
-      palette: "lavender"
+      palette: "lavender",
+      poster: makePosterData("Oohalu Gusagusalade", "AI MATCH", "lavender")
     },
     {
       id: "96",
@@ -3430,11 +3522,12 @@ const screenDiary = (() => {
       language: "Tamil",
       genre: "Nostalgic romantic drama",
       actors: ["Vijay Sethupathi", "Trisha Krishnan", "Gouri G. Kishan"],
-      synopsis: "Two former school sweethearts meet again at a reunion after more than two decades, spending one night revisiting the love, choices, and memories that shaped them.",
+      synopsis: "Former school sweethearts reunite years later and revisit the love and memories that never really left them.",
       moods: ["emotional", "romantic", "nostalgic"],
-      why: "Choose this when you want something deeply emotional and memory-focused rather than a light comedy.",
+      why: "Best for a deeply emotional and memory-filled night.",
       icon: "📷",
-      palette: "blue"
+      palette: "blue",
+      poster: makePosterData("'96", "AI MATCH", "blue")
     },
     {
       id: "about-time",
@@ -3446,11 +3539,12 @@ const screenDiary = (() => {
       language: "English",
       genre: "Romantic fantasy comedy-drama",
       actors: ["Domhnall Gleeson", "Rachel McAdams", "Bill Nighy"],
-      synopsis: "A young man learns that the men in his family can travel through time, but his attempts to improve his love life gradually teach him to value ordinary days and the people in them.",
+      synopsis: "A man who can travel through time learns that love is really about appreciating ordinary moments.",
       moods: ["emotional", "romantic", "cozy", "fantasy"],
-      why: "It turns small shared moments into the heart of the story, which makes it especially fitting for an anniversary watch.",
+      why: "A perfect anniversary-style pick because it makes everyday love feel magical.",
       icon: "⏳",
-      palette: "rain"
+      palette: "rain",
+      poster: makePosterData("About Time", "AI MATCH", "rain")
     },
     {
       id: "business-proposal",
@@ -3462,11 +3556,267 @@ const screenDiary = (() => {
       language: "Korean",
       genre: "Romantic comedy series",
       actors: ["Ahn Hyo-seop", "Kim Se-jeong", "Kim Min-kyu", "Seol In-ah"],
-      synopsis: "An employee attends a blind date while pretending to be her friend, then discovers that the man across the table is her company’s chief executive.",
+      synopsis: "A fake blind date turns into a workplace romance with big chemistry and lots of chaos.",
       moods: ["funny", "romantic", "light", "series"],
-      why: "Since Queen of Tears is already in your diary, this keeps the K-drama energy but switches to something faster, sillier, and much lighter.",
+      why: "A lighter K-drama mood if you want the excitement of a series.",
       icon: "💼",
-      palette: "sky"
+      palette: "sky",
+      poster: makePosterData("Business Proposal", "AI MATCH", "sky")
+    },
+    {
+      id: "our-beloved-summer",
+      title: "Our Beloved Summer",
+      year: 2021,
+      type: "Series",
+      duration: "16 episodes",
+      minutes: 960,
+      language: "Korean",
+      genre: "Romantic coming-of-age series",
+      actors: ["Choi Woo-shik", "Kim Da-mi", "Kim Sung-cheol"],
+      synopsis: "Former high school sweethearts are forced back into each other’s lives when their old documentary goes viral.",
+      moods: ["romantic", "cozy", "series", "nostalgic"],
+      why: "Tender, soft, and full of the kind of lingering feelings that make a series addictive.",
+      icon: "🌿",
+      palette: "green",
+      poster: makePosterData("Our Beloved Summer", "AI MATCH", "green")
+    },
+    {
+      id: "hometown-cha-cha-cha",
+      title: "Hometown Cha-Cha-Cha",
+      year: 2021,
+      type: "Series",
+      duration: "16 episodes",
+      minutes: 960,
+      language: "Korean",
+      genre: "Healing romantic comedy series",
+      actors: ["Shin Min-a", "Kim Seon-ho", "Lee Sang-yi"],
+      synopsis: "A city dentist moves to a seaside village and clashes, then slowly falls, for its beloved handyman.",
+      moods: ["cozy", "romantic", "funny", "series"],
+      why: "One of the coziest shows you could watch together.",
+      icon: "🌊",
+      palette: "sky",
+      poster: makePosterData("Hometown Cha-Cha-Cha", "AI MATCH", "sky")
+    },
+    {
+      id: "twenty-five-twenty-one",
+      title: "Twenty-Five Twenty-One",
+      year: 2022,
+      type: "Series",
+      duration: "16 episodes",
+      minutes: 960,
+      language: "Korean",
+      genre: "Youth romance series",
+      actors: ["Kim Tae-ri", "Nam Joo-hyuk", "Bona"],
+      synopsis: "A teenage fencer and a young man in crisis grow up together during turbulent years.",
+      moods: ["emotional", "romantic", "series", "nostalgic"],
+      why: "When you want romance with a lot of feeling and youthfulness.",
+      icon: "🏅",
+      palette: "gold",
+      poster: makePosterData("Twenty-Five Twenty-One", "AI MATCH", "gold")
+    },
+    {
+      id: "lovely-runner",
+      title: "Lovely Runner",
+      year: 2024,
+      type: "Series",
+      duration: "16 episodes",
+      minutes: 960,
+      language: "Korean",
+      genre: "Romantic fantasy series",
+      actors: ["Byeon Woo-seok", "Kim Hye-yoon"],
+      synopsis: "A devoted fan is thrown back in time and tries to save the artist who means everything to her.",
+      moods: ["romantic", "emotional", "series", "fantasy"],
+      why: "Sweet, dramatic, and very bingeable.",
+      icon: "✨",
+      palette: "lavender",
+      poster: makePosterData("Lovely Runner", "AI MATCH", "lavender")
+    },
+    {
+      id: "hidden-love",
+      title: "Hidden Love",
+      year: 2023,
+      type: "Series",
+      duration: "25 episodes",
+      minutes: 1100,
+      language: "Chinese",
+      genre: "Romantic coming-of-age series",
+      actors: ["Zhao Lusi", "Chen Zheyuan"],
+      synopsis: "A long-held crush slowly turns into something real as a younger girl grows up and reconnects with her brother’s friend.",
+      moods: ["romantic", "cozy", "series"],
+      why: "Soft, blushy, and made for people who love tender romance.",
+      icon: "🩷",
+      palette: "rose",
+      poster: makePosterData("Hidden Love", "AI MATCH", "rose")
+    },
+    {
+      id: "when-i-fly-towards-you",
+      title: "When I Fly Towards You",
+      year: 2023,
+      type: "Series",
+      duration: "24 episodes",
+      minutes: 960,
+      language: "Chinese",
+      genre: "Youth romance series",
+      actors: ["Zhou Yiran", "Zhang Miaoyi"],
+      synopsis: "A bright and fearless girl falls for the quiet boy in her class, leading to a sweet school-age romance.",
+      moods: ["cozy", "romantic", "series", "light"],
+      why: "Cute, easy, and very comforting.",
+      icon: "☁️",
+      palette: "sky",
+      poster: makePosterData("When I Fly Towards You", "AI MATCH", "sky")
+    },
+    {
+      id: "little-forest",
+      title: "Little Forest",
+      year: 2018,
+      type: "Movie",
+      duration: "1h 43m",
+      minutes: 103,
+      language: "Korean",
+      genre: "Healing slice-of-life drama",
+      actors: ["Kim Tae-ri", "Ryu Jun-yeol", "Jin Ki-joo"],
+      synopsis: "A young woman returns to her village and reconnects with food, seasons, friendship, and herself.",
+      moods: ["cozy", "emotional", "short"],
+      why: "A perfect comfort pick when you want peace more than drama.",
+      icon: "🍃",
+      palette: "green",
+      poster: makePosterData("Little Forest", "AI MATCH", "green")
+    },
+    {
+      id: "tune-in-for-love",
+      title: "Tune in for Love",
+      year: 2019,
+      type: "Movie",
+      duration: "2h 02m",
+      minutes: 122,
+      language: "Korean",
+      genre: "Romantic drama",
+      actors: ["Kim Go-eun", "Jung Hae-in"],
+      synopsis: "Two people keep finding and losing each other over the years, bound by radio broadcasts and timing.",
+      moods: ["romantic", "emotional", "cozy"],
+      why: "Soft and yearning with a lovely slow-burn feel.",
+      icon: "📻",
+      palette: "blue",
+      poster: makePosterData("Tune in for Love", "AI MATCH", "blue")
+    },
+    {
+      id: "love-reset",
+      title: "Love Reset",
+      year: 2023,
+      type: "Movie",
+      duration: "1h 59m",
+      minutes: 119,
+      language: "Korean",
+      genre: "Romantic comedy",
+      actors: ["Kang Ha-neul", "Jung So-min"],
+      synopsis: "A divorcing couple loses their memories in an accident and falls for each other all over again.",
+      moods: ["funny", "romantic", "light"],
+      why: "A chaotic and funny reset-button romance.",
+      icon: "🔁",
+      palette: "peach",
+      poster: makePosterData("Love Reset", "AI MATCH", "peach")
+    },
+    {
+      id: "miss-shetty-mr-polishetty",
+      title: "Miss Shetty Mr Polishetty",
+      year: 2023,
+      type: "Movie",
+      duration: "2h 29m",
+      minutes: 149,
+      language: "Telugu",
+      genre: "Romantic drama",
+      actors: ["Anushka Shetty", "Naveen Polishetty"],
+      synopsis: "A stand-up comic and a successful chef navigate an unusual relationship on very different terms.",
+      moods: ["romantic", "funny", "cozy"],
+      why: "Modern, warm, and a fun Telugu pick with a little emotional depth too.",
+      icon: "🍰",
+      palette: "cocoa",
+      poster: makePosterData("Miss Shetty Mr Polishetty", "AI MATCH", "cocoa")
+    },
+    {
+      id: "ante-sundaraniki",
+      title: "Ante Sundaraniki",
+      year: 2022,
+      type: "Movie",
+      duration: "2h 53m",
+      minutes: 173,
+      language: "Telugu",
+      genre: "Romantic comedy-drama",
+      actors: ["Nani", "Nazriya Nazim"],
+      synopsis: "A Hindu man and a Christian woman fall in love and pile up elaborate lies while trying to convince their families.",
+      moods: ["funny", "romantic", "long"],
+      why: "A longer Telugu watch when you want something big and entertaining.",
+      icon: "🎭",
+      palette: "gold",
+      poster: makePosterData("Ante Sundaraniki", "AI MATCH", "gold")
+    },
+    {
+      id: "fidaa",
+      title: "Fidaa",
+      year: 2017,
+      type: "Movie",
+      duration: "2h 24m",
+      minutes: 144,
+      language: "Telugu",
+      genre: "Romantic drama",
+      actors: ["Varun Tej", "Sai Pallavi"],
+      synopsis: "An NRI medical student and a spirited village girl fall in love across very different worlds.",
+      moods: ["romantic", "cozy", "emotional"],
+      why: "Warm-hearted and rooted in emotion, exactly the kind of movie that stays with you.",
+      icon: "🌸",
+      palette: "rose",
+      poster: makePosterData("Fidaa", "AI MATCH", "rose")
+    },
+    {
+      id: "kumbalangi-nights",
+      title: "Kumbalangi Nights",
+      year: 2019,
+      type: "Movie",
+      duration: "2h 15m",
+      minutes: 135,
+      language: "Malayalam",
+      genre: "Family drama",
+      actors: ["Shane Nigam", "Soubin Shahir", "Fahadh Faasil", "Anna Ben"],
+      synopsis: "Four brothers try to piece together their messy family while love enters their lives in unexpected ways.",
+      moods: ["cozy", "emotional", "funny"],
+      why: "Rich characters, warmth, and a beautifully lived-in world.",
+      icon: "🏡",
+      palette: "green",
+      poster: makePosterData("Kumbalangi Nights", "AI MATCH", "green")
+    },
+    {
+      id: "queen-of-tears",
+      title: "Queen of Tears",
+      year: 2024,
+      type: "Series",
+      duration: "16 episodes",
+      minutes: 960,
+      language: "Korean",
+      genre: "Romantic melodrama series",
+      actors: ["Kim Soo-hyun", "Kim Ji-won", "Park Sung-hoon"],
+      synopsis: "A married couple on the brink of separation rediscover love amid family chaos and emotional upheaval.",
+      moods: ["emotional", "romantic", "series"],
+      why: "You already wanted this in your queue, so it stays here too in case the AI confirms it for the next watch.",
+      icon: "👑",
+      palette: "plum",
+      poster: "https://upload.wikimedia.org/wikipedia/commons/6/69/Queen_of_Tears_20240307_1.png"
+    },
+    {
+      id: "crash-landing-on-you",
+      title: "Crash Landing on You",
+      year: 2019,
+      type: "Series",
+      duration: "16 episodes",
+      minutes: 960,
+      language: "Korean",
+      genre: "Romantic drama series",
+      actors: ["Hyun Bin", "Son Ye-jin", "Seo Ji-hye", "Kim Jung-hyun"],
+      synopsis: "A South Korean heiress accidentally lands in North Korea and falls for the officer protecting her.",
+      moods: ["romantic", "emotional", "series", "epic"],
+      why: "Big feelings, sweeping romance, and very binge-worthy.",
+      icon: "🪂",
+      palette: "sky",
+      poster: makePosterData("Crash Landing on You", "AI MATCH", "sky")
     }
   ];
 
@@ -3491,7 +3841,7 @@ const screenDiary = (() => {
   function loadState() {
     const fallback = {
       favorites: [],
-      toWatch: [],
+      toWatch: [...DEFAULT_TO_WATCH],
       extraWatched: [],
       pickerMessage: "",
       aiMood: "surprise",
@@ -3502,10 +3852,24 @@ const screenDiary = (() => {
     try {
       const stored = JSON.parse(safeStorage.getItem(STORAGE_KEY));
       if (!stored || typeof stored !== "object") return fallback;
+
+      const toWatch = Array.isArray(stored.toWatch) ? stored.toWatch.map((item) =>
+        enrichWatchItem(item, "NEXT ON OUR COUCH")
+      ) : [];
+
+      const hasQueen = toWatch.some((item) => item.title.toLowerCase() === "queen of tears");
+      if (!hasQueen) toWatch.unshift(...DEFAULT_TO_WATCH);
+
+      const extraWatched = Array.isArray(stored.extraWatched)
+        ? stored.extraWatched
+            .filter((item) => String(item.title || "").toLowerCase() !== "queen of tears")
+            .map((item) => enrichWatchItem(item, "WATCHED WITH YOU"))
+        : [];
+
       return {
         favorites: Array.isArray(stored.favorites) ? stored.favorites : [],
-        toWatch: Array.isArray(stored.toWatch) ? stored.toWatch : [],
-        extraWatched: Array.isArray(stored.extraWatched) ? stored.extraWatched : [],
+        toWatch,
+        extraWatched,
         pickerMessage: "",
         aiMood: typeof stored.aiMood === "string" ? stored.aiMood : "surprise",
         aiLength: typeof stored.aiLength === "string" ? stored.aiLength : "any",
@@ -3574,8 +3938,9 @@ const screenDiary = (() => {
       this._render();
     },
 
-    _addToWatch(title) {
-      const cleanTitle = String(title || "").trim();
+    _addToWatch(input) {
+      const seed = typeof input === "string" ? { title: input } : (input || {});
+      const cleanTitle = String(seed.title || "").trim();
       if (!cleanTitle) return;
 
       const alreadyExists = [
@@ -3589,10 +3954,19 @@ const screenDiary = (() => {
         return;
       }
 
-      this._state.toWatch.push({
-        id: makeId(cleanTitle),
-        title: cleanTitle
-      });
+      const match = AI_MOVIE_CATALOG.find((item) => item.title.toLowerCase() === cleanTitle.toLowerCase());
+      const entry = enrichWatchItem({
+        id: seed.id || makeId(cleanTitle),
+        title: cleanTitle,
+        note: seed.note || "Need to watch together",
+        status: "towatch",
+        type: seed.type || match?.type || "",
+        year: seed.year || match?.year || "",
+        palette: seed.palette || match?.palette || "rose",
+        poster: seed.poster || match?.poster
+      }, "NEXT ON OUR COUCH");
+
+      this._state.toWatch.push(entry);
       this._state.pickerMessage = `${cleanTitle} was added to our couch queue.`;
       this._save();
       this._render();
@@ -3610,12 +3984,11 @@ const screenDiary = (() => {
       if (!item) return;
 
       this._state.toWatch = this._state.toWatch.filter((entry) => entry.id !== id);
-      this._state.extraWatched.push({
-        id: item.id,
-        title: item.title,
+      this._state.extraWatched.push(enrichWatchItem({
+        ...item,
         note: "Watched together",
         status: "watched"
-      });
+      }, "WATCHED WITH YOU"));
       this._state.pickerMessage = `${item.title} moved into our watched memories ♥`;
       this._save();
       this._render();
@@ -3675,7 +4048,7 @@ const screenDiary = (() => {
       const state = this._state;
       if (!root || !state) return;
 
-      const watched = this._allWatched();
+      const watched = this._allWatched().map((item) => enrichWatchItem(item, "WATCHED WITH YOU"));
       const favorites = new Set(state.favorites);
       const finishedCount = watched.filter((item) => item.status === "watched").length;
       const halfwayCount = watched.filter((item) => item.status === "halfway").length;
@@ -3846,7 +4219,7 @@ const screenDiary = (() => {
       pickerMessage.textContent = state.pickerMessage || (
         state.toWatch.length
           ? "When we cannot decide, let the diary choose."
-          : "Our couch queue is empty—for now."
+          : "Our queue already has one very important drama waiting for us."
       );
 
       const aiResult = document.createElement("div");
@@ -3854,13 +4227,18 @@ const screenDiary = (() => {
 
       const aiChoice = AI_MOVIE_CATALOG.find((item) => item.id === state.aiPickId);
       if (aiChoice) {
+        const aiPoster = aiChoice.poster || makePosterData(aiChoice.title, "AI MATCH", aiChoice.palette);
         aiResult.innerHTML = `
           <article class="ai-recommendation-card">
-            <div class="ai-poster ai-poster-${escapeHtml(aiChoice.palette)}" aria-hidden="true">
-              <span class="ai-poster-icon">${escapeHtml(aiChoice.icon)}</span>
-              <small>OUR NEXT WATCH</small>
-              <strong>${escapeHtml(aiChoice.title)}</strong>
-              <em>${escapeHtml(String(aiChoice.year))}</em>
+            <div class="ai-poster-shell">
+              <div class="ai-poster ai-poster-${escapeHtml(aiChoice.palette)}">
+                <img src="${escapeHtml(aiPoster)}" alt="${escapeHtml(aiChoice.title)} poster" class="ai-poster-image" loading="lazy" referrerpolicy="no-referrer" />
+                <div class="ai-poster-overlay"></div>
+                <span class="ai-poster-icon">${escapeHtml(aiChoice.icon)}</span>
+                <small>OUR NEXT WATCH</small>
+                <strong>${escapeHtml(aiChoice.title)}</strong>
+                <em>${escapeHtml(String(aiChoice.year))}</em>
+              </div>
             </div>
             <div class="ai-recommendation-copy">
               <div class="ai-title-row">
@@ -3871,6 +4249,7 @@ const screenDiary = (() => {
                 <span class="ai-match-badge">Best match</span>
               </div>
               <div class="ai-meta" aria-label="Movie details">
+                <span>${escapeHtml(aiChoice.type)}</span>
                 <span>${escapeHtml(String(aiChoice.year))}</span>
                 <span>${escapeHtml(aiChoice.duration)}</span>
                 <span>${escapeHtml(aiChoice.language)}</span>
@@ -3890,7 +4269,7 @@ const screenDiary = (() => {
         `;
 
         aiResult.querySelector("[data-add-ai-pick]")?.addEventListener("click", () => {
-          this._addToWatch(aiChoice.title);
+          this._addToWatch(aiChoice);
         });
         aiResult.querySelector("[data-another-ai-pick]")?.addEventListener("click", () => this._pickNext());
       }
@@ -3908,11 +4287,28 @@ const screenDiary = (() => {
         queueList.appendChild(empty);
       } else {
         state.toWatch.forEach((item, index) => {
+          const enrichedItem = enrichWatchItem(item, "NEXT ON OUR COUCH");
           const row = document.createElement("article");
-          row.className = "watch-queue-item";
-          row.innerHTML = `
+          row.className = "watch-queue-item poster-queue-item";
+
+          const poster = document.createElement("div");
+          poster.className = "queue-poster";
+          poster.innerHTML = `
+            <img src="${escapeHtml(enrichedItem.poster)}" alt="${escapeHtml(enrichedItem.title)} poster" loading="lazy" referrerpolicy="no-referrer" />
+            <div class="queue-poster-overlay"></div>
             <span class="queue-number">${index + 1}</span>
-            <strong>${escapeHtml(item.title)}</strong>
+            <span class="queue-tag towatch">Need to watch</span>
+          `;
+
+          const body = document.createElement("div");
+          body.className = "queue-copy";
+          body.innerHTML = `
+            <strong>${escapeHtml(enrichedItem.title)}</strong>
+            <p>${escapeHtml(enrichedItem.note || "Need to watch together")}</p>
+            <div class="queue-meta">
+              ${enrichedItem.type ? `<span>${escapeHtml(enrichedItem.type)}</span>` : ""}
+              ${enrichedItem.year ? `<span>${escapeHtml(String(enrichedItem.year))}</span>` : ""}
+            </div>
           `;
 
           const actions = document.createElement("div");
@@ -3922,16 +4318,17 @@ const screenDiary = (() => {
           watchedButton.type = "button";
           watchedButton.className = "queue-action watched";
           watchedButton.textContent = "✓ Watched";
-          watchedButton.addEventListener("click", () => this._markWatched(item.id));
+          watchedButton.addEventListener("click", () => this._markWatched(enrichedItem.id));
 
           const removeButton = document.createElement("button");
           removeButton.type = "button";
           removeButton.className = "queue-action remove";
           removeButton.textContent = "Remove";
-          removeButton.addEventListener("click", () => this._removeToWatch(item.id));
+          removeButton.addEventListener("click", () => this._removeToWatch(enrichedItem.id));
 
           actions.append(watchedButton, removeButton);
-          row.appendChild(actions);
+          body.appendChild(actions);
+          row.append(poster, body);
           queueList.appendChild(row);
         });
       }
@@ -3950,43 +4347,43 @@ const games = {
   wordle: {
     title: "Cute Memory Wordle",
     emoji: "💌",
-    tagline: "Take real guesses and uncover a cute five-letter memory word.",
+    tagline: "Five letters, six guesses, and one sweet memory waiting for us.",
     module: wordle
   },
   sudoku: {
     title: "Easy Sudoku",
     emoji: "🔢",
-    tagline: "A gentle puzzle with hints whenever you need one.",
+    tagline: "A soft little number puzzle for a slow, cozy moment together.",
     module: sudoku
   },
   chess: {
     title: "Chess",
     emoji: "♟️",
-    tagline: "A polished chess board for two players or one player versus Benny Bot.",
+    tagline: "A tiny battle of hearts and brains—play me or challenge Benny Bot.",
     module: chess
   },
   blockblast: {
     title: "Block Blast",
     emoji: "🧩",
-    tagline: "Place colorful pieces, clear lines, and build a combo streak.",
+    tagline: "Make the pieces fit, clear the board, and build our cutest streak.",
     module: blockblast
   },
   minecraft: {
     title: "Benny’s Block World",
     emoji: "🐕",
-    tagline: "A browser-built 3D voxel world where you can mine, build, explore, and tame Benny.",
+    tagline: "Our little blocky universe where we explore, build Benny a home, and adventure together.",
     module: minecraft
   },
   solitaire: {
     title: "Solitaire",
     emoji: "🃏",
-    tagline: "Classic one-card Klondike inspired by the clean Google Solitaire layout.",
+    tagline: "A peaceful card game for the moments when one of us needs a cozy pause.",
     module: solitaire
   },
   screendiary: {
     title: "Our Cozy Screen Diary",
     emoji: "🎬",
-    tagline: "The movies and shows already in our story—and the ones waiting for our next couch night.",
+    tagline: "Every show, movie, laugh, and dramatic couch-night memory in one place.",
     module: screenDiary
   }
 };
@@ -4019,8 +4416,26 @@ function openGame(key) {
   window.scrollTo({ top: 0, behavior: "auto" });
 
   activeGame = game.module;
-  activeGame.mount(gameRoot);
-  backButton.focus({ preventScroll: true });
+
+  try {
+    activeGame.mount(gameRoot);
+    backButton.focus({ preventScroll: true });
+  } catch (error) {
+    console.error(`${game.title} could not open:`, error);
+    activeGame = null;
+    gameRoot.innerHTML = `
+      <section class="game-panel game-load-error">
+        <div class="game-load-error-icon" aria-hidden="true">${game.emoji}</div>
+        <h3>${game.title} needs one quick reload</h3>
+        <p>The game hit a browser error while opening. Refresh the page, then try it again.</p>
+        <button class="btn" type="button" data-retry-game>Try opening again</button>
+      </section>
+    `;
+    gameRoot.querySelector("[data-retry-game]")?.addEventListener("click", () => {
+      closeGame();
+      window.setTimeout(() => openGame(key), 60);
+    });
+  }
 }
 
 function closeGame() {
