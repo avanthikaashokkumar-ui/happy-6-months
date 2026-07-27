@@ -2284,3 +2284,216 @@ body {
     display: none;
   }
 }
+
+
+/* Keep decorative layers from intercepting the Benny card click in Safari. */
+.game-card::after,
+.game-card.featured::before,
+.game-card .featured-pill {
+  pointer-events: none;
+}
+
+
+.game-load-error {
+  max-width: 620px;
+  padding: 38px;
+  text-align: center;
+}
+.game-load-error-icon {
+  margin-bottom: 10px;
+  font-size: 2.5rem;
+}
+.game-load-error h3 {
+  margin: 0 0 8px;
+  color: var(--wine-900);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 2rem;
+}
+.game-load-error p {
+  max-width: 470px;
+  margin: 0 auto 18px;
+  color: var(--muted);
+}
+
+
+/* ---------- Expanded soundtrack artwork ---------- */
+.art-double-take { background: linear-gradient(145deg, #91a7b6, #354b5b); }
+.art-infatuated { background: linear-gradient(145deg, #dc9f87, #743d35); }
+.art-seasons { background: linear-gradient(145deg, #8ba88f, #334d3a); }
+.art-traingazing { background: linear-gradient(145deg, #96a6b8, #3b4356); }
+.art-love { background: linear-gradient(145deg, #c78d9b, #6d3042); }
+.art-all-need { background: linear-gradient(145deg, #dab59d, #784d3d); }
+.art-peach-eyes { background: linear-gradient(145deg, #efb18f, #a45d4d); }
+.art-heavy { background: linear-gradient(145deg, #8e7e9f, #40334f); }
+.art-heart { background: linear-gradient(145deg, #d392a0, #713043); }
+.art-sienna { background: linear-gradient(145deg, #c8876e, #6c382d); }
+.art-in-my-mind { background: linear-gradient(145deg, #9c8bb7, #4c3a6b); }
+.art-while-sleeping { background: linear-gradient(145deg, #758fa4, #303f56); }
+
+/* Twenty songs remain easy to browse inside the hovering player. */
+.soundtrack-list {
+  max-height: 390px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(243,170,185,.44) transparent;
+}
+
+
+/* ---------- Screen Diary queue posters + richer AI posters ---------- */
+.watch-status.watched {
+  color: #fff;
+  background: rgba(76, 119, 53, .92);
+}
+.watch-status.halfway {
+  color: #fff;
+  background: rgba(166, 103, 33, .92);
+}
+.watch-queue-list {
+  grid-template-columns: 1fr;
+}
+.watch-queue-item.poster-queue-item {
+  padding: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 0;
+  background: linear-gradient(180deg, #fffaf7, #fff3f2);
+  box-shadow: 0 10px 24px rgba(53,5,13,.08);
+}
+.queue-poster {
+  position: relative;
+  min-height: 168px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255,219,227,.28), transparent 38%),
+    linear-gradient(145deg, #6d1022, #26030a);
+}
+.queue-poster img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.queue-poster-overlay {
+  position: absolute;
+  inset: auto 0 0;
+  height: 44%;
+  background: linear-gradient(transparent, rgba(26,2,7,.86));
+}
+.queue-copy {
+  padding: 14px 14px 12px;
+  display: grid;
+  align-content: start;
+}
+.queue-copy strong {
+  color: var(--wine-900);
+  font-size: 1rem;
+  line-height: 1.2;
+}
+.queue-copy p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: .76rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.queue-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.queue-meta span {
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: #7d3144;
+  background: #f8e4ea;
+  font-size: .62rem;
+  font-weight: 900;
+}
+.queue-tag {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 3;
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: .62rem;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+}
+.queue-tag.towatch {
+  background: rgba(139, 58, 101, .88);
+}
+.watch-card.poster-card .watch-status.watched {
+  background: rgba(76,119,53,.88);
+}
+.watch-card.poster-card .watch-status.halfway {
+  background: rgba(166,103,33,.9);
+}
+.queue-actions {
+  grid-column: auto;
+  margin-top: 12px;
+}
+
+.ai-recommendation-card {
+  grid-template-columns: 162px minmax(0, 1fr);
+}
+.ai-poster-shell {
+  padding: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.05));
+}
+.ai-poster {
+  min-height: 280px;
+  overflow: hidden;
+  border-radius: 18px;
+  box-shadow: 0 12px 28px rgba(28,0,6,.18);
+}
+.ai-poster-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ai-poster-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(20,0,6,.16), rgba(20,0,6,.18)),
+    linear-gradient(transparent 35%, rgba(20,0,6,.82));
+}
+.ai-poster > *:not(.ai-poster-image):not(.ai-poster-overlay) {
+  position: relative;
+  z-index: 2;
+}
+.ai-meta span:first-child {
+  color: #fff;
+  background: linear-gradient(135deg, var(--wine-700), var(--wine-500));
+}
+
+@media (max-width: 700px) {
+  .watch-queue-item.poster-queue-item {
+    grid-template-columns: 94px minmax(0, 1fr);
+  }
+  .queue-poster {
+    min-height: 150px;
+  }
+}
+@media (max-width: 640px) {
+  .ai-recommendation-card {
+    grid-template-columns: 1fr;
+  }
+  .ai-poster-shell {
+    padding: 12px 12px 0;
+  }
+  .ai-poster {
+    min-height: 220px;
+  }
+}
