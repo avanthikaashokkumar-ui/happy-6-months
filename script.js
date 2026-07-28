@@ -3664,8 +3664,45 @@ const screenDiary = (() => {
     },
 
     _save() {
-      if (!this._state) return;
-      safeStorage.setItem(STORAGE_KEY, JSON.stringify(this._state));
+      if (!this._state) return true;
+
+      try {
+        safeStorage.setItem(STORAGE_KEY, JSON.stringify(this._state));
+        return true;
+      } catch (error) {
+        console.error("Could not save the Screen Diary:", error);
+
+        // Large pasted/uploaded posters can exceed Safari's localStorage.
+        // Keep every title and detail, but replace only oversized data-URL
+        // posters with a lightweight generated card, then save again.
+        const compactState = JSON.parse(JSON.stringify(this._state));
+
+        const compactItem = (item) => {
+          if (typeof item?.poster === "string" && item.poster.startsWith("data:image/")) {
+            return {
+              ...item,
+              poster: makeCustomPoster(item.title || "Our movie", item.type || "Movie")
+            };
+          }
+          return item;
+        };
+
+        compactState.extraWatched = (compactState.extraWatched || []).map(compactItem);
+        compactState.queue = (compactState.queue || []).map(compactItem);
+        compactState.message =
+          "The title was added, but Safari could not store the large poster. Upload a smaller JPG for the real poster.";
+
+        try {
+          safeStorage.setItem(STORAGE_KEY, JSON.stringify(compactState));
+          this._state = compactState;
+          return true;
+        } catch (secondError) {
+          console.error("Compact Screen Diary save also failed:", secondError);
+          this._state.message =
+            "The browser storage is full. Remove an older custom title, then add this one again.";
+          return false;
+        }
+      }
     },
 
     _watched() {
@@ -3716,20 +3753,22 @@ const screenDiary = (() => {
     _posterFromFile(file) {
       return new Promise((resolve, reject) => {
         if (!file || !String(file.type || "").startsWith("image/")) {
-          reject(new Error("Choose an image file."));
+          reject(new Error("Choose a JPG, PNG, or WebP poster image."));
           return;
         }
 
         const reader = new FileReader();
 
-        reader.onerror = () => reject(new Error("Could not read that image."));
+        reader.onerror = () => reject(new Error("Could not read that poster image."));
         reader.onload = () => {
           const image = new Image();
 
-          image.onerror = () => reject(new Error("Could not open that image."));
+          image.onerror = () => reject(new Error("That poster format could not be opened. Try JPG or PNG."));
           image.onload = () => {
-            const maxWidth = 700;
-            const maxHeight = 1050;
+            // Compress posters before storing them. This keeps several custom
+            // posters safely below Safari/localStorage limits.
+            const maxWidth = 420;
+            const maxHeight = 630;
             const scale = Math.min(
               1,
               maxWidth / image.naturalWidth,
@@ -3744,7 +3783,7 @@ const screenDiary = (() => {
 
             const context = canvas.getContext("2d");
             if (!context) {
-              reject(new Error("Could not prepare that image."));
+              reject(new Error("Could not prepare that poster."));
               return;
             }
 
@@ -3752,13 +3791,42 @@ const screenDiary = (() => {
             context.fillRect(0, 0, width, height);
             context.drawImage(image, 0, 0, width, height);
 
-            resolve(canvas.toDataURL("image/jpeg", 0.8));
+            resolve(canvas.toDataURL("image/jpeg", 0.72));
           };
 
           image.src = String(reader.result || "");
         };
 
         reader.readAsDataURL(file);
+      });
+    },
+
+    _checkPosterUrl(url) {
+      return new Promise((resolve, reject) => {
+        const cleanUrl = String(url || "").trim();
+        if (!cleanUrl) {
+          reject(new Error("Paste a direct image address or upload the poster."));
+          return;
+        }
+
+        const image = new Image();
+        const timer = window.setTimeout(() => {
+          image.src = "";
+          reject(new Error("That poster link did not load. Upload the image instead."));
+        }, 8000);
+
+        image.onload = () => {
+          window.clearTimeout(timer);
+          resolve(cleanUrl);
+        };
+
+        image.onerror = () => {
+          window.clearTimeout(timer);
+          reject(new Error("Google blocked that image link. Save the poster and upload it instead."));
+        };
+
+        image.referrerPolicy = "no-referrer";
+        image.src = cleanUrl;
       });
     },
 
@@ -3972,7 +4040,7 @@ const screenDiary = (() => {
         if (watchedTitles.has(key)) {
           this._state.message = `${item.title} is already in Watched With You ♥`;
           this._render();
-          return;
+          return false;
         }
 
         this._state.queue = this._state.queue.filter((entry) => entry.title.toLowerCase() !== key);
@@ -3988,12 +4056,13 @@ const screenDiary = (() => {
         if (queueTitles.has(key)) {
           this._state.message = `${item.title} is already under Need to Watch.`;
           this._render();
-          return;
+          return false;
         }
+
         if (watchedTitles.has(key)) {
           this._state.message = `${item.title} is already marked as watched.`;
           this._render();
-          return;
+          return false;
         }
 
         this._state.queue.unshift({
@@ -4004,8 +4073,23 @@ const screenDiary = (() => {
         this._state.message = `${item.title} was added to Need to Watch.`;
       }
 
-      this._save();
+      const saved = this._save();
       this._render();
+
+      window.requestAnimationFrame(() => {
+        const cards = [...document.querySelectorAll(".clean-watched-card")];
+        const addedCard = cards.find((card) =>
+          card.querySelector("h5")?.textContent?.trim().toLowerCase() === key
+        );
+
+        if (addedCard) {
+          addedCard.classList.add("clean-newly-added");
+          addedCard.scrollIntoView({ behavior: "smooth", block: "center" });
+          window.setTimeout(() => addedCard.classList.remove("clean-newly-added"), 2400);
+        }
+      });
+
+      return saved !== false;
     },
 
     _addCustomSearchTitle(title, type, destination) {
@@ -4385,6 +4469,11 @@ const screenDiary = (() => {
       const main = document.createElement("main");
       main.className = "clean-watched-main";
 
+      const libraryNotice = document.createElement("div");
+      libraryNotice.className = `clean-library-notice ${this._state.message ? "visible" : ""}`;
+      libraryNotice.setAttribute("aria-live", "polite");
+      libraryNotice.textContent = this._state.message || "";
+
       const searchBox = document.createElement("section");
       searchBox.className = "clean-library-search";
       searchBox.innerHTML = `
@@ -4476,15 +4565,32 @@ const screenDiary = (() => {
             </label>
 
             <label class="clean-manual-wide">
-              <span>Poster image URL</span>
-              <input type="url" data-manual-poster-url placeholder="Paste image address from Google Images" />
+              <span>Direct poster image address</span>
+              <input type="url" data-manual-poster-url placeholder="Must end in or directly load a JPG, PNG, or WebP image" />
+              <small>Google result-page links usually do not work. Use “Copy image address,” not “Copy link.”</small>
             </label>
 
-            <label class="clean-manual-wide clean-file-field">
-              <span>Or upload a poster image</span>
-              <input type="file" accept="image/*" data-manual-poster-file />
-              <small>Uploading the image is more reliable than linking it.</small>
-            </label>
+            <div class="clean-manual-wide clean-poster-import">
+              <div class="clean-poster-preview" data-manual-poster-preview>
+                <div>
+                  <strong>Add the real poster</strong>
+                  <span>Choose, drag, or paste a poster image here</span>
+                </div>
+                <img alt="Selected poster preview" data-manual-poster-preview-image hidden />
+              </div>
+
+              <div class="clean-poster-import-actions">
+                <label class="clean-poster-file-button">
+                  <span>Choose poster image</span>
+                  <input type="file" accept="image/jpeg,image/png,image/webp" data-manual-poster-file />
+                </label>
+                <button type="button" data-clear-manual-poster>Clear poster</button>
+              </div>
+
+              <small class="clean-poster-help">
+                Most reliable method: save the poster from Google, then upload it here. You can also copy the image itself and paste it into the box.
+              </small>
+            </div>
           </div>
 
           <div class="clean-manual-actions">
@@ -4510,8 +4616,13 @@ const screenDiary = (() => {
       const manualSynopsis = searchBox.querySelector("[data-manual-synopsis]");
       const manualPosterUrl = searchBox.querySelector("[data-manual-poster-url]");
       const manualPosterFile = searchBox.querySelector("[data-manual-poster-file]");
+      const manualPosterPreview = searchBox.querySelector("[data-manual-poster-preview]");
+      const manualPosterPreviewImage = searchBox.querySelector("[data-manual-poster-preview-image]");
+      const clearManualPoster = searchBox.querySelector("[data-clear-manual-poster]");
       const manualStatus = searchBox.querySelector("[data-manual-status]");
       const manualAddButton = searchBox.querySelector("[data-add-manual]");
+
+      let preparedPosterData = "";
 
       const createSearchResult = (item, online = false) => {
         const result = document.createElement("article");
@@ -4647,6 +4758,94 @@ const screenDiary = (() => {
         );
       });
 
+      const showPreparedPoster = (posterData) => {
+        preparedPosterData = posterData || "";
+        manualPosterPreview.classList.toggle("has-poster", Boolean(preparedPosterData));
+        manualPosterPreviewImage.hidden = !preparedPosterData;
+        manualPosterPreviewImage.src = preparedPosterData || "";
+        manualStatus.textContent = preparedPosterData ? "Poster ready ✓" : "";
+      };
+
+      const preparePosterFile = async (file) => {
+        if (!file) return;
+
+        manualStatus.textContent = "Preparing poster…";
+        try {
+          const posterData = await this._posterFromFile(file);
+          showPreparedPoster(posterData);
+          manualPosterUrl.value = "";
+        } catch (error) {
+          showPreparedPoster("");
+          manualStatus.textContent = error?.message || "Could not prepare that poster.";
+        }
+      };
+
+      manualPosterFile.addEventListener("change", () => {
+        preparePosterFile(manualPosterFile.files?.[0]);
+      });
+
+      manualPosterPreview.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        manualPosterPreview.classList.add("dragging");
+      });
+
+      manualPosterPreview.addEventListener("dragleave", () => {
+        manualPosterPreview.classList.remove("dragging");
+      });
+
+      manualPosterPreview.addEventListener("drop", (event) => {
+        event.preventDefault();
+        manualPosterPreview.classList.remove("dragging");
+        const imageFile = [...(event.dataTransfer?.files || [])].find((file) =>
+          String(file.type || "").startsWith("image/")
+        );
+        preparePosterFile(imageFile);
+      });
+
+      manualPosterPreview.tabIndex = 0;
+      manualPosterPreview.addEventListener("paste", (event) => {
+        const imageFile = [...(event.clipboardData?.items || [])]
+          .find((item) => String(item.type || "").startsWith("image/"))
+          ?.getAsFile();
+
+        if (!imageFile) {
+          manualStatus.textContent = "Copy the poster image itself, then paste it here.";
+          return;
+        }
+
+        event.preventDefault();
+        preparePosterFile(imageFile);
+      });
+
+      manualPosterPreview.addEventListener("click", () => {
+        manualPosterFile.click();
+      });
+
+      clearManualPoster.addEventListener("click", () => {
+        manualPosterFile.value = "";
+        manualPosterUrl.value = "";
+        showPreparedPoster("");
+      });
+
+      manualPosterUrl.addEventListener("change", async () => {
+        const url = manualPosterUrl.value.trim();
+        if (!url) return;
+
+        manualStatus.textContent = "Checking poster link…";
+        try {
+          const validUrl = await this._checkPosterUrl(url);
+          preparedPosterData = "";
+          manualPosterPreviewImage.hidden = false;
+          manualPosterPreviewImage.src = validUrl;
+          manualPosterPreview.classList.add("has-poster");
+          manualStatus.textContent = "Poster link works ✓";
+        } catch (error) {
+          manualPosterPreview.classList.remove("has-poster");
+          manualPosterPreviewImage.hidden = true;
+          manualStatus.textContent = error?.message || "That poster link did not work.";
+        }
+      });
+
       manualAddButton.addEventListener("click", async () => {
         const title = manualTitle.value.trim();
         if (!title) {
@@ -4660,13 +4859,29 @@ const screenDiary = (() => {
         manualStatus.textContent = "";
 
         try {
-          let poster = manualPosterUrl.value.trim();
+          let poster = preparedPosterData;
+          let posterWarning = "";
 
-          if (manualPosterFile.files?.[0]) {
-            poster = await this._posterFromFile(manualPosterFile.files[0]);
+          if (!poster && manualPosterFile.files?.[0]) {
+            try {
+              poster = await this._posterFromFile(manualPosterFile.files[0]);
+            } catch (error) {
+              posterWarning = error?.message || "The uploaded poster could not be used.";
+            }
           }
 
-          if (!poster) poster = makeCustomPoster(title, manualType.value);
+          if (!poster && manualPosterUrl.value.trim()) {
+            try {
+              poster = await this._checkPosterUrl(manualPosterUrl.value.trim());
+            } catch (error) {
+              // A blocked Google image URL must not block the movie/show.
+              posterWarning = error?.message || "The poster link was blocked.";
+            }
+          }
+
+          if (!poster) {
+            poster = makeCustomPoster(title, manualType.value);
+          }
 
           const item = {
             id: `manual-${Date.now().toString(36)}`,
@@ -4683,7 +4898,20 @@ const screenDiary = (() => {
             poster
           };
 
-          this._addSearchResult(item, manualDestination.value);
+          const destination = manualDestination.value;
+          const added = this._addSearchResult(item, destination);
+
+          if (!added) return;
+
+          // _addSearchResult re-renders the Screen Diary, so show the final
+          // confirmation through the state notice rather than this old form.
+          if (posterWarning) {
+            this._state.message =
+              `${title} was added, but Google blocked the poster link. ` +
+              `The title card is showing instead—upload the image file for the real poster.`;
+            this._save();
+            this._render();
+          }
         } catch (error) {
           console.error("Could not add manual title:", error);
           manualStatus.textContent = error?.message || "Could not add that title.";
@@ -4761,7 +4989,7 @@ const screenDiary = (() => {
         });
       }
 
-      main.append(searchBox, heading, watchedGrid);
+      main.append(libraryNotice, searchBox, heading, watchedGrid);
 
       const sidebar = document.createElement("aside");
       sidebar.className = "clean-ai-sidebar";
