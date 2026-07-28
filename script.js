@@ -3324,8 +3324,8 @@ return {
 })();
 
 const screenDiary = (() => {
-  const STORAGE_KEY = "happy6:cozy-screen-diary:v8";
-  const LEGACY_STORAGE_KEY = "happy6:cozy-screen-diary:v7";
+  const STORAGE_KEY = "happy6:cozy-screen-diary:v9";
+  const LEGACY_STORAGE_KEY = "happy6:cozy-screen-diary:v8";
 
   const WATCHED_STARTER = [
     {
@@ -3431,10 +3431,10 @@ const screenDiary = (() => {
       note: "Watched together",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "15 August 2018",
+      duration: "2h 28m",
+      actors: ["Vijay Deverakonda", "Rashmika Mandanna", "Subbaraju", "Vennela Kishore"],
+      synopsis: "A mild-mannered lecturer falls for an independent woman, but a disastrous misunderstanding makes earning her trust far harder than winning her heart.",
       poster: makeCustomPoster("Geetha Govindam", "Movie")
     },
     {
@@ -3448,10 +3448,10 @@ const screenDiary = (() => {
       note: "Watched together",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "14 April 2005",
+      duration: "2h 45m",
+      actors: ["Rajinikanth", "Jyothika", "Prabhu", "Nayanthara", "Vadivelu"],
+      synopsis: "A psychiatrist investigates frightening events inside an old mansion and discovers that family history, trauma, and the legend of Chandramukhi are dangerously intertwined.",
       poster: makeCustomPoster("Chandramukhi", "Movie")
     },
     {
@@ -3465,10 +3465,10 @@ const screenDiary = (() => {
       note: "Watched together",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "26 February 2010",
+      duration: "2h 37m",
+      actors: ["Silambarasan", "Trisha Krishnan", "VTV Ganesh", "Samantha Ruth Prabhu"],
+      synopsis: "An aspiring filmmaker falls deeply in love with a woman whose family, faith, and uncertainty repeatedly pull their relationship apart.",
       poster: makeCustomPoster("Vinnaithaandi Varuvaayaa", "Movie")
     },
     {
@@ -3482,10 +3482,10 @@ const screenDiary = (() => {
       note: "Watched together",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "10 July 2015",
+      duration: "2h 39m",
+      actors: ["Prabhas", "Rana Daggubati", "Anushka Shetty", "Tamannaah Bhatia", "Ramya Krishnan"],
+      synopsis: "A young man raised far from the kingdom of Mahishmati discovers his royal identity and the violent history that shaped his family.",
       poster: makeCustomPoster("Baahubali: The Beginning", "Movie")
     },
     {
@@ -3499,10 +3499,10 @@ const screenDiary = (() => {
       note: "Watched together",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "1 October 2018",
+      duration: "About 7m per episode",
+      actors: ["David McCormack", "Melanie Zanetti"],
+      synopsis: "Bluey, an energetic blue heeler puppy, turns everyday family life into imaginative adventures with her sister Bingo and their parents.",
       poster: makeCustomPoster("Bluey", "Series")
     },
     {
@@ -3516,10 +3516,10 @@ const screenDiary = (() => {
       note: "Watched together",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "9 June 2017",
+      duration: "2h 27m",
+      actors: ["Sushant Singh Rajput", "Kriti Sanon", "Jim Sarbh", "Varun Sharma"],
+      synopsis: "Two strangers feel an immediate connection, but visions of a past life reveal an unfinished love story and an old enemy.",
       poster: makeCustomPoster("Raabta", "Movie")
     },
     {
@@ -3533,10 +3533,10 @@ const screenDiary = (() => {
       note: "Watched together",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "26 July 2019",
+      duration: "2h 50m",
+      actors: ["Vijay Deverakonda", "Rashmika Mandanna", "Shruti Ramachandran", "Raj Arjun"],
+      synopsis: "A passionate student leader and a talented cricketer fall in love while struggling with anger, trauma, ambition, and the courage to speak up.",
       poster: makeCustomPoster("Dear Comrade", "Movie")
     },
     {
@@ -3550,10 +3550,10 @@ const screenDiary = (() => {
       note: "Watched together",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "9 October 2021",
+      duration: "2h 28m",
+      actors: ["Sivakarthikeyan", "Vinay Rai", "Priyanka Arul Mohan", "Yogi Babu"],
+      synopsis: "A calm military doctor uses an unusually organized team and deadpan tactics to rescue a kidnapped child from a human-trafficking network.",
       poster: makeCustomPoster("Doctor", "Movie")
     },
     {
@@ -3567,10 +3567,10 @@ const screenDiary = (() => {
       note: "Watched together",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "11 November 2011",
+      duration: "2h 39m",
+      actors: ["Ranbir Kapoor", "Nargis Fakhri", "Shammi Kapoor", "Aditi Rao Hydari"],
+      synopsis: "An aspiring musician believes heartbreak will create great art, but love, fame, and loss transform him in ways he never expected.",
       poster: makeCustomPoster("Rockstar", "Movie")
     },
     {
@@ -3584,10 +3584,10 @@ const screenDiary = (() => {
       note: "Watched together",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "22 November 2024",
+      duration: "2h 40m",
+      actors: ["Cynthia Erivo", "Ariana Grande", "Jonathan Bailey", "Michelle Yeoh", "Jeff Goldblum"],
+      synopsis: "Elphaba and Glinda meet at Shiz University, form an unlikely friendship, and begin the journey that will reshape how Oz remembers them.",
       poster: makeCustomPoster("Wicked", "Movie")
     },
     {
@@ -3601,10 +3601,10 @@ const screenDiary = (() => {
       note: "Watched together",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "21 November 2025",
+      duration: "2h 18m",
+      actors: ["Cynthia Erivo", "Ariana Grande", "Jonathan Bailey", "Michelle Yeoh", "Jeff Goldblum"],
+      synopsis: "Elphaba and Glinda live with the consequences of their choices and must reunite to confront the forces controlling Oz and the future of their friendship.",
       poster: makeCustomPoster("Wicked: For Good", "Movie")
     },
     {
@@ -3618,10 +3618,10 @@ const screenDiary = (() => {
       note: "Watched together",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "18 August 2022",
+      duration: "2h 13m",
+      actors: ["Dhanush", "Nithya Menen", "Bharathiraja", "Prakash Raj", "Raashii Khanna"],
+      synopsis: "A delivery worker struggling with grief, family tension, and unsuccessful romances slowly recognizes the love and support already beside him.",
       poster: makeCustomPoster("Thiruchitrambalam", "Movie")
     },
     {
@@ -3635,10 +3635,10 @@ const screenDiary = (() => {
       note: "Watched together",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "28 July 2008",
+      duration: "About 22m per episode",
+      actors: ["Dilip Joshi", "Amit Bhatt", "Mandar Chandwadkar", "Sonalika Joshi"],
+      synopsis: "The residents of Gokuldham Society face everyday problems through comedy, friendship, community spirit, and plenty of misunderstandings.",
       poster: makeCustomPoster("Taarak Mehta Ka Ooltah Chashmah", "Series")
     },
     {
@@ -3652,10 +3652,10 @@ const screenDiary = (() => {
       note: "Watched together",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "13 April 2022",
+      duration: "2h 38m",
+      actors: ["Vijay", "Pooja Hegde", "Selvaraghavan", "Shine Tom Chacko", "Yogi Babu"],
+      synopsis: "A former intelligence officer trapped inside a hijacked shopping mall takes on the attackers while confronting the trauma that pushed him away from service.",
       poster: makeCustomPoster("Beast", "Movie")
     },
     {
@@ -3669,10 +3669,10 @@ const screenDiary = (() => {
       note: "Halfway…",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "10 April 1999",
+      duration: "3h 01m",
+      actors: ["Rajinikanth", "Sivaji Ganesan", "Ramya Krishnan", "Soundarya", "Abbas"],
+      synopsis: "After his family loses its fortune, Padayappa rebuilds their life while facing the obsessive anger of Neelambari, whose rejected love turns into revenge.",
       poster: makeCustomPoster("Padayappa", "Movie")
     },
     {
@@ -3686,10 +3686,10 @@ const screenDiary = (() => {
       note: "Halfway…",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "10 August 2023",
+      duration: "2h 48m",
+      actors: ["Rajinikanth", "Vinayakan", "Ramya Krishnan", "Vasanth Ravi", "Yogi Babu"],
+      synopsis: "A retired jailer returns to his formidable old methods after his police-officer son disappears while investigating a dangerous smuggling network.",
       poster: makeCustomPoster("Jailer", "Movie")
     }
   ];
@@ -4798,10 +4798,10 @@ const screenDiary = (() => {
       language: "Telugu",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "25 December 2013",
+      duration: "2h 04m",
+      actors: ["Raj Tarun", "Avika Gor", "Punarnavi Bhupalam", "Peela Gangadhar"],
+      synopsis: "Childhood friends constantly tease and challenge one another until jealousy and distance make them understand what their bond really means.",
       poster: makeCustomPoster("Uyyala Jampala", "Movie")
     },
     {
@@ -4814,10 +4814,10 @@ const screenDiary = (() => {
       language: "Malayalam",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "21 January 2022",
+      duration: "2h 52m",
+      actors: ["Pranav Mohanlal", "Kalyani Priyadarshan", "Darshana Rajendran", "Vijayaraghavan"],
+      synopsis: "Arun moves through college, love, heartbreak, friendship, and adulthood as his mistakes gradually teach him responsibility and emotional maturity.",
       poster: makeCustomPoster("Hridayam", "Movie")
     },
     {
@@ -4830,10 +4830,10 @@ const screenDiary = (() => {
       language: "Tamil",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "21 October 2015",
+      duration: "2h 20m",
+      actors: ["Vijay Sethupathi", "Nayanthara", "Parthiban", "Radhika Sarathkumar"],
+      synopsis: "A harmless man pretending to be a rowdy agrees to help a hearing-impaired woman seek revenge, only to discover the job is far more serious than his act.",
       poster: makeCustomPoster("Naanum Rowdy Dhaan", "Movie")
     },
     {
@@ -4846,10 +4846,10 @@ const screenDiary = (() => {
       language: "Malayalam",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "30 May 2014",
+      duration: "2h 51m",
+      actors: ["Dulquer Salmaan", "Nivin Pauly", "Nazriya Nazim", "Fahadh Faasil", "Parvathy Thiruvothu"],
+      synopsis: "Three cousins pursue freedom, careers, romance, and belonging after their childhood dream of living in Bangalore finally comes true.",
       poster: makeCustomPoster("Bangalore Days", "Movie")
     },
     {
@@ -4862,10 +4862,10 @@ const screenDiary = (() => {
       language: "Malayalam",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "29 May 2015",
+      duration: "2h 36m",
+      actors: ["Nivin Pauly", "Sai Pallavi", "Madonna Sebastian", "Anupama Parameswaran"],
+      synopsis: "George's ideas about love evolve across three stages of his life as infatuation, heartbreak, friendship, and maturity change him.",
       poster: makeCustomPoster("Premam", "Movie")
     },
     {
@@ -4880,15 +4880,8 @@ const screenDiary = (() => {
       hydrated: false,
       releaseDate: "19 March 2026",
       duration: "2h 20m",
-      actors: [
-        "Ken Karunas",
-        "Anishma Anilkumar",
-        "Devadarshini",
-        "Suraj Venjaramoodu",
-        "Priyanshi Yadav",
-        "Meenakshi Dinesh"
-      ],
-      synopsis: "Praveen, a 15-year-old student, enters adolescence determined to experience true love before school ends. Relationships and heartbreaks gradually reshape his understanding of love, maturity, and life.",
+      actors: ["Ken Karunas", "Anishma Anilkumar", "Devadarshini", "Suraj Venjaramoodu", "Priyanshi Yadav"],
+      synopsis: "A teenage student determined to experience love before school ends moves through relationships and heartbreaks that reshape his understanding of maturity.",
       poster: makeCustomPoster("Youth", "Movie")
     },
     {
@@ -4901,10 +4894,10 @@ const screenDiary = (() => {
       language: "English",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "17 July 2026",
+      duration: "2h 52m",
+      actors: ["Matt Damon", "Tom Holland", "Anne Hathaway", "Robert Pattinson", "Lupita Nyong'o", "Zendaya"],
+      synopsis: "Odysseus faces gods, monsters, temptation, and war as he struggles to return to Ithaca after the fall of Troy.",
       poster: makeCustomPoster("The Odyssey", "Movie")
     },
     {
@@ -4917,10 +4910,10 @@ const screenDiary = (() => {
       language: "English",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "14 August 2026",
+      duration: "Runtime not announced",
+      actors: ["Anne Hathaway", "Ewan McGregor", "Maisy Stella", "Christian Convery"],
+      synopsis: "After a mysterious cosmic event tears Oak Street away from suburbia, the Platt family must stay together to survive their unrecognizable new surroundings.",
       poster: makeCustomPoster("The End of Oak Street", "Movie")
     },
     {
@@ -4933,10 +4926,10 @@ const screenDiary = (() => {
       language: "English",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "21 February 2005",
+      duration: "About 23m per episode",
+      actors: ["Zach Tyler Eisen", "Mae Whitman", "Jack De Sena", "Dante Basco"],
+      synopsis: "Aang, the last Air Nomad and the new Avatar, travels with his friends to master the elements and end the Fire Nation's war.",
       poster: makeCustomPoster("Avatar: The Last Airbender", "Series")
     },
     {
@@ -4949,10 +4942,10 @@ const screenDiary = (() => {
       language: "English",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "1 July 2010",
+      duration: "1h 43m",
+      actors: ["Noah Ringer", "Dev Patel", "Nicola Peltz", "Jackson Rathbone"],
+      synopsis: "A young Avatar must begin mastering the elements and resist the Fire Nation's campaign to dominate the world.",
       poster: makeCustomPoster("The Last Airbender", "Movie")
     },
     {
@@ -4965,10 +4958,10 @@ const screenDiary = (() => {
       language: "Tamil",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "18 October 2017",
+      duration: "2h 43m",
+      actors: ["Vijay", "S. J. Suryah", "Samantha Ruth Prabhu", "Nithya Menen", "Kajal Aggarwal"],
+      synopsis: "A doctor and a magician become connected to a campaign exposing corruption and preventable deaths in the medical system.",
       poster: makeCustomPoster("Mersal", "Movie")
     },
     {
@@ -4981,10 +4974,10 @@ const screenDiary = (() => {
       language: "Tamil",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "14 April 2016",
+      duration: "2h 37m",
+      actors: ["Vijay", "Samantha Ruth Prabhu", "Amy Jackson", "Mahendran"],
+      synopsis: "A quiet baker raising his daughter is forced to confront the violent past he left behind when an old enemy finds them.",
       poster: makeCustomPoster("Theri", "Movie")
     },
     {
@@ -4997,10 +4990,10 @@ const screenDiary = (() => {
       language: "Tamil",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "7 October 2016",
+      duration: "2h 30m",
+      actors: ["Sivakarthikeyan", "Keerthy Suresh", "Sathish", "K. S. Ravikumar"],
+      synopsis: "An aspiring actor disguises himself as a nurse to get close to the woman he loves, creating a chain of romantic and comic complications.",
       poster: makeCustomPoster("Remo", "Movie")
     },
     {
@@ -5013,10 +5006,10 @@ const screenDiary = (() => {
       language: "Tamil",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "17 April 2015",
+      duration: "2h 19m",
+      actors: ["Dulquer Salmaan", "Nithya Menen", "Prakash Raj", "Leela Samson"],
+      synopsis: "A young couple chooses a live-in relationship without promises, but the older marriage they witness makes them reconsider commitment.",
       poster: makeCustomPoster("O Kadhal Kanmani", "Movie")
     },
     {
@@ -5029,10 +5022,10 @@ const screenDiary = (() => {
       language: "Tamil",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "7 April 2017",
+      duration: "2h 26m",
+      actors: ["Karthi", "Aditi Rao Hydari", "R. J. Balaji", "Delhi Ganesh"],
+      synopsis: "A fighter pilot held as a prisoner of war reflects on his intense and damaging relationship with the doctor he left behind.",
       poster: makeCustomPoster("Kaatru Veliyidai", "Movie")
     },
     {
@@ -5045,10 +5038,10 @@ const screenDiary = (() => {
       language: "Tamil",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "22 July 2016",
+      duration: "2h 32m",
+      actors: ["Rajinikanth", "Winston Chao", "Radhika Apte", "Dhansika"],
+      synopsis: "After decades in prison, a Malaysian Tamil gangster searches for his family and confronts the criminal network that destroyed his life.",
       poster: makeCustomPoster("Kabali", "Movie")
     },
     {
@@ -5061,10 +5054,10 @@ const screenDiary = (() => {
       language: "Tamil",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "3 June 2022",
+      duration: "2h 54m",
+      actors: ["Kamal Haasan", "Vijay Sethupathi", "Fahadh Faasil", "Suriya"],
+      synopsis: "A covert investigator follows a trail of masked killings into a violent conflict involving drug syndicates and a hidden black-ops legacy.",
       poster: makeCustomPoster("Vikram", "Movie")
     },
     {
@@ -5077,10 +5070,10 @@ const screenDiary = (() => {
       language: "Tamil",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "15 June 2007",
+      duration: "3h 05m",
+      actors: ["Rajinikanth", "Shriya Saran", "Suman", "Vivek"],
+      synopsis: "A software engineer returning to India battles a corrupt businessman after his plan to provide affordable education and healthcare is sabotaged.",
       poster: makeCustomPoster("Sivaji: The Boss", "Movie")
     },
     {
@@ -5093,10 +5086,10 @@ const screenDiary = (() => {
       language: "Tamil",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "18 June 2021",
+      duration: "2h 38m",
+      actors: ["Dhanush", "James Cosmo", "Joju George", "Aishwarya Lekshmi"],
+      synopsis: "A clever gangster from Madurai is recruited for a conflict in London and is forced to confront the human cost of the side he chose.",
       poster: makeCustomPoster("Jagame Thandhiram", "Movie")
     },
     {
@@ -5109,10 +5102,10 @@ const screenDiary = (() => {
       language: "Tamil",
       needsHydration: true,
       hydrated: false,
-      releaseDate: "Loading…",
-      duration: "Loading…",
-      actors: [],
-      synopsis: "Loading details…",
+      releaseDate: "12 January 2018",
+      duration: "2h 18m",
+      actors: ["Suriya", "Keerthy Suresh", "Karthik", "Ramya Krishnan"],
+      synopsis: "A man denied a government job forms a team that impersonates federal investigators to raid corrupt officials and expose a broken system.",
       poster: makeCustomPoster("Thaanaa Serndha Koottam", "Movie")
     }
   ];
@@ -5189,11 +5182,11 @@ const screenDiary = (() => {
       const saved = JSON.parse(currentRaw || legacyRaw);
       if (!saved || typeof saved !== "object") return fallback;
 
-      const migratingFromV7 = !currentRaw && Boolean(legacyRaw);
+      const migratingFromLegacy = !currentRaw && Boolean(legacyRaw);
       const removedTitles = (Array.isArray(saved.removedTitles) ? saved.removedTitles : [])
         .map((title) => String(title || "").trim().toLowerCase())
         .filter(Boolean)
-        .filter((title) => !(migratingFromV7 && title === "chandramukhi"));
+        .filter((title) => !(migratingFromLegacy && title === "chandramukhi"));
 
       const removedQueueTitles = new Set(
         (Array.isArray(saved.removedQueueTitles) ? saved.removedQueueTitles : [])
@@ -5216,7 +5209,7 @@ const screenDiary = (() => {
         aiType: saved.aiType === "Series" ? "Series" : "Movie",
         aiLanguage: typeof saved.aiLanguage === "string" ? saved.aiLanguage : "all",
         aiPickId: typeof saved.aiPickId === "string" ? saved.aiPickId : "premalu",
-        aiCurrent: saved.aiCurrent && typeof saved.aiCurrent === "object" ? saved.aiCurrent : null,
+        aiCurrent: null,
         aiLoading: false,
         message: ""
       };
@@ -5360,12 +5353,41 @@ const screenDiary = (() => {
         .trim();
     },
 
+    _stripRemoteHtml(value) {
+      const box = document.createElement("div");
+      box.innerHTML = String(value || "");
+      return String(box.textContent || box.innerText || "")
+        .replace(/\s+/g, " ")
+        .trim();
+    },
+
+    async _fetchJsonWithTimeout(url, timeoutMs = 9000) {
+      const controller = new AbortController();
+      const timer = window.setTimeout(() => controller.abort(), timeoutMs);
+
+      try {
+        const response = await fetch(url, {
+          signal: controller.signal,
+          headers: { Accept: "application/json" }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Request failed with ${response.status}`);
+        }
+
+        return await response.json();
+      } finally {
+        window.clearTimeout(timer);
+      }
+    },
+
     _bestOnlineMatch(seed, results) {
       if (!Array.isArray(results) || !results.length) return null;
       const wanted = this._normaliseMediaTitle(seed.title);
+
       return results
         .map((item) => {
-          const candidate = this._normaliseMediaTitle(item.title);
+          const candidate = this._normaliseMediaTitle(item.title || item.name);
           let score = 0;
           if (candidate === wanted) score += 100;
           if (candidate.includes(wanted) || wanted.includes(candidate)) score += 45;
@@ -5375,6 +5397,89 @@ const screenDiary = (() => {
         .sort((a, b) => b.score - a.score)[0]?.item || results[0];
     },
 
+    async _hydrateSeriesSeed(seed) {
+      const query = encodeURIComponent(seed.searchTitle || seed.title);
+      const results = await this._fetchJsonWithTimeout(
+        `https://api.tvmaze.com/search/shows?q=${query}`,
+        9000
+      );
+
+      const shows = (Array.isArray(results) ? results : [])
+        .map((entry) => entry?.show)
+        .filter(Boolean);
+
+      const show = this._bestOnlineMatch(seed, shows);
+      if (!show) throw new Error("No matching show was found.");
+
+      let actors = Array.isArray(seed.actors) ? seed.actors : [];
+      try {
+        const cast = await this._fetchJsonWithTimeout(
+          `https://api.tvmaze.com/shows/${show.id}/cast`,
+          7000
+        );
+        const names = (Array.isArray(cast) ? cast : [])
+          .map((entry) => entry?.person?.name)
+          .filter(Boolean)
+          .slice(0, 6);
+        if (names.length) actors = names;
+      } catch (_error) {
+        // The card already contains baked-in cast information.
+      }
+
+      const runtime = Number(show.averageRuntime || show.runtime);
+      return {
+        ...seed,
+        poster: show.image?.original || show.image?.medium || seed.poster,
+        releaseDate: show.premiered || seed.releaseDate || "Not listed",
+        duration: Number.isFinite(runtime) && runtime > 0
+          ? `About ${Math.round(runtime)}m per episode`
+          : seed.duration || "Episode duration not listed",
+        actors,
+        synopsis: this._stripRemoteHtml(show.summary) || seed.synopsis,
+        sourceUrl: show.officialSite || show.url || "",
+        hydrated: true,
+        needsHydration: false,
+        posterStatus: show.image ? "remote" : "fallback"
+      };
+    },
+
+    async _hydrateMovieSeed(seed) {
+      const query = encodeURIComponent(seed.searchTitle || seed.wikiTitle || seed.title);
+      const payload = await this._fetchJsonWithTimeout(
+        `https://en.wikipedia.org/w/rest.php/v1/search/page?q=${query}&limit=5`,
+        9000
+      );
+
+      const pages = Array.isArray(payload?.pages) ? payload.pages : [];
+      const candidates = pages.map((page) => ({
+        ...page,
+        title: page.title || page.matched_title || ""
+      }));
+      const page = this._bestOnlineMatch(seed, candidates);
+      if (!page) throw new Error("No matching movie page was found.");
+
+      let poster = page.thumbnail?.url || "";
+      if (poster.startsWith("//")) poster = `https:${poster}`;
+
+      const remoteSummary =
+        this._stripRemoteHtml(page.excerpt) ||
+        this._stripRemoteHtml(page.description);
+
+      return {
+        ...seed,
+        poster: poster || seed.poster,
+        synopsis: remoteSummary && remoteSummary.length > 80
+          ? remoteSummary
+          : seed.synopsis,
+        sourceUrl: page.key
+          ? `https://en.wikipedia.org/wiki/${encodeURIComponent(page.key)}`
+          : "",
+        hydrated: true,
+        needsHydration: false,
+        posterStatus: poster ? "remote" : "fallback"
+      };
+    },
+
     async _hydrateSeedItems(items) {
       const seeds = uniqueByTitle(
         (items || []).filter((item) => item && item.title && item.needsHydration)
@@ -5382,200 +5487,35 @@ const screenDiary = (() => {
       const hydratedMap = new Map();
       if (!seeds.length) return hydratedMap;
 
-      const readClaim = (entity, property) =>
-        entity?.claims?.[property]?.[0]?.mainsnak?.datavalue?.value;
+      const workerCount = Math.min(2, seeds.length);
 
-      const readDate = (entity) => {
-        const raw = readClaim(entity, "P577")?.time;
-        if (!raw) return "Not listed";
-        const match = raw.match(/[+-](\d{4})-(\d{2})-(\d{2})/);
-        if (!match) return "Not listed";
-        const [, year, month, day] = match;
-        const date = new Date(`${year}-${month}-${day}T00:00:00Z`);
-        if (Number.isNaN(date.getTime())) return year;
-        return new Intl.DateTimeFormat("en-US", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-          timeZone: "UTC"
-        }).format(date);
-      };
-
-      const readDuration = (entity, type) => {
-        const value = readClaim(entity, "P2047");
-        const amount = Number(value?.amount);
-        if (!Number.isFinite(amount) || amount <= 0) {
-          return type === "Series" ? "Episode duration not listed" : "Not listed";
-        }
-        const minutes = Math.round(amount);
-        if (minutes < 60) return `${minutes}m`;
-        return `${Math.floor(minutes / 60)}h ${String(minutes % 60).padStart(2, "0")}m`;
-      };
-
-      for (let start = 0; start < seeds.length; start += 40) {
-        const batch = seeds.slice(start, start + 40);
-        const exactSeeds = batch.filter((item) => item.wikiTitle);
-        if (!exactSeeds.length) continue;
-
-        try {
-          const pageParams = new URLSearchParams({
-            action: "query",
-            titles: exactSeeds.map((item) => item.wikiTitle).join("|"),
-            prop: "pageimages|extracts|pageprops",
-            piprop: "thumbnail|original",
-            pithumbsize: "700",
-            exintro: "1",
-            explaintext: "1",
-            exsentences: "4",
-            redirects: "1",
-            format: "json",
-            origin: "*"
-          });
-
-          const pageResponse = await fetch(
-            `https://en.wikipedia.org/w/api.php?${pageParams.toString()}`
-          );
-          if (!pageResponse.ok) continue;
-
-          const pagePayload = await pageResponse.json();
-          const pages = Object.values(pagePayload?.query?.pages || {});
-          const aliases = new Map();
-          [...(pagePayload?.query?.normalized || []), ...(pagePayload?.query?.redirects || [])]
-            .forEach((entry) => {
-              aliases.set(
-                String(entry.from || "").trim().toLowerCase(),
-                String(entry.to || "").trim().toLowerCase()
-              );
-            });
-
-          const resolveTitle = (value) => {
-            let key = String(value || "").trim().toLowerCase();
-            const visited = new Set();
-            while (aliases.has(key) && !visited.has(key)) {
-              visited.add(key);
-              key = aliases.get(key);
-            }
-            return key;
-          };
-
-          const pageMap = new Map(
-            pages
-              .filter((page) => !page.missing)
-              .map((page) => [String(page.title || "").trim().toLowerCase(), page])
-          );
-
-          const qids = pages.map((page) => page?.pageprops?.wikibase_item).filter(Boolean);
-          let entityMap = {};
-          if (qids.length) {
-            const entityParams = new URLSearchParams({
-              action: "wbgetentities",
-              ids: qids.join("|"),
-              props: "claims|labels",
-              languages: "en",
-              format: "json",
-              origin: "*"
-            });
-            const entityResponse = await fetch(
-              `https://www.wikidata.org/w/api.php?${entityParams.toString()}`
-            );
-            if (entityResponse.ok) {
-              entityMap = (await entityResponse.json()).entities || {};
-            }
-          }
-
-          const actorIds = new Set();
-          Object.values(entityMap).forEach((entity) => {
-            (entity?.claims?.P161 || []).slice(0, 6).forEach((claim) => {
-              const actorId = claim?.mainsnak?.datavalue?.value?.id;
-              if (actorId) actorIds.add(actorId);
-            });
-          });
-
-          let actorLabels = {};
-          if (actorIds.size) {
-            const actorParams = new URLSearchParams({
-              action: "wbgetentities",
-              ids: [...actorIds].join("|"),
-              props: "labels",
-              languages: "en",
-              format: "json",
-              origin: "*"
-            });
-            const actorResponse = await fetch(
-              `https://www.wikidata.org/w/api.php?${actorParams.toString()}`
-            );
-            if (actorResponse.ok) {
-              const actorPayload = await actorResponse.json();
-              Object.entries(actorPayload.entities || {}).forEach(([id, entity]) => {
-                actorLabels[id] = entity?.labels?.en?.value || "";
-              });
-            }
-          }
-
-          exactSeeds.forEach((seed) => {
-            const page = pageMap.get(resolveTitle(seed.wikiTitle));
-            if (!page) return;
-            const qid = page?.pageprops?.wikibase_item || "";
-            const entity = entityMap[qid];
-            const cast = (entity?.claims?.P161 || [])
-              .slice(0, 6)
-              .map((claim) => claim?.mainsnak?.datavalue?.value?.id)
-              .map((id) => actorLabels[id])
-              .filter(Boolean);
-
-            const commonsFilename = readClaim(entity, "P18");
-            const poster = commonsFilename
-              ? `https://commons.wikimedia.org/wiki/Special:Redirect/file/${encodeURIComponent(commonsFilename)}?width=700`
-              : (
-                page?.thumbnail?.source ||
-                page?.original?.source ||
-                seed.poster ||
-                makeCustomPoster(seed.title, seed.type)
-              );
-
-            hydratedMap.set(seed.id, {
-              ...seed,
-              poster,
-              releaseDate: readDate(entity),
-              duration: readDuration(entity, seed.type),
-              actors: cast,
-              synopsis: page.extract || seed.synopsis || "No synopsis was returned.",
-              hydrated: true,
-              needsHydration: false,
-              sourceUrl: `https://en.wikipedia.org/?curid=${page.pageid}`
-            });
-          });
-        } catch (error) {
-          console.warn("Batch movie hydration failed:", error);
-        }
-      }
-
-      const missing = seeds.filter((seed) => !hydratedMap.has(seed.id));
-      const workerCount = Math.min(4, missing.length);
       await Promise.all(
         Array.from({ length: workerCount }, async (_, workerIndex) => {
-          for (let index = workerIndex; index < missing.length; index += workerCount) {
-            const seed = missing[index];
+          for (let index = workerIndex; index < seeds.length; index += workerCount) {
+            const seed = seeds[index];
+
             try {
-              const results = await this._searchOnline(
-                seed.searchTitle || seed.wikiTitle || seed.title,
-                seed.type
-              );
-              const match = this._bestOnlineMatch(seed, results);
-              if (!match) continue;
+              const hydrated = seed.type === "Series"
+                ? await this._hydrateSeriesSeed(seed)
+                : await this._hydrateMovieSeed(seed);
+
+              hydratedMap.set(seed.id, hydrated);
+            } catch (error) {
+              console.warn(`Could not load a real poster for ${seed.title}:`, error);
               hydratedMap.set(seed.id, {
                 ...seed,
-                ...match,
-                id: seed.id,
-                title: seed.title,
-                type: seed.type,
-                language: seed.language,
                 hydrated: true,
-                needsHydration: false
+                needsHydration: false,
+                posterStatus: "fallback",
+                releaseDate: seed.releaseDate || "Not listed",
+                duration: seed.duration || "Not listed",
+                actors: Array.isArray(seed.actors) ? seed.actors : [],
+                synopsis: seed.synopsis || "Details unavailable."
               });
-            } catch (error) {
-              console.warn(`Could not hydrate ${seed.title}:`, error);
             }
+
+            // Avoid hammering a public endpoint with dozens of simultaneous calls.
+            await new Promise((resolve) => window.setTimeout(resolve, 180));
           }
         })
       );
@@ -5583,30 +5523,60 @@ const screenDiary = (() => {
       return hydratedMap;
     },
 
-    async _hydratePermanentLibrary() {
+    async _hydratePermanentLibrary(force = false) {
       if (this._hydratingLibrary || !this._state) return;
 
-      const watchedSeeds = WATCHED_STARTER.filter(
-        (item) => item.needsHydration && !item.hydrated
-      );
-      const queueSeeds = (this._state.queue || []).filter(
-        (item) => item.needsHydration && !item.hydrated
-      );
-      if (!watchedSeeds.length && !queueSeeds.length) return;
+      const shouldHydrate = (item) =>
+        item && (
+          item.needsHydration ||
+          (force && (
+            item.posterStatus === "fallback" ||
+            String(item.poster || "").startsWith("data:image/")
+          ))
+        );
+
+      const watchedSeeds = WATCHED_STARTER
+        .filter(shouldHydrate)
+        .map((item) => force ? { ...item, needsHydration: true } : item);
+
+      const queueSeeds = (this._state.queue || [])
+        .filter(shouldHydrate)
+        .map((item) => force ? { ...item, needsHydration: true } : item);
+
+      if (!watchedSeeds.length && !queueSeeds.length) {
+        this._state.message = "Every available poster has already been checked.";
+        this._render();
+        return;
+      }
 
       this._hydratingLibrary = true;
+      this._state.message = "Loading real posters in the background…";
+      this._render();
+
       try {
         const hydrated = await this._hydrateSeedItems([...watchedSeeds, ...queueSeeds]);
 
         watchedSeeds.forEach((seed) => {
           const item = hydrated.get(seed.id);
-          if (item) Object.assign(seed, item);
+          if (item) {
+            const target = WATCHED_STARTER.find((entry) => entry.id === seed.id);
+            if (target) Object.assign(target, item);
+          }
         });
 
         this._state.queue = (this._state.queue || []).map((seed) => {
           const item = hydrated.get(seed.id);
           return item ? { ...seed, ...item, queueId: seed.queueId } : seed;
         });
+
+        const loadedCount = [...hydrated.values()]
+          .filter((item) => item.posterStatus === "remote")
+          .length;
+        const fallbackCount = hydrated.size - loadedCount;
+
+        this._state.message = fallbackCount
+          ? `${loadedCount} real posters loaded. ${fallbackCount} title card${fallbackCount === 1 ? "" : "s"} remain where the source had no usable poster.`
+          : `${loadedCount} real posters and their information are ready ♥`;
 
         this._save();
         this._render();
@@ -6033,10 +6003,10 @@ const screenDiary = (() => {
       this._state.aiCurrent = {
         ...choice,
         poster: makeCustomPoster(choice.title, choice.type),
-        releaseDate: "Loading…",
-        duration: "Loading…",
+        releaseDate: "Not listed",
+        duration: "Not listed",
         actors: [],
-        synopsis: "Finding the poster and full details…"
+        synopsis: "Finding the real poster and details…"
       };
       this._state.message = `Finding ${choice.title} and its poster…`;
       this._render();
@@ -6205,10 +6175,10 @@ const screenDiary = (() => {
       details.id = detailsId;
       details.hidden = true;
       details.innerHTML = `
-        <div><strong>Release date</strong><span>${escapeHtml(item.releaseDate || "Loading…")}</span></div>
-        <div><strong>Duration</strong><span>${escapeHtml(item.duration || "Loading…")}</span></div>
-        <div class="wide"><strong>Actors</strong><span>${escapeHtml(Array.isArray(item.actors) && item.actors.length ? item.actors.join(", ") : "Loading…")}</span></div>
-        <div class="wide"><strong>Synopsis</strong><span>${escapeHtml(item.synopsis || "Loading details…")}</span></div>
+        <div><strong>Release date</strong><span>${escapeHtml(item.releaseDate || "Not listed")}</span></div>
+        <div><strong>Duration</strong><span>${escapeHtml(item.duration || "Not listed")}</span></div>
+        <div class="wide"><strong>Actors</strong><span>${escapeHtml(Array.isArray(item.actors) && item.actors.length ? item.actors.join(", ") : "Not listed")}</span></div>
+        <div class="wide"><strong>Synopsis</strong><span>${escapeHtml(item.synopsis || "Details unavailable.")}</span></div>
       `;
 
       const favorite = document.createElement("button");
@@ -6375,18 +6345,18 @@ const screenDiary = (() => {
         </header>
 
         <div class="clean-ai-facts">
-          <span><b>Release date</b>${escapeHtml(item.releaseDate || "Loading…")}</span>
-          <span><b>Duration</b>${escapeHtml(item.duration || "Loading…")}</span>
+          <span><b>Release date</b>${escapeHtml(item.releaseDate || "Not listed")}</span>
+          <span><b>Duration</b>${escapeHtml(item.duration || "Not listed")}</span>
         </div>
 
         <section>
           <strong>Actors</strong>
-          <p>${escapeHtml(Array.isArray(item.actors) && item.actors.length ? item.actors.join(", ") : "Loading…")}</p>
+          <p>${escapeHtml(Array.isArray(item.actors) && item.actors.length ? item.actors.join(", ") : "Not listed")}</p>
         </section>
 
         <section>
           <strong>Synopsis</strong>
-          <p>${escapeHtml(item.synopsis || "Loading details…")}</p>
+          <p>${escapeHtml(item.synopsis || "Details unavailable.")}</p>
         </section>
       `;
 
@@ -6500,7 +6470,10 @@ const screenDiary = (() => {
             <p class="screen-section-kicker">Add anything to our diary</p>
             <h4>Search or add any movie/show</h4>
           </div>
-          <span>Use online search—or Google it and paste the details yourself</span>
+          <div class="clean-search-heading-side">
+            <span>Use online search—or Google it and paste the details yourself</span>
+            <button type="button" data-retry-posters>Retry real posters</button>
+          </div>
         </div>
 
         <div class="clean-search-controls clean-online-search-controls">
@@ -6622,6 +6595,7 @@ const screenDiary = (() => {
       const searchType = searchBox.querySelector("[data-library-type]");
       const searchOnlineButton = searchBox.querySelector("[data-search-online]");
       const searchGoogleButton = searchBox.querySelector("[data-search-google]");
+      const retryPostersButton = searchBox.querySelector("[data-retry-posters]");
       const searchResults = searchBox.querySelector("[data-library-results]");
 
       const manualTitle = searchBox.querySelector("[data-manual-title]");
@@ -6754,6 +6728,10 @@ const screenDiary = (() => {
           searchOnlineButton.textContent = "Search online";
         }
       };
+
+      retryPostersButton.addEventListener("click", () => {
+        this._hydratePermanentLibrary(true);
+      });
 
       searchGoogleButton.addEventListener("click", () => {
         const query = searchInput.value.trim();

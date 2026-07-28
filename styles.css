@@ -4544,3 +4544,33 @@ body.screen-diary-open .soundtrack-panel {
   cursor: wait;
   opacity: .7;
 }
+
+
+/* Reliable poster sync */
+.clean-search-heading-side {
+  max-width: 290px;
+  display: grid;
+  justify-items: end;
+  gap: 7px;
+  text-align: right;
+}
+.clean-search-heading-side button {
+  border: 1px solid rgba(116,20,38,.16);
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: var(--wine-700);
+  background: #fff;
+  cursor: pointer;
+  font-size: .58rem;
+  font-weight: 900;
+}
+.clean-search-heading-side button:hover {
+  background: #fff2f5;
+}
+@media (max-width: 700px) {
+  .clean-search-heading-side {
+    max-width: none;
+    justify-items: start;
+    text-align: left;
+  }
+}
