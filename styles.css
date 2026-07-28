@@ -4511,3 +4511,36 @@ body.screen-diary-open .soundtrack-panel {
   outline: 3px solid rgba(174,50,80,.25);
   outline-offset: 2px;
 }
+
+
+/* Expanded permanent diary and watched-card information */
+.clean-watched-poster-button {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: #32101a;
+  cursor: pointer;
+  text-align: left;
+}
+.clean-watched-poster-button:focus-visible {
+  outline: 4px solid rgba(174,50,80,.35);
+  outline-offset: 3px;
+}
+.clean-watched-detail-copy {
+  min-height: 150px;
+  padding-right: 13px;
+}
+.clean-watched-detail-card .clean-watched-card-actions {
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.clean-watched-detail-card .clean-heart {
+  top: 11px;
+  bottom: auto;
+}
+.clean-ai-result button:disabled,
+.clean-pick-button:disabled {
+  cursor: wait;
+  opacity: .7;
+}

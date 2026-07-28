@@ -3324,7 +3324,8 @@ return {
 })();
 
 const screenDiary = (() => {
-  const STORAGE_KEY = "happy6:cozy-screen-diary:v7";
+  const STORAGE_KEY = "happy6:cozy-screen-diary:v8";
+  const LEGACY_STORAGE_KEY = "happy6:cozy-screen-diary:v7";
 
   const WATCHED_STARTER = [
     {
@@ -3418,6 +3419,278 @@ const screenDiary = (() => {
       note: "Watched together",
       poster: "https://images.justwatch.com/poster/311292828/s592/nani30.jpg",
       posterFallback: "https://image.tmdb.org/t/p/original/hhMLtq9m1aK0dpY9Wcq26XeDH2z.jpg"
+    },
+    {
+      id: "geetha-govindam",
+      title: "Geetha Govindam",
+      wikiTitle: "Geetha Govindam",
+      searchTitle: "Geetha Govindam 2018 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      status: "watched",
+      note: "Watched together",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Geetha Govindam", "Movie")
+    },
+    {
+      id: "chandramukhi",
+      title: "Chandramukhi",
+      wikiTitle: "Chandramukhi (2005 film)",
+      searchTitle: "Chandramukhi 2005 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      status: "watched",
+      note: "Watched together",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Chandramukhi", "Movie")
+    },
+    {
+      id: "vinnaithaandi-varuvaayaa",
+      title: "Vinnaithaandi Varuvaayaa",
+      wikiTitle: "Vinnaithaandi Varuvaayaa",
+      searchTitle: "Vinnaithaandi Varuvaayaa 2010 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      status: "watched",
+      note: "Watched together",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Vinnaithaandi Varuvaayaa", "Movie")
+    },
+    {
+      id: "baahubali-the-beginning",
+      title: "Baahubali: The Beginning",
+      wikiTitle: "Baahubali: The Beginning",
+      searchTitle: "Baahubali The Beginning 2015 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      status: "watched",
+      note: "Watched together",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Baahubali: The Beginning", "Movie")
+    },
+    {
+      id: "bluey",
+      title: "Bluey",
+      wikiTitle: "Bluey (2018 TV series)",
+      searchTitle: "Bluey Australian animated television series",
+      type: "Series",
+      language: "English",
+      status: "watched",
+      note: "Watched together",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Bluey", "Series")
+    },
+    {
+      id: "raabta",
+      title: "Raabta",
+      wikiTitle: "Raabta (film)",
+      searchTitle: "Raabta 2017 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      status: "watched",
+      note: "Watched together",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Raabta", "Movie")
+    },
+    {
+      id: "dear-comrade",
+      title: "Dear Comrade",
+      wikiTitle: "Dear Comrade",
+      searchTitle: "Dear Comrade 2019 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      status: "watched",
+      note: "Watched together",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Dear Comrade", "Movie")
+    },
+    {
+      id: "doctor-2021",
+      title: "Doctor",
+      wikiTitle: "Doctor (2021 film)",
+      searchTitle: "Doctor 2021 Tamil film Sivakarthikeyan",
+      type: "Movie",
+      language: "Tamil",
+      status: "watched",
+      note: "Watched together",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Doctor", "Movie")
+    },
+    {
+      id: "rockstar-2011",
+      title: "Rockstar",
+      wikiTitle: "Rockstar (2011 film)",
+      searchTitle: "Rockstar 2011 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      status: "watched",
+      note: "Watched together",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Rockstar", "Movie")
+    },
+    {
+      id: "wicked-2024",
+      title: "Wicked",
+      wikiTitle: "Wicked (2024 film)",
+      searchTitle: "Wicked 2024 film",
+      type: "Movie",
+      language: "English",
+      status: "watched",
+      note: "Watched together",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Wicked", "Movie")
+    },
+    {
+      id: "wicked-for-good",
+      title: "Wicked: For Good",
+      wikiTitle: "Wicked: For Good",
+      searchTitle: "Wicked For Good 2025 film",
+      type: "Movie",
+      language: "English",
+      status: "watched",
+      note: "Watched together",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Wicked: For Good", "Movie")
+    },
+    {
+      id: "thiruchitrambalam",
+      title: "Thiruchitrambalam",
+      wikiTitle: "Thiruchitrambalam",
+      searchTitle: "Thiruchitrambalam 2022 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      status: "watched",
+      note: "Watched together",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Thiruchitrambalam", "Movie")
+    },
+    {
+      id: "taarak-mehta",
+      title: "Taarak Mehta Ka Ooltah Chashmah",
+      wikiTitle: "Taarak Mehta Ka Ooltah Chashmah",
+      searchTitle: "Taarak Mehta Ka Ooltah Chashmah television series",
+      type: "Series",
+      language: "Hindi",
+      status: "watched",
+      note: "Watched together",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Taarak Mehta Ka Ooltah Chashmah", "Series")
+    },
+    {
+      id: "beast-2022",
+      title: "Beast",
+      wikiTitle: "Beast (2022 Indian film)",
+      searchTitle: "Beast 2022 Tamil film Vijay",
+      type: "Movie",
+      language: "Tamil",
+      status: "watched",
+      note: "Watched together",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Beast", "Movie")
+    },
+    {
+      id: "padayappa",
+      title: "Padayappa",
+      wikiTitle: "Padayappa",
+      searchTitle: "Padayappa 1999 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      status: "halfway",
+      note: "Halfway…",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Padayappa", "Movie")
+    },
+    {
+      id: "jailer-2023",
+      title: "Jailer",
+      wikiTitle: "Jailer (2023 Tamil film)",
+      searchTitle: "Jailer 2023 Tamil film Rajinikanth",
+      type: "Movie",
+      language: "Tamil",
+      status: "halfway",
+      note: "Halfway…",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Jailer", "Movie")
     }
   ];
 
@@ -3544,10 +3817,1303 @@ const screenDiary = (() => {
     }
   ];
 
+
+  const AI_EXPANDED_POOL = [
+    {
+      id: "ai-sita-ramam",
+      title: "Sita Ramam",
+      searchTitle: "Sita Ramam 2022 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      needsHydration: true
+    },
+    {
+      id: "ai-fidaa",
+      title: "Fidaa",
+      searchTitle: "Fidaa 2017 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      needsHydration: true
+    },
+    {
+      id: "ai-bommarillu",
+      title: "Bommarillu",
+      searchTitle: "Bommarillu 2006 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      needsHydration: true
+    },
+    {
+      id: "ai-nuvvostanante-nenoddantana",
+      title: "Nuvvostanante Nenoddantana",
+      searchTitle: "Nuvvostanante Nenoddantana 2005 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      needsHydration: true
+    },
+    {
+      id: "ai-ala-modalaindi",
+      title: "Ala Modalaindi",
+      searchTitle: "Ala Modalaindi 2011 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      needsHydration: true
+    },
+    {
+      id: "ai-ishq",
+      title: "Ishq",
+      searchTitle: "Ishq 2012 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      needsHydration: true
+    },
+    {
+      id: "ai-oohalu-gusagusalade",
+      title: "Oohalu Gusagusalade",
+      searchTitle: "Oohalu Gusagusalade 2014 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      needsHydration: true
+    },
+    {
+      id: "ai-malli-raava",
+      title: "Malli Raava",
+      searchTitle: "Malli Raava 2017 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      needsHydration: true
+    },
+    {
+      id: "ai-chi-la-sow",
+      title: "Chi La Sow",
+      searchTitle: "Chi La Sow 2018 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      needsHydration: true
+    },
+    {
+      id: "ai-jersey",
+      title: "Jersey",
+      searchTitle: "Jersey 2019 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      needsHydration: true
+    },
+    {
+      id: "ai-agent-sai-srinivasa-athreya",
+      title: "Agent Sai Srinivasa Athreya",
+      searchTitle: "Agent Sai Srinivasa Athreya 2019 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      needsHydration: true
+    },
+    {
+      id: "ai-brochevarevarura",
+      title: "Brochevarevarura",
+      searchTitle: "Brochevarevarura 2019 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      needsHydration: true
+    },
+    {
+      id: "ai-ante-sundaraniki",
+      title: "Ante Sundaraniki",
+      searchTitle: "Ante Sundaraniki 2022 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      needsHydration: true
+    },
+    {
+      id: "ai-miss-shetty-mr-polishetty",
+      title: "Miss Shetty Mr Polishetty",
+      searchTitle: "Miss Shetty Mr Polishetty 2023 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      needsHydration: true
+    },
+    {
+      id: "ai-manmadhudu",
+      title: "Manmadhudu",
+      searchTitle: "Manmadhudu 2002 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      needsHydration: true
+    },
+    {
+      id: "ai-raja-rani",
+      title: "Raja Rani",
+      searchTitle: "Raja Rani 2013 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true
+    },
+    {
+      id: "ai-kadhalum-kadandhu-pogum",
+      title: "Kadhalum Kadandhu Pogum",
+      searchTitle: "Kadhalum Kadandhu Pogum 2016 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true
+    },
+    {
+      id: "ai-oh-my-kadavule",
+      title: "Oh My Kadavule",
+      searchTitle: "Oh My Kadavule 2020 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true
+    },
+    {
+      id: "ai-kannum-kannum-kollaiyadithaal",
+      title: "Kannum Kannum Kollaiyadithaal",
+      searchTitle: "Kannum Kannum Kollaiyadithaal 2020 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true
+    },
+    {
+      id: "ai-sillunu-oru-kaadhal",
+      title: "Sillunu Oru Kaadhal",
+      searchTitle: "Sillunu Oru Kaadhal 2006 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true
+    },
+    {
+      id: "ai-mouna-ragam",
+      title: "Mouna Ragam",
+      searchTitle: "Mouna Ragam 1986 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true
+    },
+    {
+      id: "ai-alaipayuthey",
+      title: "Alaipayuthey",
+      searchTitle: "Alaipayuthey 2000 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true
+    },
+    {
+      id: "ai-kadhalil-sodhappuvadhu-yeppadi",
+      title: "Kadhalil Sodhappuvadhu Yeppadi",
+      searchTitle: "Kadhalil Sodhappuvadhu Yeppadi 2012 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true
+    },
+    {
+      id: "ai-love-today",
+      title: "Love Today",
+      searchTitle: "Love Today 2022 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true
+    },
+    {
+      id: "ai-good-night",
+      title: "Good Night",
+      searchTitle: "Good Night 2023 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true
+    },
+    {
+      id: "ai-dada",
+      title: "Dada",
+      searchTitle: "Dada 2023 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true
+    },
+    {
+      id: "ai-parking",
+      title: "Parking",
+      searchTitle: "Parking 2023 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true
+    },
+    {
+      id: "ai-meiyazhagan",
+      title: "Meiyazhagan",
+      searchTitle: "Meiyazhagan 2024 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true
+    },
+    {
+      id: "ai-dragon",
+      title: "Dragon",
+      searchTitle: "Dragon 2025 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true
+    },
+    {
+      id: "ai-sachein",
+      title: "Sachein",
+      searchTitle: "Sachein 2005 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true
+    },
+    {
+      id: "ai-kumbalangi-nights",
+      title: "Kumbalangi Nights",
+      searchTitle: "Kumbalangi Nights 2019 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true
+    },
+    {
+      id: "ai-home",
+      title: "Home",
+      searchTitle: "Home 2021 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true
+    },
+    {
+      id: "ai-om-shanti-oshana",
+      title: "Om Shanti Oshana",
+      searchTitle: "Om Shanti Oshana 2014 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true
+    },
+    {
+      id: "ai-thattathin-marayathu",
+      title: "Thattathin Marayathu",
+      searchTitle: "Thattathin Marayathu 2012 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true
+    },
+    {
+      id: "ai-ustad-hotel",
+      title: "Ustad Hotel",
+      searchTitle: "Ustad Hotel 2012 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true
+    },
+    {
+      id: "ai-maheshinte-prathikaaram",
+      title: "Maheshinte Prathikaaram",
+      searchTitle: "Maheshinte Prathikaaram 2016 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true
+    },
+    {
+      id: "ai-njandukalude-nattil-oridavela",
+      title: "Njandukalude Nattil Oridavela",
+      searchTitle: "Njandukalude Nattil Oridavela 2017 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true
+    },
+    {
+      id: "ai-helen",
+      title: "Helen",
+      searchTitle: "Helen 2019 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true
+    },
+    {
+      id: "ai-june",
+      title: "June",
+      searchTitle: "June 2019 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true
+    },
+    {
+      id: "ai-jaya-jaya-jaya-jaya-hey",
+      title: "Jaya Jaya Jaya Jaya Hey",
+      searchTitle: "Jaya Jaya Jaya Jaya Hey 2022 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true
+    },
+    {
+      id: "ai-falimy",
+      title: "Falimy",
+      searchTitle: "Falimy 2023 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true
+    },
+    {
+      id: "ai-super-sharanya",
+      title: "Super Sharanya",
+      searchTitle: "Super Sharanya 2022 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true
+    },
+    {
+      id: "ai-charlie",
+      title: "Charlie",
+      searchTitle: "Charlie 2015 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true
+    },
+    {
+      id: "ai-aavesham",
+      title: "Aavesham",
+      searchTitle: "Aavesham 2024 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true
+    },
+    {
+      id: "ai-manjummel-boys",
+      title: "Manjummel Boys",
+      searchTitle: "Manjummel Boys 2024 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true
+    },
+    {
+      id: "ai-jab-we-met",
+      title: "Jab We Met",
+      searchTitle: "Jab We Met 2007 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      needsHydration: true
+    },
+    {
+      id: "ai-zindagi-na-milegi-dobara",
+      title: "Zindagi Na Milegi Dobara",
+      searchTitle: "Zindagi Na Milegi Dobara 2011 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      needsHydration: true
+    },
+    {
+      id: "ai-wake-up-sid",
+      title: "Wake Up Sid",
+      searchTitle: "Wake Up Sid 2009 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      needsHydration: true
+    },
+    {
+      id: "ai-yeh-jawaani-hai-deewani",
+      title: "Yeh Jawaani Hai Deewani",
+      searchTitle: "Yeh Jawaani Hai Deewani 2013 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      needsHydration: true
+    },
+    {
+      id: "ai-barfi",
+      title: "Barfi!",
+      searchTitle: "Barfi 2012 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      needsHydration: true
+    },
+    {
+      id: "ai-queen",
+      title: "Queen",
+      searchTitle: "Queen 2013 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      needsHydration: true
+    },
+    {
+      id: "ai-kapoor-and-sons",
+      title: "Kapoor & Sons",
+      searchTitle: "Kapoor and Sons 2016 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      needsHydration: true
+    },
+    {
+      id: "ai-dil-chahta-hai",
+      title: "Dil Chahta Hai",
+      searchTitle: "Dil Chahta Hai 2001 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      needsHydration: true
+    },
+    {
+      id: "ai-band-baaja-baaraat",
+      title: "Band Baaja Baaraat",
+      searchTitle: "Band Baaja Baaraat 2010 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      needsHydration: true
+    },
+    {
+      id: "ai-hasee-toh-phasee",
+      title: "Hasee Toh Phasee",
+      searchTitle: "Hasee Toh Phasee 2014 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      needsHydration: true
+    },
+    {
+      id: "ai-bareilly-ki-barfi",
+      title: "Bareilly Ki Barfi",
+      searchTitle: "Bareilly Ki Barfi 2017 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      needsHydration: true
+    },
+    {
+      id: "ai-ludo",
+      title: "Ludo",
+      searchTitle: "Ludo 2020 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      needsHydration: true
+    },
+    {
+      id: "ai-karwaan",
+      title: "Karwaan",
+      searchTitle: "Karwaan 2018 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      needsHydration: true
+    },
+    {
+      id: "ai-khoobsurat",
+      title: "Khoobsurat",
+      searchTitle: "Khoobsurat 2014 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      needsHydration: true
+    },
+    {
+      id: "ai-tu-jhoothi-main-makkaar",
+      title: "Tu Jhoothi Main Makkaar",
+      searchTitle: "Tu Jhoothi Main Makkaar 2023 Hindi film",
+      type: "Movie",
+      language: "Hindi",
+      needsHydration: true
+    },
+    {
+      id: "ai-the-holiday",
+      title: "The Holiday",
+      searchTitle: "The Holiday 2006 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-10-things-i-hate-about-you",
+      title: "10 Things I Hate About You",
+      searchTitle: "10 Things I Hate About You 1999 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-crazy-rich-asians",
+      title: "Crazy Rich Asians",
+      searchTitle: "Crazy Rich Asians 2018 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-la-la-land",
+      title: "La La Land",
+      searchTitle: "La La Land 2016 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-the-proposal",
+      title: "The Proposal",
+      searchTitle: "The Proposal 2009 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-notting-hill",
+      title: "Notting Hill",
+      searchTitle: "Notting Hill 1999 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-palm-springs",
+      title: "Palm Springs",
+      searchTitle: "Palm Springs 2020 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-set-it-up",
+      title: "Set It Up",
+      searchTitle: "Set It Up 2018 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-always-be-my-maybe",
+      title: "Always Be My Maybe",
+      searchTitle: "Always Be My Maybe 2019 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-the-big-sick",
+      title: "The Big Sick",
+      searchTitle: "The Big Sick 2017 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-to-all-the-boys-i-ve-loved-before",
+      title: "To All the Boys I've Loved Before",
+      searchTitle: "To All the Boys I've Loved Before film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-love-rosie",
+      title: "Love, Rosie",
+      searchTitle: "Love Rosie 2014 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-the-intern",
+      title: "The Intern",
+      searchTitle: "The Intern 2015 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-little-women",
+      title: "Little Women",
+      searchTitle: "Little Women 2019 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-the-princess-diaries",
+      title: "The Princess Diaries",
+      searchTitle: "The Princess Diaries 2001 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-mamma-mia",
+      title: "Mamma Mia!",
+      searchTitle: "Mamma Mia 2008 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-the-parent-trap",
+      title: "The Parent Trap",
+      searchTitle: "The Parent Trap 1998 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-enchanted",
+      title: "Enchanted",
+      searchTitle: "Enchanted 2007 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-paddington-2",
+      title: "Paddington 2",
+      searchTitle: "Paddington 2 2017 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-the-half-of-it",
+      title: "The Half of It",
+      searchTitle: "The Half of It 2020 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-crash-landing-on-you",
+      title: "Crash Landing on You",
+      searchTitle: "Crash Landing on You television series",
+      type: "Series",
+      language: "Korean",
+      needsHydration: true
+    },
+    {
+      id: "ai-hometown-cha-cha-cha",
+      title: "Hometown Cha-Cha-Cha",
+      searchTitle: "Hometown Cha-Cha-Cha television series",
+      type: "Series",
+      language: "Korean",
+      needsHydration: true
+    },
+    {
+      id: "ai-twenty-five-twenty-one",
+      title: "Twenty-Five Twenty-One",
+      searchTitle: "Twenty-Five Twenty-One television series",
+      type: "Series",
+      language: "Korean",
+      needsHydration: true
+    },
+    {
+      id: "ai-our-beloved-summer",
+      title: "Our Beloved Summer",
+      searchTitle: "Our Beloved Summer television series",
+      type: "Series",
+      language: "Korean",
+      needsHydration: true
+    },
+    {
+      id: "ai-reply-1988",
+      title: "Reply 1988",
+      searchTitle: "Reply 1988 television series",
+      type: "Series",
+      language: "Korean",
+      needsHydration: true
+    },
+    {
+      id: "ai-weightlifting-fairy-kim-bok-joo",
+      title: "Weightlifting Fairy Kim Bok-joo",
+      searchTitle: "Weightlifting Fairy Kim Bok-joo television series",
+      type: "Series",
+      language: "Korean",
+      needsHydration: true
+    },
+    {
+      id: "ai-strong-woman-do-bong-soon",
+      title: "Strong Woman Do Bong-soon",
+      searchTitle: "Strong Woman Do Bong-soon television series",
+      type: "Series",
+      language: "Korean",
+      needsHydration: true
+    },
+    {
+      id: "ai-hospital-playlist",
+      title: "Hospital Playlist",
+      searchTitle: "Hospital Playlist television series",
+      type: "Series",
+      language: "Korean",
+      needsHydration: true
+    },
+    {
+      id: "ai-because-this-is-my-first-life",
+      title: "Because This Is My First Life",
+      searchTitle: "Because This Is My First Life television series",
+      type: "Series",
+      language: "Korean",
+      needsHydration: true
+    },
+    {
+      id: "ai-love-next-door",
+      title: "Love Next Door",
+      searchTitle: "Love Next Door Korean television series",
+      type: "Series",
+      language: "Korean",
+      needsHydration: true
+    },
+    {
+      id: "ai-welcome-to-samdal-ri",
+      title: "Welcome to Samdal-ri",
+      searchTitle: "Welcome to Samdal-ri television series",
+      type: "Series",
+      language: "Korean",
+      needsHydration: true
+    },
+    {
+      id: "ai-my-liberation-notes",
+      title: "My Liberation Notes",
+      searchTitle: "My Liberation Notes television series",
+      type: "Series",
+      language: "Korean",
+      needsHydration: true
+    },
+    {
+      id: "ai-when-the-camellia-blooms",
+      title: "When the Camellia Blooms",
+      searchTitle: "When the Camellia Blooms television series",
+      type: "Series",
+      language: "Korean",
+      needsHydration: true
+    },
+    {
+      id: "ai-extraordinary-attorney-woo",
+      title: "Extraordinary Attorney Woo",
+      searchTitle: "Extraordinary Attorney Woo television series",
+      type: "Series",
+      language: "Korean",
+      needsHydration: true
+    },
+    {
+      id: "ai-lovely-runner",
+      title: "Lovely Runner",
+      searchTitle: "Lovely Runner television series",
+      type: "Series",
+      language: "Korean",
+      needsHydration: true
+    },
+    {
+      id: "ai-schitt-s-creek",
+      title: "Schitt's Creek",
+      searchTitle: "Schitt's Creek television series",
+      type: "Series",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-modern-family",
+      title: "Modern Family",
+      searchTitle: "Modern Family television series",
+      type: "Series",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-brooklyn-nine-nine",
+      title: "Brooklyn Nine-Nine",
+      searchTitle: "Brooklyn Nine-Nine television series",
+      type: "Series",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-derry-girls",
+      title: "Derry Girls",
+      searchTitle: "Derry Girls television series",
+      type: "Series",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-gilmore-girls",
+      title: "Gilmore Girls",
+      searchTitle: "Gilmore Girls television series",
+      type: "Series",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-never-have-i-ever",
+      title: "Never Have I Ever",
+      searchTitle: "Never Have I Ever television series",
+      type: "Series",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-one-day",
+      title: "One Day",
+      searchTitle: "One Day 2024 television series",
+      type: "Series",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-nobody-wants-this",
+      title: "Nobody Wants This",
+      searchTitle: "Nobody Wants This television series",
+      type: "Series",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-ted-lasso",
+      title: "Ted Lasso",
+      searchTitle: "Ted Lasso television series",
+      type: "Series",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-abbott-elementary",
+      title: "Abbott Elementary",
+      searchTitle: "Abbott Elementary television series",
+      type: "Series",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-the-bear",
+      title: "The Bear",
+      searchTitle: "The Bear television series",
+      type: "Series",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-fleabag",
+      title: "Fleabag",
+      searchTitle: "Fleabag television series",
+      type: "Series",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-the-office",
+      title: "The Office",
+      searchTitle: "The Office American television series",
+      type: "Series",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-parks-and-recreation",
+      title: "Parks and Recreation",
+      searchTitle: "Parks and Recreation television series",
+      type: "Series",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-jane-the-virgin",
+      title: "Jane the Virgin",
+      searchTitle: "Jane the Virgin television series",
+      type: "Series",
+      language: "English",
+      needsHydration: true
+    },
+    {
+      id: "ai-hidden-love",
+      title: "Hidden Love",
+      searchTitle: "Hidden Love Chinese television series",
+      type: "Series",
+      language: "Chinese",
+      needsHydration: true
+    },
+    {
+      id: "ai-put-your-head-on-my-shoulder",
+      title: "Put Your Head on My Shoulder",
+      searchTitle: "Put Your Head on My Shoulder television series",
+      type: "Series",
+      language: "Chinese",
+      needsHydration: true
+    },
+    {
+      id: "ai-when-i-fly-towards-you",
+      title: "When I Fly Towards You",
+      searchTitle: "When I Fly Towards You television series",
+      type: "Series",
+      language: "Chinese",
+      needsHydration: true
+    },
+    {
+      id: "ai-love-between-fairy-and-devil",
+      title: "Love Between Fairy and Devil",
+      searchTitle: "Love Between Fairy and Devil television series",
+      type: "Series",
+      language: "Chinese",
+      needsHydration: true
+    },
+    {
+      id: "ai-first-love",
+      title: "First Love",
+      searchTitle: "First Love 2022 Japanese television series",
+      type: "Series",
+      language: "Japanese",
+      needsHydration: true
+    },
+    {
+      id: "ai-from-me-to-you-kimi-ni-todoke",
+      title: "From Me to You: Kimi ni Todoke",
+      searchTitle: "From Me to You Kimi ni Todoke 2023 television series",
+      type: "Series",
+      language: "Japanese",
+      needsHydration: true
+    },
+    {
+      id: "ai-the-makanai-cooking-for-the-maiko-house",
+      title: "The Makanai: Cooking for the Maiko House",
+      searchTitle: "The Makanai Cooking for the Maiko House television series",
+      type: "Series",
+      language: "Japanese",
+      needsHydration: true
+    },
+    {
+      id: "ai-alice-in-borderland",
+      title: "Alice in Borderland",
+      searchTitle: "Alice in Borderland television series",
+      type: "Series",
+      language: "Japanese",
+      needsHydration: true
+    },
+    {
+      id: "ai-cable-girls",
+      title: "Cable Girls",
+      searchTitle: "Cable Girls television series",
+      type: "Series",
+      language: "Spanish",
+      needsHydration: true
+    },
+    {
+      id: "ai-the-time-it-takes",
+      title: "The Time It Takes",
+      searchTitle: "The Time It Takes Spanish television series",
+      type: "Series",
+      language: "Spanish",
+      needsHydration: true
+    }
+  ];
+
+  const AI_LIBRARY = [...AI_CATALOG, ...AI_EXPANDED_POOL];
+
   const DEFAULT_QUEUE = [
     {
       ...AI_CATALOG.find((item) => item.id === "queen-of-tears"),
       queueId: "queue-queen-of-tears"
+    },
+    {
+      id: "uyyala-jampala",
+      queueId: "queue-uyyala-jampala",
+      title: "Uyyala Jampala",
+      wikiTitle: "Uyyala Jampala",
+      searchTitle: "Uyyala Jampala 2013 Telugu film",
+      type: "Movie",
+      language: "Telugu",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Uyyala Jampala", "Movie")
+    },
+    {
+      id: "hridayam",
+      queueId: "queue-hridayam",
+      title: "Hridayam",
+      wikiTitle: "Hridayam",
+      searchTitle: "Hridayam 2022 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Hridayam", "Movie")
+    },
+    {
+      id: "naanum-rowdy-dhaan",
+      queueId: "queue-naanum-rowdy-dhaan",
+      title: "Naanum Rowdy Dhaan",
+      wikiTitle: "Naanum Rowdy Dhaan",
+      searchTitle: "Naanum Rowdy Dhaan 2015 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Naanum Rowdy Dhaan", "Movie")
+    },
+    {
+      id: "bangalore-days",
+      queueId: "queue-bangalore-days",
+      title: "Bangalore Days",
+      wikiTitle: "Bangalore Days",
+      searchTitle: "Bangalore Days 2014 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Bangalore Days", "Movie")
+    },
+    {
+      id: "premam",
+      queueId: "queue-premam",
+      title: "Premam",
+      wikiTitle: "Premam (2015 film)",
+      searchTitle: "Premam 2015 Malayalam film",
+      type: "Movie",
+      language: "Malayalam",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Premam", "Movie")
+    },
+    {
+      id: "youth-2026",
+      queueId: "queue-youth-2026",
+      title: "Youth",
+      wikiTitle: "",
+      searchTitle: "Youth 2026 Tamil film Ken Karunas",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "19 March 2026",
+      duration: "2h 20m",
+      actors: [
+        "Ken Karunas",
+        "Anishma Anilkumar",
+        "Devadarshini",
+        "Suraj Venjaramoodu",
+        "Priyanshi Yadav",
+        "Meenakshi Dinesh"
+      ],
+      synopsis: "Praveen, a 15-year-old student, enters adolescence determined to experience true love before school ends. Relationships and heartbreaks gradually reshape his understanding of love, maturity, and life.",
+      poster: makeCustomPoster("Youth", "Movie")
+    },
+    {
+      id: "the-odyssey-2026",
+      queueId: "queue-the-odyssey-2026",
+      title: "The Odyssey",
+      wikiTitle: "The Odyssey (2026 film)",
+      searchTitle: "The Odyssey 2026 Christopher Nolan film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("The Odyssey", "Movie")
+    },
+    {
+      id: "end-of-oak-street",
+      queueId: "queue-end-of-oak-street",
+      title: "The End of Oak Street",
+      wikiTitle: "The End of Oak Street",
+      searchTitle: "The End of Oak Street 2026 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("The End of Oak Street", "Movie")
+    },
+    {
+      id: "avatar-last-airbender-series",
+      queueId: "queue-avatar-last-airbender-series",
+      title: "Avatar: The Last Airbender",
+      wikiTitle: "Avatar: The Last Airbender",
+      searchTitle: "Avatar The Last Airbender animated television series",
+      type: "Series",
+      language: "English",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Avatar: The Last Airbender", "Series")
+    },
+    {
+      id: "last-airbender-film",
+      queueId: "queue-last-airbender-film",
+      title: "The Last Airbender",
+      wikiTitle: "The Last Airbender",
+      searchTitle: "The Last Airbender 2010 film",
+      type: "Movie",
+      language: "English",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("The Last Airbender", "Movie")
+    },
+    {
+      id: "mersal",
+      queueId: "queue-mersal",
+      title: "Mersal",
+      wikiTitle: "Mersal",
+      searchTitle: "Mersal 2017 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Mersal", "Movie")
+    },
+    {
+      id: "theri",
+      queueId: "queue-theri",
+      title: "Theri",
+      wikiTitle: "Theri (film)",
+      searchTitle: "Theri 2016 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Theri", "Movie")
+    },
+    {
+      id: "remo",
+      queueId: "queue-remo",
+      title: "Remo",
+      wikiTitle: "Remo (film)",
+      searchTitle: "Remo 2016 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Remo", "Movie")
+    },
+    {
+      id: "o-kadhal-kanmani",
+      queueId: "queue-o-kadhal-kanmani",
+      title: "O Kadhal Kanmani",
+      wikiTitle: "O Kadhal Kanmani",
+      searchTitle: "O Kadhal Kanmani 2015 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("O Kadhal Kanmani", "Movie")
+    },
+    {
+      id: "kaatru-veliyidai",
+      queueId: "queue-kaatru-veliyidai",
+      title: "Kaatru Veliyidai",
+      wikiTitle: "Kaatru Veliyidai",
+      searchTitle: "Kaatru Veliyidai 2017 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Kaatru Veliyidai", "Movie")
+    },
+    {
+      id: "kabali",
+      queueId: "queue-kabali",
+      title: "Kabali",
+      wikiTitle: "Kabali",
+      searchTitle: "Kabali 2016 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Kabali", "Movie")
+    },
+    {
+      id: "vikram-2022",
+      queueId: "queue-vikram-2022",
+      title: "Vikram",
+      wikiTitle: "Vikram (2022 film)",
+      searchTitle: "Vikram 2022 Tamil film Kamal Haasan",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Vikram", "Movie")
+    },
+    {
+      id: "sivaji-the-boss",
+      queueId: "queue-sivaji-the-boss",
+      title: "Sivaji: The Boss",
+      wikiTitle: "Sivaji: The Boss",
+      searchTitle: "Sivaji The Boss 2007 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Sivaji: The Boss", "Movie")
+    },
+    {
+      id: "jagame-thandhiram",
+      queueId: "queue-jagame-thandhiram",
+      title: "Jagame Thandhiram",
+      wikiTitle: "Jagame Thandhiram",
+      searchTitle: "Jagame Thandhiram 2021 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Jagame Thandhiram", "Movie")
+    },
+    {
+      id: "thaanaa-serndha-koottam",
+      queueId: "queue-thaanaa-serndha-koottam",
+      title: "Thaanaa Serndha Koottam",
+      wikiTitle: "Thaanaa Serndha Koottam",
+      searchTitle: "Thaanaa Serndha Koottam 2018 Tamil film",
+      type: "Movie",
+      language: "Tamil",
+      needsHydration: true,
+      hydrated: false,
+      releaseDate: "Loading…",
+      duration: "Loading…",
+      actors: [],
+      synopsis: "Loading details…",
+      poster: makeCustomPoster("Thaanaa Serndha Koottam", "Movie")
     }
   ];
 
@@ -3605,38 +5171,53 @@ const screenDiary = (() => {
     const fallback = {
       favorites: [],
       extraWatched: [],
-      removedTitles: ["chandramukhi"],
+      removedTitles: [],
+      removedQueueTitles: [],
       queue: DEFAULT_QUEUE,
       watchedFilter: "all",
       aiType: "Movie",
       aiLanguage: "all",
       aiPickId: "premalu",
-      message: "Queen of Tears is saved under Need to Watch ♥"
+      aiCurrent: null,
+      aiLoading: false,
+      message: "Your full movie and show diary is ready ♥"
     };
 
     try {
-      const saved = JSON.parse(safeStorage.getItem(STORAGE_KEY));
+      const currentRaw = safeStorage.getItem(STORAGE_KEY);
+      const legacyRaw = currentRaw ? null : safeStorage.getItem(LEGACY_STORAGE_KEY);
+      const saved = JSON.parse(currentRaw || legacyRaw);
       if (!saved || typeof saved !== "object") return fallback;
 
-      const isChandramukhi = (item) =>
-        String(item?.title || "").trim().toLowerCase() === "chandramukhi";
+      const migratingFromV7 = !currentRaw && Boolean(legacyRaw);
+      const removedTitles = (Array.isArray(saved.removedTitles) ? saved.removedTitles : [])
+        .map((title) => String(title || "").trim().toLowerCase())
+        .filter(Boolean)
+        .filter((title) => !(migratingFromV7 && title === "chandramukhi"));
+
+      const removedQueueTitles = new Set(
+        (Array.isArray(saved.removedQueueTitles) ? saved.removedQueueTitles : [])
+          .map((title) => String(title || "").trim().toLowerCase())
+          .filter(Boolean)
+      );
+
+      const requiredQueue = DEFAULT_QUEUE.filter(
+        (item) => !removedQueueTitles.has(String(item.title || "").trim().toLowerCase())
+      );
+      const savedQueue = Array.isArray(saved.queue) ? saved.queue : [];
 
       return {
         favorites: Array.isArray(saved.favorites) ? saved.favorites : [],
-        extraWatched: Array.isArray(saved.extraWatched)
-          ? saved.extraWatched.filter((item) => !isChandramukhi(item))
-          : [],
-        removedTitles: Array.from(new Set([
-          "chandramukhi",
-          ...(Array.isArray(saved.removedTitles) ? saved.removedTitles : [])
-        ].map((title) => String(title || "").trim().toLowerCase()).filter(Boolean))),
-        queue: Array.isArray(saved.queue)
-          ? saved.queue.filter((item) => !isChandramukhi(item))
-          : DEFAULT_QUEUE,
+        extraWatched: Array.isArray(saved.extraWatched) ? saved.extraWatched : [],
+        removedTitles: Array.from(new Set(removedTitles)),
+        removedQueueTitles: [...removedQueueTitles],
+        queue: uniqueByTitle([...requiredQueue, ...savedQueue]),
         watchedFilter: typeof saved.watchedFilter === "string" ? saved.watchedFilter : "all",
         aiType: saved.aiType === "Series" ? "Series" : "Movie",
         aiLanguage: typeof saved.aiLanguage === "string" ? saved.aiLanguage : "all",
         aiPickId: typeof saved.aiPickId === "string" ? saved.aiPickId : "premalu",
+        aiCurrent: saved.aiCurrent && typeof saved.aiCurrent === "object" ? saved.aiCurrent : null,
+        aiLoading: false,
         message: ""
       };
     } catch (_error) {
@@ -3660,6 +5241,8 @@ const screenDiary = (() => {
   return {
     _root: null,
     _state: null,
+    _hydratingLibrary: false,
+    _aiRequestId: 0,
 
     mount(root) {
       this._root = root;
@@ -3667,6 +5250,7 @@ const screenDiary = (() => {
       document.body.classList.add("screen-diary-open");
       this._save();
       this._render();
+      this._hydratePermanentLibrary();
     },
 
     unmount() {
@@ -3766,6 +5350,269 @@ const screenDiary = (() => {
           return typeMatches && searchText.includes(cleanQuery);
         })
         .slice(0, 8);
+    },
+
+    _normaliseMediaTitle(value) {
+      return String(value || "")
+        .toLowerCase()
+        .replace(/&/g, "and")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+    },
+
+    _bestOnlineMatch(seed, results) {
+      if (!Array.isArray(results) || !results.length) return null;
+      const wanted = this._normaliseMediaTitle(seed.title);
+      return results
+        .map((item) => {
+          const candidate = this._normaliseMediaTitle(item.title);
+          let score = 0;
+          if (candidate === wanted) score += 100;
+          if (candidate.includes(wanted) || wanted.includes(candidate)) score += 45;
+          if (item.type === seed.type) score += 20;
+          return { item, score };
+        })
+        .sort((a, b) => b.score - a.score)[0]?.item || results[0];
+    },
+
+    async _hydrateSeedItems(items) {
+      const seeds = uniqueByTitle(
+        (items || []).filter((item) => item && item.title && item.needsHydration)
+      );
+      const hydratedMap = new Map();
+      if (!seeds.length) return hydratedMap;
+
+      const readClaim = (entity, property) =>
+        entity?.claims?.[property]?.[0]?.mainsnak?.datavalue?.value;
+
+      const readDate = (entity) => {
+        const raw = readClaim(entity, "P577")?.time;
+        if (!raw) return "Not listed";
+        const match = raw.match(/[+-](\d{4})-(\d{2})-(\d{2})/);
+        if (!match) return "Not listed";
+        const [, year, month, day] = match;
+        const date = new Date(`${year}-${month}-${day}T00:00:00Z`);
+        if (Number.isNaN(date.getTime())) return year;
+        return new Intl.DateTimeFormat("en-US", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+          timeZone: "UTC"
+        }).format(date);
+      };
+
+      const readDuration = (entity, type) => {
+        const value = readClaim(entity, "P2047");
+        const amount = Number(value?.amount);
+        if (!Number.isFinite(amount) || amount <= 0) {
+          return type === "Series" ? "Episode duration not listed" : "Not listed";
+        }
+        const minutes = Math.round(amount);
+        if (minutes < 60) return `${minutes}m`;
+        return `${Math.floor(minutes / 60)}h ${String(minutes % 60).padStart(2, "0")}m`;
+      };
+
+      for (let start = 0; start < seeds.length; start += 40) {
+        const batch = seeds.slice(start, start + 40);
+        const exactSeeds = batch.filter((item) => item.wikiTitle);
+        if (!exactSeeds.length) continue;
+
+        try {
+          const pageParams = new URLSearchParams({
+            action: "query",
+            titles: exactSeeds.map((item) => item.wikiTitle).join("|"),
+            prop: "pageimages|extracts|pageprops",
+            piprop: "thumbnail|original",
+            pithumbsize: "700",
+            exintro: "1",
+            explaintext: "1",
+            exsentences: "4",
+            redirects: "1",
+            format: "json",
+            origin: "*"
+          });
+
+          const pageResponse = await fetch(
+            `https://en.wikipedia.org/w/api.php?${pageParams.toString()}`
+          );
+          if (!pageResponse.ok) continue;
+
+          const pagePayload = await pageResponse.json();
+          const pages = Object.values(pagePayload?.query?.pages || {});
+          const aliases = new Map();
+          [...(pagePayload?.query?.normalized || []), ...(pagePayload?.query?.redirects || [])]
+            .forEach((entry) => {
+              aliases.set(
+                String(entry.from || "").trim().toLowerCase(),
+                String(entry.to || "").trim().toLowerCase()
+              );
+            });
+
+          const resolveTitle = (value) => {
+            let key = String(value || "").trim().toLowerCase();
+            const visited = new Set();
+            while (aliases.has(key) && !visited.has(key)) {
+              visited.add(key);
+              key = aliases.get(key);
+            }
+            return key;
+          };
+
+          const pageMap = new Map(
+            pages
+              .filter((page) => !page.missing)
+              .map((page) => [String(page.title || "").trim().toLowerCase(), page])
+          );
+
+          const qids = pages.map((page) => page?.pageprops?.wikibase_item).filter(Boolean);
+          let entityMap = {};
+          if (qids.length) {
+            const entityParams = new URLSearchParams({
+              action: "wbgetentities",
+              ids: qids.join("|"),
+              props: "claims|labels",
+              languages: "en",
+              format: "json",
+              origin: "*"
+            });
+            const entityResponse = await fetch(
+              `https://www.wikidata.org/w/api.php?${entityParams.toString()}`
+            );
+            if (entityResponse.ok) {
+              entityMap = (await entityResponse.json()).entities || {};
+            }
+          }
+
+          const actorIds = new Set();
+          Object.values(entityMap).forEach((entity) => {
+            (entity?.claims?.P161 || []).slice(0, 6).forEach((claim) => {
+              const actorId = claim?.mainsnak?.datavalue?.value?.id;
+              if (actorId) actorIds.add(actorId);
+            });
+          });
+
+          let actorLabels = {};
+          if (actorIds.size) {
+            const actorParams = new URLSearchParams({
+              action: "wbgetentities",
+              ids: [...actorIds].join("|"),
+              props: "labels",
+              languages: "en",
+              format: "json",
+              origin: "*"
+            });
+            const actorResponse = await fetch(
+              `https://www.wikidata.org/w/api.php?${actorParams.toString()}`
+            );
+            if (actorResponse.ok) {
+              const actorPayload = await actorResponse.json();
+              Object.entries(actorPayload.entities || {}).forEach(([id, entity]) => {
+                actorLabels[id] = entity?.labels?.en?.value || "";
+              });
+            }
+          }
+
+          exactSeeds.forEach((seed) => {
+            const page = pageMap.get(resolveTitle(seed.wikiTitle));
+            if (!page) return;
+            const qid = page?.pageprops?.wikibase_item || "";
+            const entity = entityMap[qid];
+            const cast = (entity?.claims?.P161 || [])
+              .slice(0, 6)
+              .map((claim) => claim?.mainsnak?.datavalue?.value?.id)
+              .map((id) => actorLabels[id])
+              .filter(Boolean);
+
+            const commonsFilename = readClaim(entity, "P18");
+            const poster = commonsFilename
+              ? `https://commons.wikimedia.org/wiki/Special:Redirect/file/${encodeURIComponent(commonsFilename)}?width=700`
+              : (
+                page?.thumbnail?.source ||
+                page?.original?.source ||
+                seed.poster ||
+                makeCustomPoster(seed.title, seed.type)
+              );
+
+            hydratedMap.set(seed.id, {
+              ...seed,
+              poster,
+              releaseDate: readDate(entity),
+              duration: readDuration(entity, seed.type),
+              actors: cast,
+              synopsis: page.extract || seed.synopsis || "No synopsis was returned.",
+              hydrated: true,
+              needsHydration: false,
+              sourceUrl: `https://en.wikipedia.org/?curid=${page.pageid}`
+            });
+          });
+        } catch (error) {
+          console.warn("Batch movie hydration failed:", error);
+        }
+      }
+
+      const missing = seeds.filter((seed) => !hydratedMap.has(seed.id));
+      const workerCount = Math.min(4, missing.length);
+      await Promise.all(
+        Array.from({ length: workerCount }, async (_, workerIndex) => {
+          for (let index = workerIndex; index < missing.length; index += workerCount) {
+            const seed = missing[index];
+            try {
+              const results = await this._searchOnline(
+                seed.searchTitle || seed.wikiTitle || seed.title,
+                seed.type
+              );
+              const match = this._bestOnlineMatch(seed, results);
+              if (!match) continue;
+              hydratedMap.set(seed.id, {
+                ...seed,
+                ...match,
+                id: seed.id,
+                title: seed.title,
+                type: seed.type,
+                language: seed.language,
+                hydrated: true,
+                needsHydration: false
+              });
+            } catch (error) {
+              console.warn(`Could not hydrate ${seed.title}:`, error);
+            }
+          }
+        })
+      );
+
+      return hydratedMap;
+    },
+
+    async _hydratePermanentLibrary() {
+      if (this._hydratingLibrary || !this._state) return;
+
+      const watchedSeeds = WATCHED_STARTER.filter(
+        (item) => item.needsHydration && !item.hydrated
+      );
+      const queueSeeds = (this._state.queue || []).filter(
+        (item) => item.needsHydration && !item.hydrated
+      );
+      if (!watchedSeeds.length && !queueSeeds.length) return;
+
+      this._hydratingLibrary = true;
+      try {
+        const hydrated = await this._hydrateSeedItems([...watchedSeeds, ...queueSeeds]);
+
+        watchedSeeds.forEach((seed) => {
+          const item = hydrated.get(seed.id);
+          if (item) Object.assign(seed, item);
+        });
+
+        this._state.queue = (this._state.queue || []).map((seed) => {
+          const item = hydrated.get(seed.id);
+          return item ? { ...seed, ...item, queueId: seed.queueId } : seed;
+        });
+
+        this._save();
+        this._render();
+      } finally {
+        this._hydratingLibrary = false;
+      }
     },
 
     _posterFromFile(file) {
@@ -4075,6 +5922,10 @@ const screenDiary = (() => {
         this._state.watchedFilter = "all";
         this._state.message = `${item.title} was added to Watched With You ♥`;
       } else {
+        this._state.removedQueueTitles = (this._state.removedQueueTitles || []).filter(
+          (title) => String(title || "").trim().toLowerCase() !== key
+        );
+
         if (queueTitles.has(key)) {
           this._state.message = `${item.title} is already under Need to Watch.`;
           this._render();
@@ -4134,19 +5985,27 @@ const screenDiary = (() => {
     },
 
     _aiCandidates() {
-      return AI_CATALOG.filter((item) => {
+      const existingTitles = new Set([
+        ...this._watched().map((item) => String(item.title || "").trim().toLowerCase()),
+        ...(this._state.queue || []).map((item) => String(item.title || "").trim().toLowerCase())
+      ]);
+
+      return AI_LIBRARY.filter((item) => {
         const typeMatches = item.type === this._state.aiType;
         const languageMatches =
           this._state.aiLanguage === "all" ||
           item.language === this._state.aiLanguage;
-        return typeMatches && languageMatches;
+        const isNew = !existingTitles.has(String(item.title || "").trim().toLowerCase());
+        return typeMatches && languageMatches && isNew;
       });
     },
 
-    _pickSuggestion(id = "") {
+    async _pickSuggestion(id = "") {
       const candidates = this._aiCandidates();
       if (!candidates.length) {
-        this._state.message = "No match in that exact category yet—try another language.";
+        this._state.message = "No unused match in that exact category yet—try another language.";
+        this._state.aiCurrent = null;
+        this._state.aiLoading = false;
         this._render();
         return;
       }
@@ -4158,10 +6017,53 @@ const screenDiary = (() => {
         choice = pool[Math.floor(Math.random() * pool.length)];
       }
 
+      const requestId = ++this._aiRequestId;
       this._state.aiPickId = choice.id;
-      this._state.message = `${choice.title} is the ${choice.type.toLowerCase()} pick for tonight ✨`;
-      this._save();
+
+      if (!choice.needsHydration && choice.poster && choice.synopsis) {
+        this._state.aiCurrent = choice;
+        this._state.aiLoading = false;
+        this._state.message = `${choice.title} is the ${choice.type.toLowerCase()} pick for tonight ✨`;
+        this._save();
+        this._render();
+        return;
+      }
+
+      this._state.aiLoading = true;
+      this._state.aiCurrent = {
+        ...choice,
+        poster: makeCustomPoster(choice.title, choice.type),
+        releaseDate: "Loading…",
+        duration: "Loading…",
+        actors: [],
+        synopsis: "Finding the poster and full details…"
+      };
+      this._state.message = `Finding ${choice.title} and its poster…`;
       this._render();
+
+      try {
+        const hydrated = await this._hydrateSeedItems([choice]);
+        if (requestId !== this._aiRequestId) return;
+        const result = hydrated.get(choice.id);
+        this._state.aiCurrent = result || {
+          ...choice,
+          poster: makeCustomPoster(choice.title, choice.type),
+          releaseDate: "Not listed",
+          duration: "Not listed",
+          actors: [],
+          synopsis: "The online details could not be loaded right now."
+        };
+        this._state.aiLoading = false;
+        this._state.message = `${choice.title} is the ${choice.type.toLowerCase()} pick for tonight ✨`;
+        this._save();
+        this._render();
+      } catch (error) {
+        if (requestId !== this._aiRequestId) return;
+        console.error("AI recommendation hydration failed:", error);
+        this._state.aiLoading = false;
+        this._state.message = "The suggestion loaded, but its online poster/details could not be reached.";
+        this._render();
+      }
     },
 
     _saveSuggestion(item) {
@@ -4177,6 +6079,11 @@ const screenDiary = (() => {
         this._render();
         return;
       }
+
+      const titleKey = String(item.title || "").trim().toLowerCase();
+      this._state.removedQueueTitles = (this._state.removedQueueTitles || []).filter(
+        (title) => String(title || "").trim().toLowerCase() !== titleKey
+      );
 
       this._state.queue.unshift({
         ...item,
@@ -4213,8 +6120,19 @@ const screenDiary = (() => {
     },
 
     _removeQueue(queueId) {
-      this._state.queue = this._state.queue.filter((item) => item.queueId !== queueId);
-      this._state.message = "Removed from Need to Watch.";
+      const item = this._state.queue.find((entry) => entry.queueId === queueId);
+      if (!item) return;
+
+      const confirmed = window.confirm(`Remove "${item.title}" from Need to Watch?`);
+      if (!confirmed) return;
+
+      const titleKey = String(item.title || "").trim().toLowerCase();
+      this._state.queue = this._state.queue.filter((entry) => entry.queueId !== queueId);
+      this._state.removedQueueTitles = Array.from(new Set([
+        ...(this._state.removedQueueTitles || []),
+        titleKey
+      ]));
+      this._state.message = `${item.title} was removed from Need to Watch.`;
       this._save();
       this._render();
     },
@@ -4241,10 +6159,15 @@ const screenDiary = (() => {
 
     _renderWatchedCard(item, index) {
       const card = document.createElement("article");
-      card.className = "clean-watched-card";
+      card.className = "clean-watched-card clean-watched-detail-card";
 
-      const poster = document.createElement("div");
-      poster.className = "clean-watched-poster";
+      const detailsId = `watched-details-${String(item.id || index).replace(/[^a-z0-9_-]/gi, "-")}`;
+      const poster = document.createElement("button");
+      poster.type = "button";
+      poster.className = "clean-watched-poster clean-watched-poster-button";
+      poster.setAttribute("aria-expanded", "false");
+      poster.setAttribute("aria-controls", detailsId);
+      poster.setAttribute("aria-label", `View details for ${item.title}`);
       poster.innerHTML = `
         <div class="clean-poster-fallback">
           <span>Poster unavailable</span>
@@ -4255,22 +6178,37 @@ const screenDiary = (() => {
         <span class="clean-status ${item.status === "halfway" ? "halfway" : "watched"}">
           ${item.status === "halfway" ? "Still watching" : "Watched"}
         </span>
+        <span class="clean-poster-details-hint">Tap for details</span>
       `;
 
-      const image = poster.querySelector("img");
-      attachPosterFallback(image, item, poster.querySelector(".clean-poster-fallback"));
+      attachPosterFallback(
+        poster.querySelector("img"),
+        item,
+        poster.querySelector(".clean-poster-fallback")
+      );
 
       const copy = document.createElement("div");
-      copy.className = "clean-watched-copy";
+      copy.className = "clean-watched-copy clean-watched-detail-copy";
       copy.innerHTML = `
         <div>
           <h5>${escapeHtml(item.title)}</h5>
-          <p>${escapeHtml(item.note)}</p>
+          <p>${escapeHtml(item.note || "Watched together")}</p>
         </div>
         <div class="clean-meta">
           <span>${escapeHtml(item.type === "Series" ? "Show" : "Movie")}</span>
-          <span>${escapeHtml(item.language)}</span>
+          <span>${escapeHtml(item.language || "Not listed")}</span>
         </div>
+      `;
+
+      const details = document.createElement("div");
+      details.className = "clean-need-details";
+      details.id = detailsId;
+      details.hidden = true;
+      details.innerHTML = `
+        <div><strong>Release date</strong><span>${escapeHtml(item.releaseDate || "Loading…")}</span></div>
+        <div><strong>Duration</strong><span>${escapeHtml(item.duration || "Loading…")}</span></div>
+        <div class="wide"><strong>Actors</strong><span>${escapeHtml(Array.isArray(item.actors) && item.actors.length ? item.actors.join(", ") : "Loading…")}</span></div>
+        <div class="wide"><strong>Synopsis</strong><span>${escapeHtml(item.synopsis || "Loading details…")}</span></div>
       `;
 
       const favorite = document.createElement("button");
@@ -4278,21 +6216,35 @@ const screenDiary = (() => {
       favorite.type = "button";
       favorite.className = `clean-heart ${active ? "active" : ""}`;
       favorite.textContent = active ? "♥" : "♡";
-      favorite.setAttribute("aria-label", `${active ? "Remove" : "Add"} ${item.title} ${active ? "from" : "to"} favorites`);
       favorite.addEventListener("click", () => this._toggleFavorite(item.id));
+
+      const detailsButton = document.createElement("button");
+      detailsButton.type = "button";
+      detailsButton.className = "clean-details-action";
+      detailsButton.textContent = "View details";
+
+      const toggleDetails = () => {
+        const opening = details.hidden;
+        details.hidden = !opening;
+        detailsButton.textContent = opening ? "Hide details" : "View details";
+        detailsButton.setAttribute("aria-expanded", String(opening));
+        poster.setAttribute("aria-expanded", String(opening));
+        card.classList.toggle("details-open", opening);
+      };
+      detailsButton.addEventListener("click", toggleDetails);
+      poster.addEventListener("click", toggleDetails);
 
       const removeButton = document.createElement("button");
       removeButton.type = "button";
       removeButton.className = "clean-watched-remove";
       removeButton.textContent = "Remove";
-      removeButton.setAttribute("aria-label", `Remove ${item.title} from Watched With You`);
       removeButton.addEventListener("click", () => this._removeWatched(item));
 
       const cardActions = document.createElement("div");
       cardActions.className = "clean-watched-card-actions";
-      cardActions.append(removeButton);
+      cardActions.append(detailsButton, removeButton);
 
-      copy.append(favorite, cardActions);
+      copy.append(favorite, details, cardActions);
       card.append(poster, copy);
       return card;
     },
@@ -4423,25 +6375,28 @@ const screenDiary = (() => {
         </header>
 
         <div class="clean-ai-facts">
-          <span><b>Release date</b>${escapeHtml(item.releaseDate)}</span>
-          <span><b>Duration</b>${escapeHtml(item.duration)}</span>
+          <span><b>Release date</b>${escapeHtml(item.releaseDate || "Loading…")}</span>
+          <span><b>Duration</b>${escapeHtml(item.duration || "Loading…")}</span>
         </div>
 
         <section>
           <strong>Actors</strong>
-          <p>${escapeHtml(item.actors.join(", "))}</p>
+          <p>${escapeHtml(Array.isArray(item.actors) && item.actors.length ? item.actors.join(", ") : "Loading…")}</p>
         </section>
 
         <section>
           <strong>Synopsis</strong>
-          <p>${escapeHtml(item.synopsis)}</p>
+          <p>${escapeHtml(item.synopsis || "Loading details…")}</p>
         </section>
       `;
 
       const saveButton = document.createElement("button");
       saveButton.type = "button";
       saveButton.className = `btn clean-save-pick ${item.type === "Series" ? "show" : "movie"}`;
-      saveButton.textContent = `Save ${item.type === "Series" ? "show" : "movie"} to Need to Watch`;
+      saveButton.textContent = this._state.aiLoading
+        ? "Loading full details…"
+        : `Save ${item.type === "Series" ? "show" : "movie"} to Need to Watch`;
+      saveButton.disabled = Boolean(this._state.aiLoading);
       saveButton.addEventListener("click", () => this._saveSuggestion(item));
       copy.appendChild(saveButton);
 
@@ -4504,8 +6459,9 @@ const screenDiary = (() => {
       const watched = this._watched();
       const filteredWatched = this._filteredWatched();
       const candidates = this._aiCandidates();
-      let aiPick = candidates.find((item) => item.id === this._state.aiPickId);
-      if (!aiPick) aiPick = candidates[0] || AI_CATALOG.find((item) => item.type === this._state.aiType);
+      let aiPick = this._state.aiCurrent;
+      if (!aiPick) aiPick = AI_CATALOG.find((item) => item.id === this._state.aiPickId);
+      if (!aiPick) aiPick = candidates.find((item) => !item.needsHydration) || AI_CATALOG.find((item) => item.type === this._state.aiType);
 
       const panel = document.createElement("section");
       panel.className = "game-panel wide clean-screen-diary";
@@ -5075,8 +7031,9 @@ const screenDiary = (() => {
           this._state.aiType = value;
           this._state.aiLanguage = "all";
           this._state.aiPickId = "";
+          this._state.aiCurrent = null;
           this._save();
-          this._render();
+          this._pickSuggestion();
         });
         typeTabs.appendChild(button);
       });
@@ -5092,8 +7049,12 @@ const screenDiary = (() => {
           <option value="Telugu">Telugu</option>
           <option value="Tamil">Tamil</option>
           <option value="Malayalam">Malayalam</option>
+          <option value="Hindi">Hindi</option>
           <option value="English">English</option>
           <option value="Korean">Korean</option>
+          <option value="Chinese">Chinese</option>
+          <option value="Japanese">Japanese</option>
+          <option value="Spanish">Spanish</option>
         </select>
       `;
       const languageSelect = languageLabel.querySelector("select");
@@ -5101,14 +7062,18 @@ const screenDiary = (() => {
       languageSelect.addEventListener("change", () => {
         this._state.aiLanguage = languageSelect.value;
         this._state.aiPickId = "";
+        this._state.aiCurrent = null;
         this._save();
-        this._render();
+        this._pickSuggestion();
       });
 
       const pickButton = document.createElement("button");
       pickButton.type = "button";
       pickButton.className = "btn clean-pick-button";
-      pickButton.textContent = `Suggest another ${this._state.aiType === "Series" ? "show" : "movie"}`;
+      pickButton.textContent = this._state.aiLoading
+        ? "Finding poster & details…"
+        : `Suggest another ${this._state.aiType === "Series" ? "show" : "movie"}`;
+      pickButton.disabled = Boolean(this._state.aiLoading);
       pickButton.addEventListener("click", () => this._pickSuggestion());
 
       controls.append(languageLabel, pickButton);
