@@ -3605,6 +3605,7 @@ const screenDiary = (() => {
     const fallback = {
       favorites: [],
       extraWatched: [],
+      removedTitles: ["chandramukhi"],
       queue: DEFAULT_QUEUE,
       watchedFilter: "all",
       aiType: "Movie",
@@ -3617,10 +3618,21 @@ const screenDiary = (() => {
       const saved = JSON.parse(safeStorage.getItem(STORAGE_KEY));
       if (!saved || typeof saved !== "object") return fallback;
 
+      const isChandramukhi = (item) =>
+        String(item?.title || "").trim().toLowerCase() === "chandramukhi";
+
       return {
         favorites: Array.isArray(saved.favorites) ? saved.favorites : [],
-        extraWatched: Array.isArray(saved.extraWatched) ? saved.extraWatched : [],
-        queue: Array.isArray(saved.queue) && saved.queue.length ? saved.queue : DEFAULT_QUEUE,
+        extraWatched: Array.isArray(saved.extraWatched)
+          ? saved.extraWatched.filter((item) => !isChandramukhi(item))
+          : [],
+        removedTitles: Array.from(new Set([
+          "chandramukhi",
+          ...(Array.isArray(saved.removedTitles) ? saved.removedTitles : [])
+        ].map((title) => String(title || "").trim().toLowerCase()).filter(Boolean))),
+        queue: Array.isArray(saved.queue)
+          ? saved.queue.filter((item) => !isChandramukhi(item))
+          : DEFAULT_QUEUE,
         watchedFilter: typeof saved.watchedFilter === "string" ? saved.watchedFilter : "all",
         aiType: saved.aiType === "Series" ? "Series" : "Movie",
         aiLanguage: typeof saved.aiLanguage === "string" ? saved.aiLanguage : "all",
@@ -3706,10 +3718,16 @@ const screenDiary = (() => {
     },
 
     _watched() {
+      const removedTitles = new Set(
+        (this._state.removedTitles || [])
+          .map((title) => String(title || "").trim().toLowerCase())
+          .filter(Boolean)
+      );
+
       return uniqueByTitle([
         ...WATCHED_STARTER,
         ...(this._state.extraWatched || [])
-      ]);
+      ]).filter((item) => !removedTitles.has(String(item.title || "").trim().toLowerCase()));
     },
 
     _filteredWatched() {
@@ -4037,6 +4055,10 @@ const screenDiary = (() => {
       const key = item.title.toLowerCase();
 
       if (destination === "watched") {
+        this._state.removedTitles = (this._state.removedTitles || []).filter(
+          (title) => String(title || "").trim().toLowerCase() !== key
+        );
+
         if (watchedTitles.has(key)) {
           this._state.message = `${item.title} is already in Watched With You ♥`;
           this._render();
@@ -4165,6 +4187,31 @@ const screenDiary = (() => {
       this._render();
     },
 
+    _removeWatched(item) {
+      if (!item) return;
+
+      const confirmed = window.confirm(`Remove "${item.title}" from Watched With You?`);
+      if (!confirmed) return;
+
+      const titleKey = String(item.title || "").trim().toLowerCase();
+
+      this._state.extraWatched = (this._state.extraWatched || []).filter((entry) => {
+        const sameId = item.id && entry.id === item.id;
+        const sameTitle = String(entry.title || "").trim().toLowerCase() === titleKey;
+        return !sameId && !sameTitle;
+      });
+
+      this._state.removedTitles = Array.from(new Set([
+        ...(this._state.removedTitles || []),
+        titleKey
+      ]));
+
+      this._state.favorites = (this._state.favorites || []).filter((id) => id !== item.id);
+      this._state.message = `${item.title} was removed from Watched With You.`;
+      this._save();
+      this._render();
+    },
+
     _removeQueue(queueId) {
       this._state.queue = this._state.queue.filter((item) => item.queueId !== queueId);
       this._state.message = "Removed from Need to Watch.";
@@ -4177,6 +4224,10 @@ const screenDiary = (() => {
       if (!item) return;
 
       this._state.queue = this._state.queue.filter((entry) => entry.queueId !== queueId);
+      const titleKey = String(item.title || "").trim().toLowerCase();
+      this._state.removedTitles = (this._state.removedTitles || []).filter(
+        (title) => String(title || "").trim().toLowerCase() !== titleKey
+      );
       this._state.extraWatched.push({
         ...item,
         id: `watched-${item.id}-${Date.now().toString(36)}`,
@@ -4230,7 +4281,18 @@ const screenDiary = (() => {
       favorite.setAttribute("aria-label", `${active ? "Remove" : "Add"} ${item.title} ${active ? "from" : "to"} favorites`);
       favorite.addEventListener("click", () => this._toggleFavorite(item.id));
 
-      copy.appendChild(favorite);
+      const removeButton = document.createElement("button");
+      removeButton.type = "button";
+      removeButton.className = "clean-watched-remove";
+      removeButton.textContent = "Remove";
+      removeButton.setAttribute("aria-label", `Remove ${item.title} from Watched With You`);
+      removeButton.addEventListener("click", () => this._removeWatched(item));
+
+      const cardActions = document.createElement("div");
+      cardActions.className = "clean-watched-card-actions";
+      cardActions.append(removeButton);
+
+      copy.append(favorite, cardActions);
       card.append(poster, copy);
       return card;
     },

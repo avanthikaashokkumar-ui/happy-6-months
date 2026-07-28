@@ -4486,3 +4486,28 @@ body.screen-diary-open .soundtrack-panel {
     transform: translateY(-4px);
   }
 }
+
+
+/* Remove movies and shows from Watched With You */
+.clean-watched-card-actions {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+.clean-watched-remove {
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 9px;
+  color: var(--wine-700);
+  background: #f7e5e9;
+  cursor: pointer;
+  font-size: .57rem;
+  font-weight: 900;
+}
+.clean-watched-remove:hover {
+  background: #efd4dc;
+}
+.clean-watched-remove:focus-visible {
+  outline: 3px solid rgba(174,50,80,.25);
+  outline-offset: 2px;
+}
