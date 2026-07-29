@@ -3324,8 +3324,8 @@ return {
 })();
 
 const screenDiary = (() => {
-  const STORAGE_KEY = "happy6:cozy-screen-diary:v9";
-  const LEGACY_STORAGE_KEY = "happy6:cozy-screen-diary:v8";
+  const STORAGE_KEY = "happy6:cozy-screen-diary:v11";
+  const LEGACY_STORAGE_KEY = "happy6:cozy-screen-diary:v10";
 
   const WATCHED_STARTER = [
     {
@@ -4750,9 +4750,22 @@ const screenDiary = (() => {
     {
       id: "ai-the-makanai-cooking-for-the-maiko-house",
       title: "The Makanai: Cooking for the Maiko House",
+      wikiTitle: "The Makanai: Cooking for the Maiko House",
       searchTitle: "The Makanai Cooking for the Maiko House television series",
       type: "Series",
       language: "Japanese",
+      releaseDate: "12 January 2023",
+      duration: "9 episodes",
+      actors: [
+        "Nana Mori",
+        "Natsuki Deguchi",
+        "Aju Makita",
+        "Ai Hashimoto",
+        "Mayu Matsuoka",
+        "Takako Tokiwa"
+      ],
+      synopsis: "Kiyo and Sumire leave Aomori for Kyoto hoping to become maiko. When Kiyo discovers that her real talent is cooking, she becomes the makanai who prepares comforting meals for the women of their maiko house.",
+      poster: makeCustomPoster("The Makanai: Cooking for the Maiko House", "Series"),
       needsHydration: true
     },
     {
@@ -5348,6 +5361,8 @@ const screenDiary = (() => {
     _normaliseMediaTitle(value) {
       return String(value || "")
         .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
         .replace(/&/g, "and")
         .replace(/[^a-z0-9]+/g, " ")
         .trim();
@@ -5361,122 +5376,299 @@ const screenDiary = (() => {
         .trim();
     },
 
-    async _fetchJsonWithTimeout(url, timeoutMs = 9000) {
-      const controller = new AbortController();
-      const timer = window.setTimeout(() => controller.abort(), timeoutMs);
-
-      try {
-        const response = await fetch(url, {
-          signal: controller.signal,
-          headers: { Accept: "application/json" }
-        });
-
-        if (!response.ok) {
-          throw new Error(`Request failed with ${response.status}`);
-        }
-
-        return await response.json();
-      } finally {
-        window.clearTimeout(timer);
-      }
-    },
-
     _bestOnlineMatch(seed, results) {
       if (!Array.isArray(results) || !results.length) return null;
       const wanted = this._normaliseMediaTitle(seed.title);
 
       return results
         .map((item) => {
-          const candidate = this._normaliseMediaTitle(item.title || item.name);
+          const candidate = this._normaliseMediaTitle(
+            item.title || item.name || item.matched_title || item.l
+          );
           let score = 0;
-          if (candidate === wanted) score += 100;
-          if (candidate.includes(wanted) || wanted.includes(candidate)) score += 45;
-          if (item.type === seed.type) score += 20;
+
+          if (candidate === wanted) score += 140;
+          if (candidate.includes(wanted) || wanted.includes(candidate)) score += 55;
+
+          const typeText = String(
+            item.q || item.qid || item.type || item.titleType || ""
+          ).toLowerCase();
+
+          if (
+            seed.type === "Series" &&
+            (
+              typeText.includes("series") ||
+              typeText.includes("tv") ||
+              typeText.includes("mini")
+            )
+          ) {
+            score += 28;
+          }
+
+          if (
+            seed.type === "Movie" &&
+            (
+              typeText.includes("movie") ||
+              typeText.includes("feature") ||
+              typeText.includes("film")
+            )
+          ) {
+            score += 28;
+          }
+
+          const requestedYear = String(seed.searchTitle || "").match(/\b(19|20)\d{2}\b/)?.[0];
+          if (requestedYear && String(item.y || item.year || "") === requestedYear) {
+            score += 30;
+          }
+
           return { item, score };
         })
         .sort((a, b) => b.score - a.score)[0]?.item || results[0];
     },
 
-    async _hydrateSeriesSeed(seed) {
-      const query = encodeURIComponent(seed.searchTitle || seed.title);
-      const results = await this._fetchJsonWithTimeout(
-        `https://api.tvmaze.com/search/shows?q=${query}`,
-        9000
-      );
+    _imdbSlug(seed) {
+      const year = String(seed.searchTitle || "").match(/\b(19|20)\d{2}\b/)?.[0] || "";
+      const base = `${seed.title}${year ? ` ${year}` : ""}`
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/&/g, "and")
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "");
 
-      const shows = (Array.isArray(results) ? results : [])
-        .map((entry) => entry?.show)
-        .filter(Boolean);
-
-      const show = this._bestOnlineMatch(seed, shows);
-      if (!show) throw new Error("No matching show was found.");
-
-      let actors = Array.isArray(seed.actors) ? seed.actors : [];
-      try {
-        const cast = await this._fetchJsonWithTimeout(
-          `https://api.tvmaze.com/shows/${show.id}/cast`,
-          7000
-        );
-        const names = (Array.isArray(cast) ? cast : [])
-          .map((entry) => entry?.person?.name)
-          .filter(Boolean)
-          .slice(0, 6);
-        if (names.length) actors = names;
-      } catch (_error) {
-        // The card already contains baked-in cast information.
-      }
-
-      const runtime = Number(show.averageRuntime || show.runtime);
-      return {
-        ...seed,
-        poster: show.image?.original || show.image?.medium || seed.poster,
-        releaseDate: show.premiered || seed.releaseDate || "Not listed",
-        duration: Number.isFinite(runtime) && runtime > 0
-          ? `About ${Math.round(runtime)}m per episode`
-          : seed.duration || "Episode duration not listed",
-        actors,
-        synopsis: this._stripRemoteHtml(show.summary) || seed.synopsis,
-        sourceUrl: show.officialSite || show.url || "",
-        hydrated: true,
-        needsHydration: false,
-        posterStatus: show.image ? "remote" : "fallback"
-      };
+      return (base || "movie").slice(0, 20).replace(/_+$/g, "");
     },
 
-    async _hydrateMovieSeed(seed) {
-      const query = encodeURIComponent(seed.searchTitle || seed.wikiTitle || seed.title);
-      const payload = await this._fetchJsonWithTimeout(
-        `https://en.wikipedia.org/w/rest.php/v1/search/page?q=${query}&limit=5`,
-        9000
+    _imdbJsonp(seed, timeoutMs = 12000) {
+      return new Promise((resolve, reject) => {
+        const slug = this._imdbSlug(seed);
+        const firstLetter = slug.charAt(0) || "x";
+        const callbackName = `imdb$${slug}`;
+        const sources = [
+          `https://sg.media-imdb.com/suggests/${firstLetter}/${encodeURIComponent(slug)}.json`,
+          `https://v2.sg.media-imdb.com/suggests/${firstLetter}/${encodeURIComponent(slug)}.json`
+        ];
+
+        let sourceIndex = 0;
+        let scriptNode = null;
+        let timer = null;
+        let finished = false;
+
+        const cleanScript = () => {
+          if (scriptNode) {
+            scriptNode.remove();
+            scriptNode = null;
+          }
+        };
+
+        const cleanAll = () => {
+          cleanScript();
+          if (timer) window.clearTimeout(timer);
+
+          try {
+            delete window[callbackName];
+          } catch (_error) {
+            window[callbackName] = undefined;
+          }
+        };
+
+        const failOrRetry = () => {
+          cleanScript();
+
+          if (sourceIndex < sources.length) {
+            loadNext();
+            return;
+          }
+
+          if (finished) return;
+          finished = true;
+          cleanAll();
+          reject(new Error("IMDb poster lookup could not load."));
+        };
+
+        const loadNext = () => {
+          const source = sources[sourceIndex++];
+          scriptNode = document.createElement("script");
+          scriptNode.src = source;
+          scriptNode.async = true;
+          scriptNode.onerror = failOrRetry;
+          document.head.appendChild(scriptNode);
+        };
+
+        window[callbackName] = (payload) => {
+          if (finished) return;
+          finished = true;
+          cleanAll();
+          resolve(payload);
+        };
+
+        timer = window.setTimeout(() => {
+          if (finished) return;
+          finished = true;
+          cleanAll();
+          reject(new Error("IMDb poster lookup timed out."));
+        }, timeoutMs);
+
+        loadNext();
+      });
+    },
+
+    async _imdbTitle(seed) {
+      const payload = await this._imdbJsonp(seed);
+      const results = Array.isArray(payload?.d) ? payload.d : [];
+      return this._bestOnlineMatch(seed, results);
+    },
+
+    _imdbPoster(result) {
+      if (!result) return "";
+
+      if (Array.isArray(result.i)) {
+        return result.i[0] || "";
+      }
+
+      if (result.i && typeof result.i === "object") {
+        return result.i.imageUrl || result.i.url || "";
+      }
+
+      return "";
+    },
+
+    _mediaWikiJsonp(params, timeoutMs = 10000) {
+      return new Promise((resolve, reject) => {
+        const callbackName = `__cozyWiki_${Date.now().toString(36)}_${Math.random()
+          .toString(36)
+          .slice(2)}`;
+        const scriptNode = document.createElement("script");
+        let completed = false;
+        let timer = null;
+
+        const cleanUp = () => {
+          if (completed) return;
+          completed = true;
+          if (timer) window.clearTimeout(timer);
+          scriptNode.remove();
+
+          try {
+            delete window[callbackName];
+          } catch (_error) {
+            window[callbackName] = undefined;
+          }
+        };
+
+        window[callbackName] = (payload) => {
+          cleanUp();
+          resolve(payload);
+        };
+
+        scriptNode.onerror = () => {
+          cleanUp();
+          reject(new Error("Wikipedia information request could not load."));
+        };
+
+        timer = window.setTimeout(() => {
+          cleanUp();
+          reject(new Error("Wikipedia information request timed out."));
+        }, timeoutMs);
+
+        const query = new URLSearchParams({
+          ...params,
+          action: "query",
+          format: "json",
+          callback: callbackName
+        });
+
+        scriptNode.src = `https://en.wikipedia.org/w/api.php?${query.toString()}`;
+        scriptNode.async = true;
+        document.head.appendChild(scriptNode);
+      });
+    },
+
+    async _wikiInformation(seed) {
+      const searchText =
+        seed.wikiTitle ||
+        seed.searchTitle ||
+        `${seed.title} ${seed.type === "Series" ? "television series" : "film"}`;
+
+      const payload = await this._mediaWikiJsonp({
+        generator: "search",
+        gsrsearch: searchText,
+        gsrnamespace: "0",
+        gsrlimit: "6",
+        prop: "extracts",
+        exintro: "1",
+        explaintext: "1",
+        exsentences: "4"
+      });
+
+      const rawPages = payload?.query?.pages || {};
+      const pages = Array.isArray(rawPages)
+        ? rawPages
+        : Object.values(rawPages);
+
+      return this._bestOnlineMatch(
+        seed,
+        pages.filter((page) => page && !page.missing)
       );
+    },
 
-      const pages = Array.isArray(payload?.pages) ? payload.pages : [];
-      const candidates = pages.map((page) => ({
-        ...page,
-        title: page.title || page.matched_title || ""
-      }));
-      const page = this._bestOnlineMatch(seed, candidates);
-      if (!page) throw new Error("No matching movie page was found.");
+    async _hydrateSingleSeed(seed) {
+      let imdbResult = null;
+      let wikiResult = null;
 
-      let poster = page.thumbnail?.url || "";
-      if (poster.startsWith("//")) poster = `https:${poster}`;
+      try {
+        imdbResult = await this._imdbTitle(seed);
+      } catch (error) {
+        console.warn(`IMDb lookup failed for ${seed.title}:`, error);
+      }
 
-      const remoteSummary =
-        this._stripRemoteHtml(page.excerpt) ||
-        this._stripRemoteHtml(page.description);
+      try {
+        wikiResult = await this._wikiInformation(seed);
+      } catch (error) {
+        console.warn(`Wikipedia information failed for ${seed.title}:`, error);
+      }
+
+      const imdbPoster = this._imdbPoster(imdbResult);
+      const imdbActors = String(imdbResult?.s || "")
+        .split(",")
+        .map((actor) => actor.trim())
+        .filter(Boolean)
+        .slice(0, 6);
+
+      const wikiSynopsis = this._stripRemoteHtml(wikiResult?.extract);
+      const imdbYear = Number(imdbResult?.y);
+      const currentPoster = String(seed.poster || "");
 
       return {
         ...seed,
-        poster: poster || seed.poster,
-        synopsis: remoteSummary && remoteSummary.length > 80
-          ? remoteSummary
-          : seed.synopsis,
-        sourceUrl: page.key
-          ? `https://en.wikipedia.org/wiki/${encodeURIComponent(page.key)}`
-          : "",
+        poster:
+          imdbPoster ||
+          currentPoster ||
+          makeCustomPoster(seed.title, seed.type),
+        releaseDate:
+          seed.releaseDate && seed.releaseDate !== "Not listed"
+            ? seed.releaseDate
+            : (Number.isFinite(imdbYear) ? String(imdbYear) : "Not listed"),
+        duration: seed.duration || "Not listed",
+        actors:
+          Array.isArray(seed.actors) && seed.actors.length
+            ? seed.actors
+            : imdbActors,
+        synopsis:
+          seed.synopsis && seed.synopsis !== "Details unavailable."
+            ? seed.synopsis
+            : (
+              wikiSynopsis && wikiSynopsis.length > 80
+                ? wikiSynopsis
+                : "A hand-picked recommendation from our expanded movie and show library."
+            ),
+        imdbId: imdbResult?.id || seed.imdbId || "",
+        sourceUrl:
+          imdbResult?.id
+            ? `https://www.imdb.com/title/${imdbResult.id}/`
+            : seed.sourceUrl || "",
         hydrated: true,
         needsHydration: false,
-        posterStatus: poster ? "remote" : "fallback"
+        posterStatus: imdbPoster ? "remote" : "fallback"
       };
     },
 
@@ -5495,27 +5687,25 @@ const screenDiary = (() => {
             const seed = seeds[index];
 
             try {
-              const hydrated = seed.type === "Series"
-                ? await this._hydrateSeriesSeed(seed)
-                : await this._hydrateMovieSeed(seed);
-
-              hydratedMap.set(seed.id, hydrated);
+              hydratedMap.set(seed.id, await this._hydrateSingleSeed(seed));
             } catch (error) {
-              console.warn(`Could not load a real poster for ${seed.title}:`, error);
+              console.warn(`Could not load ${seed.title}:`, error);
               hydratedMap.set(seed.id, {
                 ...seed,
+                poster: seed.poster || makeCustomPoster(seed.title, seed.type),
                 hydrated: true,
                 needsHydration: false,
                 posterStatus: "fallback",
                 releaseDate: seed.releaseDate || "Not listed",
                 duration: seed.duration || "Not listed",
                 actors: Array.isArray(seed.actors) ? seed.actors : [],
-                synopsis: seed.synopsis || "Details unavailable."
+                synopsis:
+                  seed.synopsis ||
+                  "A hand-picked recommendation from our expanded movie and show library."
               });
             }
 
-            // Avoid hammering a public endpoint with dozens of simultaneous calls.
-            await new Promise((resolve) => window.setTimeout(resolve, 180));
+            await new Promise((resolve) => window.setTimeout(resolve, 100));
           }
         })
       );
@@ -5527,21 +5717,26 @@ const screenDiary = (() => {
       if (this._hydratingLibrary || !this._state) return;
 
       const shouldHydrate = (item) =>
-        item && (
+        item &&
+        (
           item.needsHydration ||
-          (force && (
-            item.posterStatus === "fallback" ||
-            String(item.poster || "").startsWith("data:image/")
-          ))
+          (
+            force &&
+            (
+              item.posterStatus === "fallback" ||
+              !item.posterStatus ||
+              String(item.poster || "").startsWith("data:image/")
+            )
+          )
         );
 
       const watchedSeeds = WATCHED_STARTER
         .filter(shouldHydrate)
-        .map((item) => force ? { ...item, needsHydration: true } : item);
+        .map((item) => (force ? { ...item, needsHydration: true } : item));
 
       const queueSeeds = (this._state.queue || [])
         .filter(shouldHydrate)
-        .map((item) => force ? { ...item, needsHydration: true } : item);
+        .map((item) => (force ? { ...item, needsHydration: true } : item));
 
       if (!watchedSeeds.length && !queueSeeds.length) {
         this._state.message = "Every available poster has already been checked.";
@@ -5550,33 +5745,40 @@ const screenDiary = (() => {
       }
 
       this._hydratingLibrary = true;
-      this._state.message = "Loading real posters in the background…";
+      this._state.message = "Loading real posters from IMDb in the background…";
       this._render();
 
       try {
-        const hydrated = await this._hydrateSeedItems([...watchedSeeds, ...queueSeeds]);
+        const hydrated = await this._hydrateSeedItems([
+          ...watchedSeeds,
+          ...queueSeeds
+        ]);
 
         watchedSeeds.forEach((seed) => {
           const item = hydrated.get(seed.id);
-          if (item) {
-            const target = WATCHED_STARTER.find((entry) => entry.id === seed.id);
-            if (target) Object.assign(target, item);
-          }
+          if (!item) return;
+
+          const target = WATCHED_STARTER.find((entry) => entry.id === seed.id);
+          if (target) Object.assign(target, item);
         });
 
         this._state.queue = (this._state.queue || []).map((seed) => {
           const item = hydrated.get(seed.id);
-          return item ? { ...seed, ...item, queueId: seed.queueId } : seed;
+          return item
+            ? { ...seed, ...item, queueId: seed.queueId }
+            : seed;
         });
 
-        const loadedCount = [...hydrated.values()]
-          .filter((item) => item.posterStatus === "remote")
-          .length;
-        const fallbackCount = hydrated.size - loadedCount;
+        const realPosterCount = [...hydrated.values()].filter(
+          (item) => item.posterStatus === "remote"
+        ).length;
+        const fallbackCount = hydrated.size - realPosterCount;
 
         this._state.message = fallbackCount
-          ? `${loadedCount} real posters loaded. ${fallbackCount} title card${fallbackCount === 1 ? "" : "s"} remain where the source had no usable poster.`
-          : `${loadedCount} real posters and their information are ready ♥`;
+          ? `${realPosterCount} real posters loaded. ${fallbackCount} designed title card${
+              fallbackCount === 1 ? "" : "s"
+            } remain where no poster result was available.`
+          : `${realPosterCount} real posters and all available information are ready ♥`;
 
         this._save();
         this._render();
@@ -6006,7 +6208,7 @@ const screenDiary = (() => {
         releaseDate: "Not listed",
         duration: "Not listed",
         actors: [],
-        synopsis: "Finding the real poster and details…"
+        synopsis: "Finding the IMDb poster, cast, year, and details…"
       };
       this._state.message = `Finding ${choice.title} and its poster…`;
       this._render();
@@ -6021,7 +6223,7 @@ const screenDiary = (() => {
           releaseDate: "Not listed",
           duration: "Not listed",
           actors: [],
-          synopsis: "The online details could not be loaded right now."
+          synopsis: "The poster service could not be reached. Try Suggest another again."
         };
         this._state.aiLoading = false;
         this._state.message = `${choice.title} is the ${choice.type.toLowerCase()} pick for tonight ✨`;
@@ -6031,7 +6233,7 @@ const screenDiary = (() => {
         if (requestId !== this._aiRequestId) return;
         console.error("AI recommendation hydration failed:", error);
         this._state.aiLoading = false;
-        this._state.message = "The suggestion loaded, but its online poster/details could not be reached.";
+        this._state.message = "The suggestion loaded, but the poster service could not be reached. Try again.";
         this._render();
       }
     },
@@ -6472,7 +6674,7 @@ const screenDiary = (() => {
           </div>
           <div class="clean-search-heading-side">
             <span>Use online search—or Google it and paste the details yourself</span>
-            <button type="button" data-retry-posters>Retry real posters</button>
+            <button type="button" data-retry-posters>Reload IMDb posters</button>
           </div>
         </div>
 
